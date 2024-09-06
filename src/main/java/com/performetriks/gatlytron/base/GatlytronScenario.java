@@ -1,4 +1,4 @@
-package com.performetriks.gatlytron.utils;
+package com.performetriks.gatlytron.base;
 
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.PopulationBuilder;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
 
-public class GatlingBaseScenario {
+public class GatlytronScenario {
 	private String scenarioName;
 	// set default to not be null
 	private ArrayList<FeederBuilder<?>> feederBuilderList = new ArrayList<>();
@@ -22,7 +22,7 @@ public class GatlingBaseScenario {
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
-	public GatlingBaseScenario(String scenarioName) {
+	public GatlytronScenario(String scenarioName) {
 		this.scenarioName = scenarioName;
 	}
 
@@ -100,7 +100,7 @@ public class GatlingBaseScenario {
 		// -----------------------------------------------
 		// Add debugging data if enabled
 		// -----------------------------------------------
-		GatlingBaseScenario.addDebug(SCENARIO, debug);
+		GatlytronScenario.addDebug(SCENARIO, debug);
 
 		return SCENARIO;
 	}
@@ -130,7 +130,7 @@ public class GatlingBaseScenario {
 		// -----------------------------------------------
 		// Add debugging data if enabled
 		// -----------------------------------------------
-		GatlingBaseScenario.addDebug(SCENARIO, debug);
+		GatlytronScenario.addDebug(SCENARIO, debug);
 
 		return SCENARIO.injectOpen(atOnceUsers(1));
 	}
@@ -159,7 +159,7 @@ public class GatlingBaseScenario {
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
-	public GatlingBaseScenario scenarioName(String scenarioName) {
+	public GatlytronScenario scenarioName(String scenarioName) {
 		this.scenarioName = scenarioName;
 		return this;
 	}
@@ -174,7 +174,7 @@ public class GatlingBaseScenario {
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
-	public GatlingBaseScenario feederBuilder(FeederBuilder<?> feederBuilder) {
+	public GatlytronScenario feederBuilder(FeederBuilder<?> feederBuilder) {
 		this.feederBuilderList.add(feederBuilder);
 		return this;
 	}
@@ -189,7 +189,7 @@ public class GatlingBaseScenario {
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
-	public GatlingBaseScenario scenarioSteps(ChainBuilder scenarioSteps) {
+	public GatlytronScenario scenarioSteps(ChainBuilder scenarioSteps) {
 		this.scenarioSteps = scenarioSteps;
 		return this;
 	}
@@ -204,7 +204,7 @@ public class GatlingBaseScenario {
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
-	public GatlingBaseScenario debug(boolean debug) {
+	public GatlytronScenario debug(boolean debug) {
 		this.debug = debug;
 		return this;
 	}

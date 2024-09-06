@@ -1,5 +1,8 @@
 package com.performetriks.gatlytron.test.simulation;
  
+import java.time.Duration;
+
+import com.performetriks.gatlytron.reporting.GraphiteReceiver;
 import com.performetriks.gatlytron.test.scenario.SampleScenario;
 import com.performetriks.gatlytron.test.settings.TestSettings;
 
@@ -8,7 +11,14 @@ import io.gatling.javaapi.core.Simulation;
  
 public class SimulationCheckDebug extends Simulation {
  
+    private static final Duration TEST_DURATION = Duration.ofSeconds(30);
+
     {
+    	
+    	//System.setProperty("gatling.graphite.host", "localhost");
+    	//System.setProperty("gatling.graphite.port", "2003");
+    	GraphiteReceiver.start(2003);
+    	
         //======================================================================
         // Use this simulation class for testing and debugging.
         // This is done to have an easy way to develop while not messing
@@ -16,6 +26,12 @@ public class SimulationCheckDebug extends Simulation {
         // (I hope I won't regret writting this)
         //======================================================================
        
+//    	setUp(
+//                new SampleScenario().buildStandardLoad(10, 600, 0, 2)
+//           ).protocols(TestSettings.getProtocol())
+//            .maxDuration(TEST_DURATION)
+//           ;
+    	
         setUp(
             new SampleScenario().buildRunOnce()
         ).protocols(TestSettings.getProtocol())

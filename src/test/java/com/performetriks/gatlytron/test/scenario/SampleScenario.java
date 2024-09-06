@@ -1,15 +1,15 @@
 package com.performetriks.gatlytron.test.scenario;
  
+import com.performetriks.gatlytron.base.GatlytronScenario;
 import com.performetriks.gatlytron.test.settings.TestSettings;
-import com.performetriks.gatlytron.utils.GatlingBaseScenario;
- 
+
 import java.util.HashMap;
 import java.util.Map;
  
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
  
-public class SampleScenario extends GatlingBaseScenario {
+public class SampleScenario extends GatlytronScenario {
   
     public static final String SCENARIO_NAME = "API.callInterface";
     public static final String URL_API = TestSettings.URL_BASE + "";
