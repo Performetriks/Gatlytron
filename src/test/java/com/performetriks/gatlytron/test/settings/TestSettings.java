@@ -9,7 +9,7 @@ public class TestSettings {
 
 	public static final boolean DEBUG = false;
 
-	public static final String URL_BASE = "https://www.nasa.gov";
+	public static final String URL_BASE = "https://www.google.com";
 	
 	public static FeederBuilder.Batchable<String> dataFeeder = csv("testdata.csv").circular();
 

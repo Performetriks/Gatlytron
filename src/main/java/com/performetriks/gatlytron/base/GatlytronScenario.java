@@ -11,6 +11,14 @@ import java.util.ArrayList;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
 
+/***************************************************************************
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
 public class GatlytronScenario {
 	private String scenarioName;
 	// set default to not be null

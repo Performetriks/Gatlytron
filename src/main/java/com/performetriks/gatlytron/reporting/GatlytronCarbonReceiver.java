@@ -6,8 +6,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedHashMap;
 
-public class GraphiteReceiver {
+/***************************************************************************
+ * This class is used to start a thread that listens on a port for data
+ * sent in Carbon protocol format by gatling. (https://graphite.readthedocs.io/en/latest/feeding-carbon.html)
+ * 
+ * Currently supported format: <metric path> <metric value> <metric timestamp>
+ * Unsupported format: [(path, (timestamp, value)), ...]
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
+public class GatlytronCarbonReceiver {
 	
 	private static ServerSocket serverSocket;
     private static Socket clientSocket;
@@ -16,8 +30,8 @@ public class GraphiteReceiver {
     
     private static int sleepInterval = 100;
     /***************************************************************************
-    *
-    ***************************************************************************/
+     *
+     ***************************************************************************/
     public static void start(int port) {
     	
 	        new Thread(createRunnable(port)).start();
@@ -47,7 +61,9 @@ public class GraphiteReceiver {
 		    		e.printStackTrace();
 		    	}
 		        
+		    	LinkedHashMap<GatlytronCarbonRecord,GatlytronCarbonRecord> existingRecords = new LinkedHashMap<>();
 				// TODO Auto-generated method stub
+		    	String lastTime = null;
 				while (true) {
 
 					//-------------------------------
@@ -63,7 +79,22 @@ public class GraphiteReceiver {
 						&& !clientSocket.isClosed()
 						&& !serverSocket.isClosed()) {
 							while( (graphiteMessage = in.readLine()) != null) {
-								System.out.println("graphiteMessage: "+graphiteMessage);
+								GatlytronCarbonRecord record = new GatlytronCarbonRecord(graphiteMessage, existingRecords);
+								
+								if(lastTime == null) {
+									lastTime = record.time();
+								}else if( !lastTime.equals(record.time()) ) {
+									lastTime = record.time();
+									
+									existingRecords.remove(record); // remove as timestamp has changed
+									System.out.println("===== start =====");
+									for(GatlytronCarbonRecord printThis : existingRecords.values()) {
+										System.out.println(printThis.toJsonString());
+									}
+									
+									existingRecords = new LinkedHashMap<>();
+									existingRecords.put(record, record); // put into new collection
+								}
 							}
 						}
 						
