@@ -26,7 +26,7 @@ public class TestSettings {
 	 ****************************************************************************/
 	public static void commonInitialization() {
 		
-		// You can add sysem properties if y
+		// You can add system properties if you don't want to to use gatling.conf
     	// System.setProperty("gatling.graphite.host", "localhost");
     	// System.setProperty("gatling.graphite.port", "2003");
 		// System.setProperty("gatling.graphite.writePeriod", "5");
@@ -35,6 +35,7 @@ public class TestSettings {
     	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	Gatlytron.addReporter(new GatlytronReporterSysout());
+    	
     	Gatlytron.addReporter(
     			new GatlytronReporterDatabasePostGres(
 	    			"localhost"

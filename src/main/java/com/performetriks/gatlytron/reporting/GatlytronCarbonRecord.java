@@ -186,7 +186,10 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	private void addValue(String type, String metric, String value) {
 		
 		int parsedInt = Integer.parseInt(value);
-		String finalMetric = metric.replace("percentiles", "p");  // make it shorter to reduce footprint
+		String finalMetric = metric
+								.replace("percentiles", "p")
+								.replace("stdDev", "stdev")
+								;  // make it shorter to reduce footprint
 
 		values.put(type +"_"+finalMetric, parsedInt);
 

@@ -52,3 +52,43 @@ gatling {
   ...
 }
 ```
+
+# Reporting to Databases
+There are Gatlytron reporters which allow you to report metrics to a database.
+For this to work you will need to include the respective driver dependency. Following an example for PostGres SQL:
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.7.4</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+Now you can add the Reporter for the database. The reporter will create the table with the given name if not exists:
+
+```java
+{ 	
+	Gatlytron.enableGraphiteReceiver(2003);
+	Gatlytron.addReporter(
+    			new GatlytronReporterDatabasePostGres(
+	    			"localhost"
+	    			, 5432
+	    			, "postgres"  // database name
+	    			, "gatlytron" // table name
+	    			, "dbuser"
+	    			, "dbpassowrd"  
+    			)
+    		);
+    	
+	setUp(
+			new SampleScenario().buildStandardLoad(10, 600, 0, 2)
+	   ).protocols(TestSettings.getProtocol())
+		.maxDuration(TEST_DURATION)
+	   ;
+    	
+}
+
+```
