@@ -5,6 +5,11 @@ import io.gatling.javaapi.http.*;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 
+import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
+import com.performetriks.gatlytron.reporting.GatlytronReporterJsonFile;
+import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
+
 public class TestSettings {
 
 	public static final boolean DEBUG = false;
@@ -15,7 +20,24 @@ public class TestSettings {
 
 	public static FeederBuilder.Batchable<String> getDataFeeder() { return dataFeeder; }
 
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	public static void commonInitialization() {
+		
+    	//System.setProperty("gatling.graphite.host", "localhost");
+    	//System.setProperty("gatling.graphite.port", "2003");
+		
+    	Gatlytron.enableGraphiteReceiver(2003);
+    	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
+    	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
+    	Gatlytron.addReporter(new GatlytronReporterSysout());
+    	
+	}
 	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
 	public static HttpProtocolBuilder getProtocol() { 
 		HttpProtocolBuilder httpProtocol= http
 				.baseUrl(URL_BASE)

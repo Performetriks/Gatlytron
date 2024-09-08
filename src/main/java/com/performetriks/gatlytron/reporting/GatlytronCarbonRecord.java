@@ -46,7 +46,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, count_ok, count_ko, count_all, min_o
 	private HashMap<String, Integer> values = new HashMap<>();
 	
 	// value Names consist of type + "_" + metric
-	private String[] valueNames = new String[] {
+	private static String[] valueNames = new String[] {
 		  "users_active"
 		, "users_waiting"
 		, "users_done"
@@ -82,41 +82,16 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, count_ok, count_ko, count_all, min_o
 		, "all_p99"
 	};
 	
+	private static String csvHeaderTemplate = "time,simulation,request,user_group";
 	
-//	private Integer users_active = null;
-//	private Integer users_waiting = null;
-//	private Integer users_done = null;
-//	
-//	private Integer ok_count = null;
-//	private Integer ok_min = null;
-//	private Integer ok_max = null;
-//	private Integer ok_mean = null;
-//	private Integer ok_stdev = null;
-//	private Integer ok_perc50 = null;
-//	private Integer ok_perc75 = null;
-//	private Integer ok_perc95 = null;
-//	private Integer ok_perc99 = null;
-//	
-//	private Integer ko_count = null;
-//	private Integer ko_min = null;
-//	private Integer ko_max = null;
-//	private Integer ko_mean = null;
-//	private Integer ko_stdev = null;
-//	private Integer ko_perc50 = null;
-//	private Integer ko_perc75 = null;
-//	private Integer ko_perc95 = null;
-//	private Integer ko_perc99 = null;
-//	
-//	private Integer all_count = null;
-//	private Integer all_min = null;
-//	private Integer all_max = null;
-//	private Integer all_mean = null;
-//	private Integer all_stdev = null;
-//	private Integer all_perc50 = null;
-//	private Integer all_perc75 = null;
-//	private Integer all_perc95 = null;
-//	private Integer all_perc99 = null;
-
+	static {
+		
+		for(String name : valueNames) {
+			csvHeaderTemplate += ","+name;
+		}
+		csvHeaderTemplate += "\r\n";
+		
+	}
 
 	/***********************************************************************
 	 * Parse the Gatling Carbon Message
@@ -179,6 +154,37 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, count_ok, count_ko, count_all, min_o
 		String finalMetric = metric.replace("percentiles", "p");  // make it shorter to reduce footprint
 
 		values.put(type +"_"+finalMetric, parsedInt);
+
+	}
+	
+	
+	
+	/***********************************************************************
+	 * Returns a CSV header
+	 ***********************************************************************/
+	public static String getCSVHeader(String separator) {
+		return csvHeaderTemplate.replace(",", separator);
+	}
+	
+	/***********************************************************************
+	 * Returns the record as a CSV data record.
+	 * Will not contain the header, use getCSVHeader() for that.
+	 ***********************************************************************/
+	public String toCSV(String separator) {
+		
+		String csv = time 
+					+ separator + simulation 
+					+ separator + request 
+					+ separator + user_group
+					;
+				
+		for(String name : valueNames) {
+			Integer val = values.get(name);
+			val = (val == null) ? 0 : val;
+			csv += separator + val; 
+		}
+		
+		return csv;
 
 	}
 	
