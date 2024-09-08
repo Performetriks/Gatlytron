@@ -7,6 +7,7 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
+import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
 import com.performetriks.gatlytron.reporting.GatlytronReporterJsonFile;
 import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
 
@@ -34,6 +35,17 @@ public class TestSettings {
     	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	Gatlytron.addReporter(new GatlytronReporterSysout());
+    	Gatlytron.addReporter(
+    			new GatlytronReporterDatabasePostGres(
+	    			"localhost"
+	    			, 5432
+	    			, "postgres"
+	    			, "gatlytron"
+	    			, "postgres"
+	    			, "postgres"
+    			)
+    		);
+    			
     	
 	}
 	

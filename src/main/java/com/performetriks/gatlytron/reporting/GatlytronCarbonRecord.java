@@ -1,5 +1,6 @@
 package com.performetriks.gatlytron.reporting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
+import com.performetriks.gatlytron.database.DBInterface;
 
 /***************************************************************************
  * 
@@ -88,13 +90,41 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	};
 	
 	private static String csvHeaderTemplate = "time,simulation,request,user_group";
+	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
+			+ "		  time BIGINT,\r\n"
+			+ "		  simulation VARCHAR(4096),\r\n"
+			+ "		  request VARCHAR(4096),\r\n"
+			+ "		  user_group VARCHAR(4096)"
+			;
 	
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,simulation,request,user_group";
+
 	static {
 		
+		//-----------------------------------------
+		// CSV Template
 		for(String name : valueNames) {
 			csvHeaderTemplate += ","+name;
 		}
 		csvHeaderTemplate += "\r\n";
+		
+		//-----------------------------------------
+		// SQL Create Table Template
+		for(String name : valueNames) {
+			sqlCreateTableTemplate += ",\r\n		  "+name+" BIGINT";
+		}
+		sqlCreateTableTemplate += ");";
+
+		//-----------------------------------------
+		// SQL Insert Into Template
+		String sqlInsertValues = "VALUES (?, ?, ?, ?";
+		for(String name : valueNames) {
+			sqlInsertIntoTemplate += ","+name;
+			sqlInsertValues += ", ?";
+		}
+		sqlInsertValues += ")";
+		sqlInsertIntoTemplate += ") " + sqlInsertValues;
+		
 		
 	}
 
@@ -220,6 +250,40 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		}
 		
 		return object;
+
+	}
+	
+	/***********************************************************************
+	 * Returns a CSV header
+	 ***********************************************************************/
+	public static String getSQLCreateTableTemplate(String tableName) {
+		return sqlCreateTableTemplate.replace("{tablename}", tableName);
+	}
+	
+	/***********************************************************************
+	 * Returns an insert statement 
+	 ***********************************************************************/
+	public boolean insertIntoDatabase(DBInterface db, String tableName) {
+
+		if(db == null || tableName == null) { return false; }
+		
+		String insertSQL = sqlInsertIntoTemplate.replace("{tablename}", tableName);
+	
+		ArrayList<Object> valueList = new ArrayList<>();
+		
+		valueList.add(Integer.parseInt(time));
+		valueList.add(simulation);
+		valueList.add(request);
+		valueList.add(user_group);
+		
+		for(String name : valueNames) {
+			Integer val = values.get(name);
+			val = (val == null) ? 0 : val;
+			valueList.add(val);
+		}
+		
+		return db.preparedExecute(insertSQL, valueList.toArray());
+		
 
 	}
 	

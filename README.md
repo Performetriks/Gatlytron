@@ -1,9 +1,10 @@
 
 # Gatlytron
 
-Gatlytron is a little framework that assists you in creating 
+Gatlytron is a little framework that assists you in creating Gatling tests and provides some additional features like reporting.
 
-# Running Specific simulations
+
+# Running Specific Simulations
 To run a specific simulation define the parameter "-Dgatling.simulationClass":
 
 ```
