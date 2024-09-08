@@ -4,13 +4,27 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/***************************************************************************
+ * This reporter writes report data to a CSV file.
+ * You might choose the separator for your CSV data so that you can properly delimit your data.
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
 public class GatlytronReporterCSV implements GatlytronReporter {
 
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterCSV.class);
+	
 	private String separator;
 	private String filepath;
 	private Path path;
@@ -34,8 +48,7 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 					);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while initializing CSV file.", e);
 		}
 		
 	}
@@ -57,15 +70,13 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 			
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while writing CSV data.", e);
 		}finally {
 			if(writer != null) {
 				try {
 					writer.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Error while closing CSV file.", e);
 				}
 			}
 		}

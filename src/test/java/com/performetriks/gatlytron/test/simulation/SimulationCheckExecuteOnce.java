@@ -7,8 +7,10 @@ import io.gatling.javaapi.core.Simulation;
  
  
 public class SimulationCheckExecuteOnce extends Simulation {
- 
+	
     {
+    	TestSettings.commonInitialization();
+    	
         //======================================================================
         // Runs every script once, useful to check if all the scripts are working.
         //======================================================================

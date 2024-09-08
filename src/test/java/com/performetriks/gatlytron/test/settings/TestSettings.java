@@ -25,8 +25,10 @@ public class TestSettings {
 	 ****************************************************************************/
 	public static void commonInitialization() {
 		
-    	//System.setProperty("gatling.graphite.host", "localhost");
-    	//System.setProperty("gatling.graphite.port", "2003");
+		// You can add sysem properties if y
+    	// System.setProperty("gatling.graphite.host", "localhost");
+    	// System.setProperty("gatling.graphite.port", "2003");
+		// System.setProperty("gatling.graphite.writePeriod", "5");
 		
     	Gatlytron.enableGraphiteReceiver(2003);
     	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));

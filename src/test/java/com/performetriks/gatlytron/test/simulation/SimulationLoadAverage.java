@@ -13,9 +13,10 @@ public class SimulationLoadAverage extends Simulation {
     private static final Duration TEST_DURATION = Duration.ofMinutes(3);
  
     {
+    	TestSettings.commonInitialization();
+    	
         //======================================================================
-        // Average Load executed in FAT environment, simulates production-like
-        // load scaled to the FAT environment (33% of PROD size)
+        // Average Load Example Scenario
         //======================================================================
         setUp(
              new SampleScenario().buildStandardLoad(10, 600, 0, 2)

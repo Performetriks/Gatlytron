@@ -2,10 +2,6 @@ package com.performetriks.gatlytron.test.simulation;
  
 import java.time.Duration;
 
-import com.performetriks.gatlytron.base.Gatlytron;
-import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
-import com.performetriks.gatlytron.reporting.GatlytronReporterJsonFile;
-import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
 import com.performetriks.gatlytron.test.scenario.SampleScenario;
 import com.performetriks.gatlytron.test.settings.TestSettings;
 
@@ -19,7 +15,6 @@ public class SimulationCheckDebug extends Simulation {
     {
     	
     	TestSettings.commonInitialization();
-    	    	
     	
         //======================================================================
         // Use this simulation class for testing and debugging.

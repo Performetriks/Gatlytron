@@ -9,6 +9,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.performetriks.gatlytron.base.Gatlytron;
 
 /***************************************************************************
@@ -26,6 +29,8 @@ import com.performetriks.gatlytron.base.Gatlytron;
  ***************************************************************************/
 public class GatlytronCarbonReceiver {
 	
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronCarbonReceiver.class);
+	
 	private static ServerSocket serverSocket;
     private static Socket clientSocket;
     private static PrintWriter out;
@@ -37,8 +42,7 @@ public class GatlytronCarbonReceiver {
      ***************************************************************************/
     public static void start(int port) {
     	
-	        new Thread(createRunnable(port)).start();
-
+	    new Thread(createRunnable(port)).start();
     	
     }
     
@@ -60,12 +64,10 @@ public class GatlytronCarbonReceiver {
 			        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			        
 		    	}catch(IOException e) {
-		    		// TODO Auto-generated catch block
-		    		e.printStackTrace();
+		    		logger.error("Error while initializing socket connection on port "+port, e);
 		    	}
 		        
 		    	LinkedHashMap<GatlytronCarbonRecord,GatlytronCarbonRecord> existingRecords = new LinkedHashMap<>();
-				// TODO Auto-generated method stub
 		    	String lastTime = null;
 				while (true) {
 
@@ -93,7 +95,6 @@ public class GatlytronCarbonReceiver {
 									
 									
 									for (GatlytronReporter reporter : Gatlytron.getReporterList()){
-										System.out.println("");
 										ArrayList<GatlytronCarbonRecord> clone = new ArrayList<>();
 										clone.addAll(existingRecords.values());
 									    reporter.report(clone);
@@ -111,12 +112,12 @@ public class GatlytronCarbonReceiver {
 						try {
 							Thread.sleep(sleepInterval);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							logger.error("Thread interrupted while waiting for carbon protocol data.", e);
 							Thread.currentThread().interrupt();
 						}
 						
 					} catch (IOException e) {
-						e.printStackTrace();
+						logger.error("Error while reading carbon protocol data.", e);
 					}
 				}
 			}
@@ -135,8 +136,7 @@ public class GatlytronCarbonReceiver {
 	        clientSocket.close();
 	        serverSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while closing socket connection.", e);
 		}
         
     }

@@ -7,8 +7,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/***************************************************************************
+ * This reporter writes json data to a file. the file will be written as
+ * one json object per line. Every line is a valid JSON string.
+ * The whole file itself is not a valid JSON string as it is not an array.
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
 public class GatlytronReporterJsonFile implements GatlytronReporter {
 
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterJsonFile.class);
+	
 	String filepath;
 	
 	/****************************************************************************
@@ -22,8 +38,7 @@ public class GatlytronReporterJsonFile implements GatlytronReporter {
 			Files.deleteIfExists(Path.of(filepath));
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while deleting JSON file.", e);
 		}
 		
 	}
@@ -45,15 +60,13 @@ public class GatlytronReporterJsonFile implements GatlytronReporter {
 			
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error while writing JSON data to file.", e);
 		}finally {
 			if(writer != null) {
 				try {
 					writer.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Error while closing JSON file.", e);
 				}
 			}
 		}

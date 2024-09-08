@@ -3,6 +3,9 @@ package com.performetriks.gatlytron.reporting;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonObject;
 
 /***************************************************************************
@@ -35,9 +38,11 @@ gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles95 273 1725627230
 gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles99 273 1725627230
 
 Target tabular format:
-TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, count_ok, count_ko, count_all, min_ok, min_ko, min_all [...], active, waiting, done
+TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_done, ok_count, ok_min ...
 
  */
+	
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronCarbonRecord.class);
 	
 	private String time = null;
 	private String simulation = null;
@@ -99,12 +104,12 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, count_ok, count_ko, count_all, min_o
 	public GatlytronCarbonRecord(String carbonMessage, LinkedHashMap<GatlytronCarbonRecord, GatlytronCarbonRecord> existingRecords) {
 		
 		if(carbonMessage != null) {
-			
+
 			//-----------------------------------
 			// Parse Message
 			String[] splitted = carbonMessage.split("\\.");
 			
-			if(splitted.length != 5) { System.out.println("!!!Unexpected message format: "+carbonMessage); return; }
+			if(splitted.length != 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
 			
 			simulation = splitted[1];
 			String type = splitted[3];  
