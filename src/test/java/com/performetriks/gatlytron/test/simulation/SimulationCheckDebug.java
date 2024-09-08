@@ -3,6 +3,8 @@ package com.performetriks.gatlytron.test.simulation;
 import java.time.Duration;
 
 import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.reporting.GatlytronReporterJsonFile;
+import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
 import com.performetriks.gatlytron.test.scenario.SampleScenario;
 import com.performetriks.gatlytron.test.settings.TestSettings;
 
@@ -16,6 +18,9 @@ public class SimulationCheckDebug extends Simulation {
     {
     	
     	Gatlytron.enableGraphiteReceiver(2003);
+    	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
+    	Gatlytron.addReporter(new GatlytronReporterSysout());
+    	
     	//System.setProperty("gatling.graphite.host", "localhost");
     	//System.setProperty("gatling.graphite.port", "2003");
     	

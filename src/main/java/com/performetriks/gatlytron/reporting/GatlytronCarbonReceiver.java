@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+
+import com.performetriks.gatlytron.base.Gatlytron;
 
 /***************************************************************************
  * This class is used to start a thread that listens on a port for data
@@ -87,10 +90,15 @@ public class GatlytronCarbonReceiver {
 									lastTime = record.time();
 									
 									existingRecords.remove(record); // remove as timestamp has changed
-									System.out.println("===== start =====");
-									for(GatlytronCarbonRecord printThis : existingRecords.values()) {
-										System.out.println(printThis.toJsonString());
+									
+									
+									for (GatlytronReporter reporter : Gatlytron.getReporterList()){
+										System.out.println("");
+										ArrayList<GatlytronCarbonRecord> clone = new ArrayList<>();
+										clone.addAll(existingRecords.values());
+									    reporter.report(clone);
 									}
+
 									
 									existingRecords = new LinkedHashMap<>();
 									existingRecords.put(record, record); // put into new collection
