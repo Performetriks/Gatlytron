@@ -26,5 +26,13 @@ public class GatlytronReporterSysout implements GatlytronReporter {
 		}
 
 	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	@Override
+	public void terminate() {
+		// nothing to do
+	}
 
 }

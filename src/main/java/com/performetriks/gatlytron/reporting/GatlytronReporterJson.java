@@ -21,16 +21,16 @@ import org.slf4j.LoggerFactory;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronReporterJsonFile implements GatlytronReporter {
+public class GatlytronReporterJson implements GatlytronReporter {
 
-	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterJsonFile.class);
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterJson.class);
 	
 	String filepath;
 	
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	public GatlytronReporterJsonFile(String filepath) {
+	public GatlytronReporterJson(String filepath) {
 		
 		this.filepath = filepath;
 		try {
@@ -71,6 +71,14 @@ public class GatlytronReporterJsonFile implements GatlytronReporter {
 			}
 		}
 			
+	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	@Override
+	public void terminate() {
+		// nothing to do
 	}
 
 	

@@ -64,5 +64,13 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporter {
 		}
 
 	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	@Override
+	public void terminate() {
+		// nothing to do
+	}
 
 }

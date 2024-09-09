@@ -8,10 +8,10 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
-import com.performetriks.gatlytron.reporting.GatlytronReporterJsonFile;
+import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
 import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
 
-public class TestSettings {
+public class TestGlobals {
 
 	public static final boolean DEBUG = false;
 
@@ -29,16 +29,16 @@ public class TestSettings {
 		// You can add system properties if you don't want to to use gatling.conf
     	// System.setProperty("gatling.graphite.host", "localhost");
     	// System.setProperty("gatling.graphite.port", "2003");
-		// System.setProperty("gatling.graphite.writePeriod", "5");
+		// System.setProperty("gatling.graphite.writePeriod", "15");
 		
     	Gatlytron.enableGraphiteReceiver(2003);
-    	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
+    	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	Gatlytron.addReporter(new GatlytronReporterSysout());
     	
     	Gatlytron.addReporter(
     			new GatlytronReporterDatabasePostGres(
-	    			"localhost"
+	    			 "localhost"
 	    			, 5432
 	    			, "postgres"
 	    			, "gatlytron"
@@ -46,8 +46,14 @@ public class TestSettings {
 	    			, "postgres"
     			)
     		);
-    			
-    	
+
+	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	public static void commonTermination() {
+		Gatlytron.terminate();
 	}
 	
 	/****************************************************************************

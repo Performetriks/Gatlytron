@@ -42,6 +42,20 @@ public class Gatlytron {
 		GatlytronCarbonReceiver.start(port);
 	}
 	
+	/******************************************************************
+	 * Returns the list of added reporters.
+	 * 
+	 ******************************************************************/
+	@SuppressWarnings("unchecked")
+	public static void terminate() {
+		
+		GatlytronCarbonReceiver.terminate();
+		
+		for(GatlytronReporter reporter : reporterList) {
+			reporter.terminate();
+		}
+	}
+	
 	
 	
 	

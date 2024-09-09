@@ -15,4 +15,6 @@ public interface GatlytronReporter {
 
 	public void report(ArrayList<GatlytronCarbonRecord> records);
 	
+	public void terminate();
+	
 }

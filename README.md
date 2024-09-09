@@ -2,6 +2,7 @@
 # Gatlytron
 
 Gatlytron is a little framework that assists you in creating Gatling tests and provides some additional features like reporting.
+Example code that uses gatling can be found in this repository under `src/test/java/` in the package `com.performetriks.gatlytron.test`.
 
 
 # Running Specific Simulations
