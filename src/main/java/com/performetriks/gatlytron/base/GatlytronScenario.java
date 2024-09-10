@@ -91,7 +91,7 @@ public class GatlytronScenario {
 	 * Builds a scenario using the feeders and scenario Steps. Also adds a debug
 	 * output that will be triggered if debug is set to true.
 	 ***************************************************************************/
-	private ScenarioBuilder buildScenario(int pacingSeconds) {
+	public ScenarioBuilder buildScenario(int pacingSeconds) {
 		// -----------------------------------------------
 		// Add all feeders
 		// -----------------------------------------------

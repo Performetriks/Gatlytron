@@ -28,13 +28,7 @@ public class SimulationCheckDebug extends Simulation {
            ).protocols(TestGlobals.getProtocol())
             .maxDuration(TEST_DURATION)
            ;
-    	
-//        setUp(
-//            new SampleScenario().buildRunOnce()
-//        ).protocols(TestSettings.getProtocol())
-//        ;
- 
- 
+
     }
     
     /********************************************************************

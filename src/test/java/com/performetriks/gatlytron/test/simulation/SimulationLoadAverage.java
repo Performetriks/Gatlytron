@@ -23,5 +23,5 @@ public class SimulationLoadAverage extends Simulation {
         ).protocols(TestGlobals.getProtocol())
          .maxDuration(TEST_DURATION)
         ;
-  }
+	}
 }
