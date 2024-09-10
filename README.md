@@ -75,6 +75,16 @@ To increase performance, the reporting feature will take the carbon metrics and 
 * **ko_count, ko_min, ko_max, ko_mean, ko_stdev, ko_p50, ko_p75, ko_p95, ko_p99:** Fields that countain the metrics for request in status "ko".
 * **all_count, all_min, all_max, all_mean, all_stdev, all_p50, all_p75, all_p95, all_p99:** Fields that countain the metrics for all requests (ok and ko combined).
 
+Here is a JSON example of three records. the first two are user statistic records, the next two are request records:
+
+``` json
+{"time":"1725964648","simulation":"simulationcheckdebug","request":null,"user_group":"myScenario","users_active":2,"users_waiting":0,"users_done":0,"ok_count":0,"ok_min":0,"ok_max":0,"ok_mean":0,"ok_stdev":0,"ok_p50":0,"ok_p75":0,"ok_p95":0,"ok_p99":0,"ko_count":0,"ko_min":0,"ko_max":0,"ko_mean":0,"ko_stdev":0,"ko_p50":0,"ko_p75":0,"ko_p95":0,"ko_p99":0,"all_count":0,"all_min":0,"all_max":0,"all_mean":0,"all_stdev":0,"all_p50":0,"all_p75":0,"all_p95":0,"all_p99":0}
+{"time":"1725964648","simulation":"simulationcheckdebug","request":null,"user_group":"allUsers","users_active":2,"users_waiting":0,"users_done":0,"ok_count":0,"ok_min":0,"ok_max":0,"ok_mean":0,"ok_stdev":0,"ok_p50":0,"ok_p75":0,"ok_p95":0,"ok_p99":0,"ko_count":0,"ko_min":0,"ko_max":0,"ko_mean":0,"ko_stdev":0,"ko_p50":0,"ko_p75":0,"ko_p95":0,"ko_p99":0,"all_count":0,"all_min":0,"all_max":0,"all_mean":0,"all_stdev":0,"all_p50":0,"all_p75":0,"all_p95":0,"all_p99":0}
+{"time":"1725964648","simulation":"simulationcheckdebug","request":"myRequest","user_group":null,"users_active":0,"users_waiting":0,"users_done":0,"ok_count":4,"ok_min":338,"ok_max":373,"ok_mean":357,"ok_stdev":14,"ok_p50":347,"ok_p75":369,"ok_p95":373,"ok_p99":373,"ko_count":0,"ko_min":0,"ko_max":0,"ko_mean":0,"ko_stdev":0,"ko_p50":0,"ko_p75":0,"ko_p95":0,"ko_p99":0,"all_count":4,"all_min":338,"all_max":373,"all_mean":357,"all_stdev":14,"all_p50":347,"all_p75":369,"all_p95":373,"all_p99":373}
+{"time":"1725965555","simulation":"simulationcheckdebug","request":"myFailingRequest","user_group":null,"users_active":0,"users_waiting":0,"users_done":0,"ok_count":0,"ok_min":0,"ok_max":0,"ok_mean":0,"ok_stdev":0,"ok_p50":0,"ok_p75":0,"ok_p95":0,"ok_p99":0,"ko_count":4,"ko_min":119,"ko_max":179,"ko_mean":150,"ko_stdev":26,"ko_p50":130,"ko_p75":173,"ko_p95":179,"ko_p99":179,"all_count":4,"all_min":119,"all_max":179,"all_mean":150,"all_stdev":26,"all_p50":130,"all_p75":173,"all_p95":179,"all_p99":179}
+
+
+```
 
 
 ## Enable Graphite Receiver and Reporting

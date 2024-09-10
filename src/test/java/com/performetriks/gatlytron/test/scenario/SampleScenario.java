@@ -25,7 +25,7 @@ public class SampleScenario extends GatlytronScenario {
             .scenarioSteps(
                 exec(
                 http("callAPI")
-                        .get(URL_API)
+                        .post(URL_API)
                         //.body(ElFileBody("postbody.json")) //.asJson()
                         //.headers(getHeader())
                         //.check(bodyString().saveAs("responseBody"))
