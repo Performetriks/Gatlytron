@@ -345,7 +345,7 @@ public class DBInterface {
 			
 		}
 		
-		logger.trace("sql", sql);
+		logger.trace("SQL Statement: "+sql);
 		return result;
 	}
 	
@@ -400,7 +400,7 @@ public class DBInterface {
 			
 		}
 		
-		logger.trace("sql", sql);
+		logger.trace("SQL Statement: "+sql);
 		return -1;
 	}
 	
@@ -455,7 +455,7 @@ public class DBInterface {
 			
 		}
 		
-		logger.trace("sql", sql);
+		logger.trace("SQL Statement: "+sql);
 		return generatedID;
 	}
 	/********************************************************************************************
@@ -521,7 +521,7 @@ public class DBInterface {
 			}
 		} 
 		
-		logger.trace("sql", sql);
+		logger.trace("SQL Statement: "+sql);
 				 
 		return result;
 	}

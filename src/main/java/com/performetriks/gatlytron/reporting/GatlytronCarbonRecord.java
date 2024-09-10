@@ -1,5 +1,6 @@
 package com.performetriks.gatlytron.reporting;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -50,7 +51,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	private String simulation = null;
 	private String request = null;
 	private String user_group = null;
-	private HashMap<String, Integer> values = new HashMap<>();
+	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
 	// value Names consist of type + "_" + metric
 	private static String[] valueNames = new String[] {
@@ -111,7 +112,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		//-----------------------------------------
 		// SQL Create Table Template
 		for(String name : valueNames) {
-			sqlCreateTableTemplate += ",\r\n		  "+name+" BIGINT";
+			sqlCreateTableTemplate += ",\r\n		  "+name+" DECIMAL(32,3)";
 		}
 		sqlCreateTableTemplate += ");";
 
@@ -137,19 +138,22 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 
 			//-----------------------------------
 			// Parse Message
-			String[] splitted = carbonMessage.split("\\.");
+			String[] splittedRecord = carbonMessage.split(" ");
+			String[] splittedMetricPath = splittedRecord[0].split("\\.");
+			if(splittedMetricPath.length != 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
 			
-			if(splitted.length != 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
-			
-			simulation = splitted[1];
-			String type = splitted[3];  
+			simulation = splittedMetricPath[1];
+			String type = splittedMetricPath[3];  
+			String metric = splittedMetricPath[4];
+			String value = splittedRecord[1];
+			time = splittedRecord[2];
 			
 			switch(type) {
 				
 				case "ok":
 				case "ko":
 				case "all":
-					request = splitted[2];
+					request = splittedMetricPath[2];
 				break;
 					
 				
@@ -159,10 +163,6 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 				break;
 			}
 			
-			String[] metricValueTimestamp = splitted[4].split(" ");
-			String metric = metricValueTimestamp[0];
-			String value = metricValueTimestamp[1];
-			time = metricValueTimestamp[2];
 			
 			//-----------------------------------
 			// Parse Message
@@ -185,7 +185,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	 ***********************************************************************/
 	private void addValue(String type, String metric, String value) {
 		
-		int parsedInt = Integer.parseInt(value);
+		BigDecimal parsedInt = new BigDecimal(value);
 		String finalMetric = metric
 								.replace("percentiles", "p")
 								.replace("stdDev", "stdev")
@@ -217,8 +217,8 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 					;
 				
 		for(String name : valueNames) {
-			Integer val = values.get(name);
-			val = (val == null) ? 0 : val;
+			BigDecimal val = values.get(name);
+			val = (val == null) ? BigDecimal.ZERO : val;
 			csv += separator + val; 
 		}
 		
@@ -247,8 +247,8 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		object.addProperty("user_group", user_group);
 		
 		for(String name : valueNames) {
-			Integer val = values.get(name);
-			val = (val == null) ? 0 : val;
+			BigDecimal val = values.get(name);
+			val = (val == null) ? BigDecimal.ZERO : val;
 			object.addProperty(name, val);
 		}
 		
@@ -280,8 +280,8 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		valueList.add(user_group);
 		
 		for(String name : valueNames) {
-			Integer val = values.get(name);
-			val = (val == null) ? 0 : val;
+			BigDecimal val = values.get(name);
+			val = (val == null) ? BigDecimal.ZERO : val;
 			valueList.add(val);
 		}
 		

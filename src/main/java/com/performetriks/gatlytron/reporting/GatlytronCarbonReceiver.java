@@ -77,7 +77,7 @@ public class GatlytronCarbonReceiver {
 					try {
 						handleCarbonData();
 					} catch (IOException e) {
-						logger.error("IO Exception while reading carbon data.", e);
+						logger.warn("GatlytronCarbonReceiver: While reading carbon data: "+e.getMessage());
 					}
 					
 					//---------------------------------
@@ -85,8 +85,7 @@ public class GatlytronCarbonReceiver {
 					try {
 						Thread.sleep(sleepInterval);
 					} catch (InterruptedException e) {
-						logger.error("Thread interrupted while waiting for carbon protocol data.", e);
-						Thread.currentThread().interrupt();
+						// ignore
 					}
 				}
 			}
@@ -106,7 +105,7 @@ public class GatlytronCarbonReceiver {
 		if(!clientSocket.isClosed()
 		&& !serverSocket.isClosed()) {
 			
-			while( (graphiteMessage = in.readLine()) != null) {
+			while( (graphiteMessage = in.readLine()) != null ) {
 				GatlytronCarbonRecord record = new GatlytronCarbonRecord(graphiteMessage, existingRecords);
 				
 				if(lastTime == null) {
@@ -155,30 +154,35 @@ public class GatlytronCarbonReceiver {
 		}
 		
 		//---------------------------------
-		// Closing Things
+		// Closing Server Socket
 		try {
-			//in.close();
-			//out.close();
-	        //clientSocket.close();
 	        serverSocket.close();
 		} catch (IOException e) {
-			logger.error("Error while closing socket connection.", e);
+			logger.error("Error while closing server socket connection.", e);
 		}
 		
-		System.err.println("Z");
 		
 		//---------------------------------
 		// Last Round of Writing Data
-		System.err.println("THE LAST ROUND");
 		try {
 			handleCarbonData();
 		} catch (IOException e) {
 			logger.error("Error while reading carbon data.", e);
 		}
-		System.err.println("YYYY!!!???");
+
 		if( !existingRecords.isEmpty() ) {
 			sendRecordsToReporter();
 			
+		}
+
+		//---------------------------------
+		// Closing Client Socket and Stream
+		try {
+
+			//in.close(); - causes the process to hang an never terminate
+	        clientSocket.close();
+		} catch (IOException e) {
+			logger.error("Error while closing client socket connection.", e);
 		}
 	       
 	}

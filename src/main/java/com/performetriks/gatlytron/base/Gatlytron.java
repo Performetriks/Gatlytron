@@ -2,6 +2,9 @@ package com.performetriks.gatlytron.base;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.performetriks.gatlytron.reporting.GatlytronCarbonReceiver;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
 
@@ -14,14 +17,25 @@ import com.performetriks.gatlytron.reporting.GatlytronReporter;
  * 
  ***************************************************************************/
 public class Gatlytron {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(Gatlytron.class);
+	
 	private static ArrayList<GatlytronReporter> reporterList = new ArrayList<>();
 	
+	/******************************************************************
+	 * Enables the Gatlytron Graphite Receiver to do custom reports.
+	 * @param port
+	 ******************************************************************/
+	public static void enableGraphiteReceiver(int port) {
+		logger.info("Starting Carbon Receiver");
+		GatlytronCarbonReceiver.start(port);
+	}
 	
 	/******************************************************************
 	 * Add reporters to the list.
 	 ******************************************************************/
 	public static void addReporter(GatlytronReporter reporter) {
+		logger.info("Adding Reporter: " + reporter.getClass().getSimpleName());
 		reporterList.add(reporter);
 	}
 	
@@ -34,13 +48,6 @@ public class Gatlytron {
 		return (ArrayList<GatlytronReporter>) reporterList.clone();
 	}
 	
-	/******************************************************************
-	 * Enables the Gatlytron Graphite Receiver to do custom reports.
-	 * @param port
-	 ******************************************************************/
-	public static void enableGraphiteReceiver(int port) {
-		GatlytronCarbonReceiver.start(port);
-	}
 	
 	/******************************************************************
 	 * Returns the list of added reporters.
@@ -48,7 +55,7 @@ public class Gatlytron {
 	 ******************************************************************/
 	@SuppressWarnings("unchecked")
 	public static void terminate() {
-		
+		logger.info("Terminating Gatlytron");
 		GatlytronCarbonReceiver.terminate();
 		
 		for(GatlytronReporter reporter : reporterList) {
