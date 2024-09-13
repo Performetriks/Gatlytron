@@ -1,76 +1,178 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+	<!-- ================= PROJECT INFORMATION ================== -->
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.performetriks</groupId>
-  <artifactId>gatlytron</artifactId>
-  <version>1.0.0</version>
+	<groupId>com.performetriks</groupId>
+	<artifactId>gatlytron</artifactId>
+	<version>1.0.0</version>
 
-  <properties>
-    <maven.compiler.release>11</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gatling.version>3.11.5</gatling.version>
-    <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
-    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-    <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-  </properties>
-
-  <dependencies>
-	  
-    <dependency>
-      <groupId>io.gatling.highcharts</groupId>
-      <artifactId>gatling-charts-highcharts</artifactId>
-      <version>${gatling.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    
-    <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
-	<dependency>
-	    <groupId>org.postgresql</groupId>
-	    <artifactId>postgresql</artifactId>
-	    <version>42.7.4</version>
-	    <scope>provided</scope>
-	</dependency>
-    
-    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-	<dependency>
-	    <groupId>com.google.code.gson</groupId>
-	    <artifactId>gson</artifactId>
-	    <version>2.11.0</version>
-	</dependency>
+	<packaging>jar</packaging>
 	
-	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
-	<dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-dbcp2</artifactId>
-	    <version>2.12.0</version>
-	</dependency>
-    
-  </dependencies>
+	<name>Gatlytron</name>
+	<description>Gatlytron is a little framework that assists you in creatname>Gatlyting tests and provides some additional features like reporting.</description>
+	<url>https://github.com/Performetriks/Gatlytron</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>${maven-resources-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>io.gatling</groupId>
-        <artifactId>gatling-maven-plugin</artifactId>
-        <version>${gatling-maven-plugin.version}</version>
-        <configuration>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<!-- ================= PROPERTIES ================== -->
+	<properties>
+		<maven.compiler.release>11</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gatling.version>3.11.5</gatling.version>
+		<gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
+		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+
+		<skipTests>true</skipTests>
+		<skipJavadoc>false</skipJavadoc>
+		<skipSigning>false</skipSigning>
+
+	</properties>
+
+	<!-- ================= DEVELOPERS ================== -->
+	<developers>
+		<developer>
+			<name>Reto Scheiwiller</name>
+			<email>reto.scheiwiller5@bluewin.ch</email>
+			<organization>Performetriks</organization>
+			<organizationUrl>http://www.performetriks.com</organizationUrl>
+		</developer>
+	</developers>
+	
+	<!-- ================= LICENSES ================== -->
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/xresch/CoreFramework/blob/master/LICENSE</url>
+		</license>
+	</licenses>
+
+	<!-- ================= SCM ================== -->
+	<scm>
+		<connection>scm:git:git://github.com/Performetriks/Gatlytron.git</connection>
+		<developerConnection>scm:git:ssh://github.com/Performetriks/Gatlytron.git</developerConnection>
+		<url>https://github.com/Performetriks/Gatlytron/tree/master</url>
+	</scm>
+
+
+	<!-- ================= DISTRIBUTION MANAGEMENT ================== -->
+	<!-- NOTE: If upload fails try to upload manually: -->
+	<!-- https://central.sonatype.org/publish/publish-manual/ -->
+
+	<!--distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement-->
+	
+	<!-- ================= DEPENDENCIES ================== -->
+	<dependencies>
+
+		<dependency>
+			<groupId>io.gatling.highcharts</groupId>
+			<artifactId>gatling-charts-highcharts</artifactId>
+			<version>${gatling.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.12.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<!-- ================= BUILD ================== -->
+	<build>
+		<plugins>
+			
+			<!-- ================= COMPILER ================== -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+			</plugin>
+			
+			<!-- ================= RECOURCES ================== -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+			</plugin>
+			
+			<!-- ================= JAR ================== -->
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+			</plugin>
+			
+			<!-- ================= GATLING ================== -->
+			<plugin>
+				<groupId>io.gatling</groupId>
+				<artifactId>gatling-maven-plugin</artifactId>
+				<version>${gatling-maven-plugin.version}</version>
+				<configuration>
+				</configuration>
+			</plugin>
+			
+			<!-- ================= SOURCES ================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- ================= JAVADOC ================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<skip>${skipJavadoc}</skip>
+					<additionalparam>-Xdoclint:none</additionalparam>
+					<additionalOptions>-Xdoclint:none</additionalOptions>
+					<additionalJOption>-Xdoclint:none</additionalJOption>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>
