@@ -8,6 +8,7 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
+import com.performetriks.gatlytron.reporting.GatlytronReporterEMP;
 import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
 import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
 
@@ -35,6 +36,13 @@ public class TestGlobals {
     	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	Gatlytron.addReporter(new GatlytronReporterSysout());
+    	
+    	Gatlytron.addReporter(
+    			new GatlytronReporterEMP(
+    					"http://localhost:8888"
+    					,"gatlytron-test-token-MSGIUzrLyUsOypYOkekVgmlfjMpLbRCA"
+    				)
+    			);
     	
     	Gatlytron.addReporter(
     			new GatlytronReporterDatabasePostGres(

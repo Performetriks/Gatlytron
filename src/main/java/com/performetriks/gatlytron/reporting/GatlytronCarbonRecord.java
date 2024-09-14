@@ -53,8 +53,21 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	private String user_group = null;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
-	// value Names consist of type + "_" + metric
-	private static String[] valueNames = new String[] {
+	// list of metric names
+	public static final String[] metricNames = new String[] {
+		  "count"
+		, "min"
+		, "max"
+		, "mean"
+		, "stdev"
+		, "p50"
+		, "p75"
+		, "p95"
+		, "p99"
+	};
+	
+	// value names consist of type + "_" + metric
+	public static final String[] valueNames = new String[] {
 		  "users_active"
 		, "users_waiting"
 		, "users_done"
@@ -247,9 +260,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		object.addProperty("user_group", user_group);
 		
 		for(String name : valueNames) {
-			BigDecimal val = values.get(name);
-			val = (val == null) ? BigDecimal.ZERO : val;
-			object.addProperty(name, val);
+			object.addProperty(name, this.getValue(name));
 		}
 		
 		return object;
@@ -280,9 +291,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		valueList.add(user_group);
 		
 		for(String name : valueNames) {
-			BigDecimal val = values.get(name);
-			val = (val == null) ? BigDecimal.ZERO : val;
-			valueList.add(val);
+			valueList.add(this.getValue(name));
 		}
 		
 		return db.preparedExecute(insertSQL, valueList.toArray());
@@ -306,9 +315,67 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
         return obj.hashCode() == this.hashCode();
     }
 	
-	public String time() {
+	/***********************************************************************
+	 * Returns the time of this record.
+	 ***********************************************************************/
+	public String getTime() {
 		return time;
 	}
+	
+	/***********************************************************************
+	 * Returns the name of the gatling simulation.
+	 ***********************************************************************/
+	public String getSimulation() {
+		return simulation;
+	}
+	
+	/***********************************************************************
+	 * Returns the name of the request, or null if this is a user record.
+	 ***********************************************************************/
+	public String getRequest() {
+		return request;
+	}
+	
+	/***********************************************************************
+	 * Returns the name of the user group, or null if this is a user record.
+	 ***********************************************************************/
+	public String getUserGroup() {
+		return user_group;
+	}
+	
+	/***********************************************************************
+	 * 
+	 * @return the value for the given name, never null, if null returns zero
+	 ***********************************************************************/
+	public BigDecimal getValue(String name) {
+		BigDecimal val = values.get(name);
+		val = (val == null) ? BigDecimal.ZERO : val;
+		return val;
+	}
+	
+	/***********************************************************************
+	 * Returns a clone of the values. 
+	 ***********************************************************************/
+	public HashMap<String, BigDecimal> getValues() {
+		HashMap<String, BigDecimal> clone = new HashMap<>();
+		clone.putAll(values);
+		return clone;
+	}
+	
+	/***********************************************************************
+	 * Returns true if this is a request record.
+	 ***********************************************************************/
+	public boolean isRequestRecord() {
+		return  (request != null);
+	}
+	
+	/***********************************************************************
+	 * Returns true if this is a user record.
+	 ***********************************************************************/
+	public boolean isUserRecord() {
+		return  (user_group != null);
+	}
+	
 	
 	
 	

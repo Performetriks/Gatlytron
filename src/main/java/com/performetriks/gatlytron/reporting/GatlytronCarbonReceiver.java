@@ -109,9 +109,9 @@ public class GatlytronCarbonReceiver {
 				GatlytronCarbonRecord record = new GatlytronCarbonRecord(graphiteMessage, existingRecords);
 				
 				if(lastTime == null) {
-					lastTime = record.time();
-				}else if( !lastTime.equals(record.time()) ) {
-					lastTime = record.time();
+					lastTime = record.getTime();
+				}else if( !lastTime.equals(record.getTime()) ) {
+					lastTime = record.getTime();
 					
 					existingRecords.remove(record); // remove as timestamp has changed
 					
