@@ -22,7 +22,7 @@ public class GatlytronReporterSysout implements GatlytronReporter {
 	public void report(ArrayList<GatlytronCarbonRecord> records) {
 		
 		for(GatlytronCarbonRecord record : records ) {
-			if( ! record.isNoData() ) {
+			if( record.hasRequestData() || record.isUserRecord() ) {
 				System.out.println( record.toJsonString() );
 			}
 		}

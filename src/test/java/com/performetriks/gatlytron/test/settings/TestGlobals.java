@@ -16,7 +16,7 @@ public class TestGlobals {
 
 	public static final boolean DEBUG = false;
 
-	public static final String URL_BASE = "http://stats.xresch.com/";
+	public static final String URL_BASE = "http://www.nasa.gov/";
 	
 	public static FeederBuilder.Batchable<String> dataFeeder = csv("testdata.csv").circular();
 

@@ -61,7 +61,7 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporter {
 		
 		for(GatlytronCarbonRecord record : records ) {
 			
-			if( !record.isNoData() ) {
+			if( record.hasRequestData() || record.isUserRecord() ) {
 				record.insertIntoDatabase(db, tableName);
 			}
 		}

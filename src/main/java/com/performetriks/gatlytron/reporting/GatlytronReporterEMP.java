@@ -201,11 +201,11 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
-		if(!record.isNoData()) {
+		if(record.hasRequestData()) {
 			csv.append("\r\n"+recordALL);
 			
-			if(!record.isNoDataOK()) { csv.append("\r\n"+recordOK); }
-			if(!record.isNoDataKO()) {csv.append("\r\n"+recordKO); }
+			if(!record.hasRequestDataOK()) { csv.append("\r\n"+recordOK); }
+			if(!record.hasRequestDataKO()) {csv.append("\r\n"+recordKO); }
 		}
 		
 	}
