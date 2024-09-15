@@ -1,5 +1,6 @@
 package com.performetriks.gatlytron.reporting;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -54,7 +55,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	private String apiToken;
 	private String categoryPrefix = "GTRON:";
 	private HttpClient client = HttpClient.newBuilder()
-									.connectTimeout(Duration.ofSeconds(10))
+									.connectTimeout(Duration.ofSeconds(15))
 									.build();
 	/****************************************************************************
 	 * 
@@ -187,9 +188,14 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		// Common information
 
 		for(String metric : GatlytronCarbonRecord.metricNames) {
-			recordOK += SEPARATOR + record.getValue("ok_"+metric);
-			recordKO += SEPARATOR + record.getValue("ko_"+metric);
-			recordALL += SEPARATOR + record.getValue("all_"+metric);
+			
+			BigDecimal valueOK = record.getValue("ok_"+metric);
+			BigDecimal valueKO = record.getValue("ko_"+metric);
+			BigDecimal valueALL = record.getValue("all_"+metric);
+			
+			recordOK += SEPARATOR + ( (valueOK != null) ? valueOK : "") ;
+			recordKO += SEPARATOR + ( (valueKO != null) ? valueKO : "");
+			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
 		csv.append("\r\n"+recordOK);

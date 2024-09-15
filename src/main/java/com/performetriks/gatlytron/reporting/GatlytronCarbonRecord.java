@@ -345,11 +345,11 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	
 	/***********************************************************************
 	 * 
-	 * @return the value for the given name, never null, if null returns zero
+	 * @return the value for the given name
 	 ***********************************************************************/
 	public BigDecimal getValue(String name) {
 		BigDecimal val = values.get(name);
-		val = (val == null) ? BigDecimal.ZERO : val;
+		//val = (val == null) ? BigDecimal.ZERO : val;
 		return val;
 	}
 	
