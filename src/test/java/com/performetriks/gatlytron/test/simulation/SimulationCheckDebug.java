@@ -10,7 +10,7 @@ import io.gatling.javaapi.core.Simulation;
  
 public class SimulationCheckDebug extends Simulation {
  
-    private static final Duration TEST_DURATION = Duration.ofSeconds(30);
+    private static final Duration TEST_DURATION = Duration.ofSeconds(3600);
 
     {
     	
@@ -24,7 +24,7 @@ public class SimulationCheckDebug extends Simulation {
         //======================================================================
        
     	setUp(
-                new SampleScenario().buildStandardLoad(10, 600, 0, 2)
+                new SampleScenario().debug(true).buildStandardLoad(10, 600, 0, 2)
            ).protocols(TestGlobals.getProtocol())
             .maxDuration(TEST_DURATION)
            ;

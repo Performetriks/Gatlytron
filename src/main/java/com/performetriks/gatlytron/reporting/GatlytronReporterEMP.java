@@ -129,13 +129,16 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			}
 		}
 		
-		System.out.println("==== CSV ====");
-		System.out.println(csv.toString());
+		String postBody = csv.toString();
+		
+		logger.debug("==== EMP: CSV Body ====");
+		logger.debug(postBody);
+		System.out.println(postBody);
 		
 		//----------------------------------
 		// create CSV Records
 		HttpRequest request = HttpRequest.newBuilder(apiEndpoint)
-				.POST(HttpRequest.BodyPublishers.ofString(csv.toString()))
+				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.header("API-Token", apiToken)
 				.build();
 		
@@ -198,9 +201,12 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
-		csv.append("\r\n"+recordOK);
-		csv.append("\r\n"+recordKO);
-		csv.append("\r\n"+recordALL);
+		if(!record.isNoData()) {
+			csv.append("\r\n"+recordALL);
+			
+			if(!record.isNoDataOK()) { csv.append("\r\n"+recordOK); }
+			if(!record.isNoDataKO()) {csv.append("\r\n"+recordKO); }
+		}
 		
 	}
 

@@ -64,8 +64,9 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 			writer = new BufferedWriter(new FileWriter(filepath, true));
 	    
 			for(GatlytronCarbonRecord record : records ) {
-				
-				writer.write(record.toCSV(separator)+"\r\n");
+				if( ! record.isNoData() ) {
+					writer.write(record.toCSV(separator)+"\r\n");
+				}
 			}
 			
 			

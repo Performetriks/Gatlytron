@@ -363,6 +363,41 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	}
 	
 	/***********************************************************************
+	 * Checks if there is no data in this record.
+	 ***********************************************************************/
+	public boolean isNoData() {
+		return this.isNoData("all");
+	}
+	
+	/***********************************************************************
+	 * Checks if there is no 'ok' data in this record.
+	 ***********************************************************************/
+	public boolean isNoDataOK() {
+		return this.isNoData("ok");
+	}
+	
+	/***********************************************************************
+	 * Checks if there is no 'ok' data in this record.
+	 ***********************************************************************/
+	public boolean isNoDataKO() {
+		return this.isNoData("ko");
+	}
+			
+	/***********************************************************************
+	 * Checks if the data is empty.
+	 * @param type either 'ok', 'ko' or 'all'. If null checks 'all'
+	 ***********************************************************************/
+	private boolean isNoData(String type) {
+
+		if(type == null) { type = "all"; }
+		
+		BigDecimal value = this.getValue(type+"_count");
+		
+		return (value == null || value.compareTo(BigDecimal.ZERO) == 0) ;
+
+	}
+	
+	/***********************************************************************
 	 * Returns true if this is a request record.
 	 ***********************************************************************/
 	public boolean isRequestRecord() {

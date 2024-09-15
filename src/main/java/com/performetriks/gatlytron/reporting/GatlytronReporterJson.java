@@ -54,8 +54,9 @@ public class GatlytronReporterJson implements GatlytronReporter {
 			writer = new BufferedWriter(new FileWriter(filepath, true));
 	    
 			for(GatlytronCarbonRecord record : records ) {
-				
-				writer.write(record.toJsonString()+"\r\n");
+				if( ! record.isNoData() ) {
+					writer.write(record.toJsonString()+"\r\n");
+				}
 			}
 			
 			
