@@ -95,7 +95,7 @@ To enable it, add `Gatlytron.enableGraphiteReceiver(<port>);` and `Gatlytron.add
 ```java
 { 	
 	Gatlytron.enableGraphiteReceiver(2003);
-	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json",true));
+	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json", true));
    Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
    Gatlytron.addReporter(new GatlytronReporterSysoutJson());
     	
