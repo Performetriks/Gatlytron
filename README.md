@@ -130,8 +130,12 @@ gatling {
 ```
 
 ## Reporting to Databases
+
 There are Gatlytron reporters which allow you to report metrics to a database.
-For this to work you will need to include the respective driver dependency. Following an example for PostGres SQL:
+For this to work you will need to include the respective driver dependency. 
+
+### Reporting to Postgres
+Following an example for PostGres SQL:
 
 ```xml
 <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
@@ -166,5 +170,40 @@ Now you can add the Reporter for the database. The reporter will create the tabl
 	   ;
     	
 }
+
+```
+
+### Reporting to any JDBC Database
+You can use the class `GatlytronReporterDatabaseJDBC` to connect to any SQL database that is availabie through JDBC.
+You need to include the dependency which provides the driver for the database you want to connect to.
+Following an example for an H2 database:
+```xml
+<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+<!dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<version>2.2.224</version> 
+</dependency>
+```
+
+Now you can add the Reporter for the database.
+You will need to implement the method `getCreateTableSQL()` and may or may not adjust the SQL to create the table:
+
+```java
+//------------------------------
+// JDBC DB Reporter
+Gatlytron.addReporter(
+		new GatlytronReporterDatabaseJDBC("org.h2.Driver"
+				, "jdbc:h2:tcp://localhost:8889/./datastore/h2database;MODE=MYSQL;IGNORECASE=TRUE"
+				, REPORTING_TABLE_NAME
+				, "sa"
+				, "sa") {
+			
+			@Override
+			public String getCreateTableSQL() {
+				return GatlytronCarbonRecord.getSQLCreateTableTemplate(REPORTING_TABLE_NAME);
+			}
+		}
+	);
 
 ```

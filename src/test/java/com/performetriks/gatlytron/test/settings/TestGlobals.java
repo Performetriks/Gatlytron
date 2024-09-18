@@ -6,7 +6,9 @@ import static io.gatling.javaapi.core.CoreDsl.csv;
 import static io.gatling.javaapi.http.HttpDsl.http;
 
 import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.reporting.GatlytronCarbonRecord;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
+import com.performetriks.gatlytron.reporting.GatlytronReporterDatabaseJDBC;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
 import com.performetriks.gatlytron.reporting.GatlytronReporterEMP;
 import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
@@ -20,6 +22,8 @@ import io.gatling.javaapi.http.HttpProtocolBuilder;
 public class TestGlobals {
 
 	public static final String URL_BASE = "http://www.nasa.gov/";
+	
+	public static String REPORTING_TABLE_NAME = "gatlytron";
 	
 	public static FeederBuilder.Batchable<String> dataFeeder = csv("testdata.csv").circular();
 
@@ -35,19 +39,28 @@ public class TestGlobals {
     	// System.setProperty("gatling.graphite.port", "2003");
 		// System.setProperty("gatling.graphite.writePeriod", "15");
 		
-		//Gatlytron.setKeepEmptyRecords(false);
-		
+
+		//------------------------------
+    	// Gatlytron Configuration
 		Gatlytron.setDebug(false);
 		Gatlytron.setLogLevelRoot(Level.INFO);
 		Gatlytron.setLogLevel(Level.DEBUG, "com.performetriks.gatlytron");
+		//Gatlytron.setKeepEmptyRecords(false);
 		
     	Gatlytron.enableGraphiteReceiver(2003);
+    	
+    	//------------------------------
+    	// File Reporter
     	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json", true));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	
+    	//------------------------------
+    	// Sysout Reporter
     	//Gatlytron.addReporter(new GatlytronReporterSysoutJson());
     	//Gatlytron.addReporter(new GatlytronReporterSysoutCSV(";"));
     	
+    	//------------------------------
+    	// EMP Reporter
     	Gatlytron.addReporter(
     			new GatlytronReporterEMP(
     					"http://localhost:8888"
@@ -55,16 +68,36 @@ public class TestGlobals {
     				)
     			);
     	
+    	//------------------------------
+    	// PostGres DB Reporter
     	Gatlytron.addReporter(
     			new GatlytronReporterDatabasePostGres(
 	    			 "localhost"
 	    			, 5432
 	    			, "postgres"
-	    			, "gatlytron"
+	    			, REPORTING_TABLE_NAME
 	    			, "postgres"
 	    			, "postgres"
     			)
     		);
+    	
+    	//------------------------------
+    	// JDBC DB Reporter
+    	Gatlytron.addReporter(
+    			new GatlytronReporterDatabaseJDBC("org.h2.Driver"
+    					, "jdbc:h2:tcp://localhost:8889/./datastore/h2database;MODE=MYSQL;IGNORECASE=TRUE"
+    					, REPORTING_TABLE_NAME
+    					, "sa"
+    					, "sa") {
+					
+					@Override
+					public String getCreateTableSQL() {
+						return GatlytronCarbonRecord.getSQLCreateTableTemplate(REPORTING_TABLE_NAME);
+					}
+				}
+    		);
+    	
+    	
 
 	}
 	
