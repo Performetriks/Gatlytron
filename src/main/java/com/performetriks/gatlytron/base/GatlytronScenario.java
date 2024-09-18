@@ -8,6 +8,11 @@ import io.gatling.javaapi.core.FeederBuilder;
 import java.time.Duration;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.performetriks.gatlytron.database.DBInterface;
+
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
 
@@ -20,13 +25,15 @@ import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
  * 
  ***************************************************************************/
 public class GatlytronScenario {
+	
+	private static Logger logger = LoggerFactory.getLogger(GatlytronScenario.class.getName());
+
 	private String scenarioName;
 	// set default to not be null
 	private ArrayList<FeederBuilder<?>> feederBuilderList = new ArrayList<>();
 	private ChainBuilder scenarioSteps;
-	private boolean debug = false;
+	private boolean debug = Gatlytron.isDebug();
 
-	
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
@@ -69,17 +76,15 @@ public class GatlytronScenario {
 		int pacingSeconds = 3600 / (execsHour / users);
 		int rampUpInterval = pacingSeconds / users * rampUp;
 
-		if (debug) {
-			System.err.println("============== Load Parameters ==============");
-			System.err.println("Scenario: " + scenarioName);
-			System.err.println("Target Users: " + users);
-			System.err.println("Executions/Hour: " + execsHour);
-			System.err.println("StartOffset: " + offset);
-			System.err.println("RampUp Users: " + rampUp);
-			System.err.println("RampUp Interval(s): " + rampUpInterval);
-			System.err.println("Pacing(s): " + pacingSeconds);
-			System.err.println("============================================");
-		}
+		logger.info("============== Load Parameters ==============");
+		logger.info("Scenario: " + scenarioName);
+		logger.info("Target Users: " + users);
+		logger.info("Executions/Hour: " + execsHour);
+		logger.info("StartOffset: " + offset);
+		logger.info("RampUp Users: " + rampUp);
+		logger.info("RampUp Interval(s): " + rampUpInterval);
+		logger.info("Pacing(s): " + pacingSeconds);
+		logger.info("============================================");
 
 		ScenarioBuilder SCENARIO = buildScenario(pacingSeconds);
 
@@ -210,7 +215,8 @@ public class GatlytronScenario {
 	}
 
 	/***************************************************************************
-	 *
+	 * Set if debug logs should be printed.
+	 * Default value is obtained from Gatlytron.isDebug();
 	 ***************************************************************************/
 	public GatlytronScenario debug(boolean debug) {
 		this.debug = debug;

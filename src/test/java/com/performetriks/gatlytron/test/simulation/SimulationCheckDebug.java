@@ -2,6 +2,7 @@ package com.performetriks.gatlytron.test.simulation;
  
 import java.time.Duration;
 
+import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.test.scenario.SampleScenario;
 import com.performetriks.gatlytron.test.settings.TestGlobals;
 
@@ -15,6 +16,7 @@ public class SimulationCheckDebug extends Simulation {
     {
     	
     	TestGlobals.commonInitialization();
+    	Gatlytron.setDebug(true);
     	
         //======================================================================
         // Use this simulation class for testing and debugging.
@@ -24,7 +26,7 @@ public class SimulationCheckDebug extends Simulation {
         //======================================================================
        
     	setUp(
-                new SampleScenario().debug(true).buildStandardLoad(10, 600, 0, 2)
+                new SampleScenario().buildStandardLoad(10, 600, 0, 2)
            ).protocols(TestGlobals.getProtocol())
             .maxDuration(TEST_DURATION)
            ;

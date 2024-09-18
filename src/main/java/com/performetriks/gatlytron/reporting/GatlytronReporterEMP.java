@@ -137,15 +137,9 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		String postBodyRequest = csvRecordsRequest.toString();
 		String postBodyUser = csvRecordsUser.toString();
 		
-		logger.debug("==== EMP: CSV Body (Requests) ====");
-		logger.debug(postBodyRequest);
-		//System.out.println(postBodyRequest);
-		
-		logger.debug("==== EMP: CSV Body (User) ====");
-		logger.debug(postBodyUser);
-		//System.out.println(postBodyUser);
-		
-		
+		logger.debug("==== EMP: CSV Body (Requests) ====\n"+postBodyRequest);
+		logger.debug("==== EMP: CSV Body (User) ====\n"+postBodyUser);
+
 		//----------------------------------
 		// Send CSV Records Request
 		callEMPAPI(apiEndpoint, postBodyRequest);

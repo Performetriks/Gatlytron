@@ -148,6 +148,7 @@ public class GatlytronCarbonReceiver {
 		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
 			ArrayList<GatlytronCarbonRecord> clone = new ArrayList<>();
 			clone.addAll(finalRecords);
+			logger.debug("Send Graphite/Carbon data to: "+reporter.getClass().getSimpleName());
 		    reporter.report(clone);
 		}
 		

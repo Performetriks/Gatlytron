@@ -20,7 +20,8 @@ public class SampleScenario extends GatlytronScenario {
     public SampleScenario() {
         super(SCENARIO_NAME);
       
-        this.debug(TestGlobals.DEBUG)
+        this
+        	//.debug(TestGlobals.DEBUG) // default is obtained from Gatlytron.isDebug()
             .feederBuilder(TestGlobals.getDataFeeder())
             .scenarioSteps(
                 exec(

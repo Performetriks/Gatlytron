@@ -13,12 +13,11 @@ import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
 import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutCSV;
 import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutJson;
 
+import ch.qos.logback.classic.Level;
 import io.gatling.javaapi.core.FeederBuilder;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 public class TestGlobals {
-
-	public static final boolean DEBUG = false;
 
 	public static final String URL_BASE = "http://www.nasa.gov/";
 	
@@ -36,11 +35,18 @@ public class TestGlobals {
     	// System.setProperty("gatling.graphite.port", "2003");
 		// System.setProperty("gatling.graphite.writePeriod", "15");
 		
+		//Gatlytron.setKeepEmptyRecords(false);
+		
+		Gatlytron.setDebug(false);
+		Gatlytron.setLogLevelRoot(Level.INFO);
+		Gatlytron.setLogLevel(Level.DEBUG, "com.performetriks.gatlytron");
+		
     	Gatlytron.enableGraphiteReceiver(2003);
     	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
+    	
     	//Gatlytron.addReporter(new GatlytronReporterSysoutJson());
-    	Gatlytron.addReporter(new GatlytronReporterSysoutCSV(";"));
+    	//Gatlytron.addReporter(new GatlytronReporterSysoutCSV(";"));
     	
     	Gatlytron.addReporter(
     			new GatlytronReporterEMP(
