@@ -42,7 +42,7 @@ public class TestGlobals {
 		Gatlytron.setLogLevel(Level.DEBUG, "com.performetriks.gatlytron");
 		
     	Gatlytron.enableGraphiteReceiver(2003);
-    	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json"));
+    	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json", true));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
     	
     	//Gatlytron.addReporter(new GatlytronReporterSysoutJson());

@@ -14,7 +14,8 @@ public class SampleScenario extends GatlytronScenario {
     public SampleScenario() {
         super("MyScenario");
       
-        this.debug(TestGlobals.DEBUG)
+        this
+        	  //.debug(TestGlobals.DEBUG) // default obtained from Gatlytron.isDebu();
             .feederBuilder(TestGlobals.getDataFeeder())
             .scenarioSteps(
                 exec(
@@ -94,9 +95,9 @@ To enable it, add `Gatlytron.enableGraphiteReceiver(<port>);` and `Gatlytron.add
 ```java
 { 	
 	Gatlytron.enableGraphiteReceiver(2003);
-	Gatlytron.addReporter(new GatlytronReporterJsonFile("./target/gatlytron.json"));
+	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json",true));
    Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
-   Gatlytron.addReporter(new GatlytronReporterSysout());
+   Gatlytron.addReporter(new GatlytronReporterSysoutJson());
     	
 	setUp(
 			new SampleScenario().buildStandardLoad(10, 600, 0, 2)
