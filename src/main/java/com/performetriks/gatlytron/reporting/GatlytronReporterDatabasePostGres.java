@@ -60,10 +60,7 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporter {
 	public void report(ArrayList<GatlytronCarbonRecord> records) {
 		
 		for(GatlytronCarbonRecord record : records ) {
-			
-			if( record.hasRequestData() || record.isUserRecord() ) {
-				record.insertIntoDatabase(db, tableName);
-			}
+			record.insertIntoDatabase(db, tableName);
 		}
 
 	}

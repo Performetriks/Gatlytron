@@ -21,6 +21,7 @@ public class Gatlytron {
 	private static final Logger logger = LoggerFactory.getLogger(Gatlytron.class);
 	
 	private static ArrayList<GatlytronReporter> reporterList = new ArrayList<>();
+	private static boolean keepEmptyRecords = false;
 	
 	/******************************************************************
 	 * Enables the Gatlytron Graphite Receiver to do custom reports.
@@ -62,5 +63,21 @@ public class Gatlytron {
 			reporter.terminate();
 		}
 	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static boolean isKeepEmptyRecords() {
+		return keepEmptyRecords;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static void setKeepEmptyRecords(boolean skipEmptyRecords) {
+		Gatlytron.keepEmptyRecords = skipEmptyRecords;
+	}
+	
+	
 	
 }

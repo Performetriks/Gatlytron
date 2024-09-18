@@ -1,16 +1,20 @@
 package com.performetriks.gatlytron.test.settings;
 
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
+import static io.gatling.javaapi.core.CoreDsl.AllowList;
+import static io.gatling.javaapi.core.CoreDsl.DenyList;
+import static io.gatling.javaapi.core.CoreDsl.csv;
+import static io.gatling.javaapi.http.HttpDsl.http;
 
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
 import com.performetriks.gatlytron.reporting.GatlytronReporterEMP;
 import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
-import com.performetriks.gatlytron.reporting.GatlytronReporterSysout;
+import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutCSV;
+import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutJson;
+
+import io.gatling.javaapi.core.FeederBuilder;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 public class TestGlobals {
 
@@ -35,7 +39,8 @@ public class TestGlobals {
     	Gatlytron.enableGraphiteReceiver(2003);
     	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json"));
     	Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
-    	//Gatlytron.addReporter(new GatlytronReporterSysout());
+    	//Gatlytron.addReporter(new GatlytronReporterSysoutJson());
+    	Gatlytron.addReporter(new GatlytronReporterSysoutCSV(";"));
     	
     	Gatlytron.addReporter(
     			new GatlytronReporterEMP(

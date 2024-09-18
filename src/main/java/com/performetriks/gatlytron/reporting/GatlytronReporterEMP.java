@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.performetriks.gatlytron.base.Gatlytron;
+
 /***************************************************************************
  * This reporter send the received records and sends them to an instance of
  * the open source tool Engineered Monitoring Platform(EMP), which you can find
@@ -32,16 +34,16 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterEMP.class);
 	
 	private static final String SEPARATOR = ";";
-	private static String CSV_HEADER = "category,entity,attributes";
+	private static String CSV_HEADER_START = "category"+SEPARATOR+"entity"+SEPARATOR+"attributes";
+	private static String CSV_HEADER = CSV_HEADER_START;
 	
 	static {
 		
 		for(String metric : GatlytronCarbonRecord.metricNames) {
-			CSV_HEADER += ","+metric;
+			CSV_HEADER += SEPARATOR+metric;
 		}
 
 		CSV_HEADER = CSV_HEADER
-						.replace(",", SEPARATOR)
 						.replace("mean", "avg")  // emp uses name "avg"
 						;
 	}
@@ -115,28 +117,46 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		URI apiEndpoint = URI.create(empURL+"/app/api?apiName=EAVStats&actionName=pushStatsCSV"
 				+ "&SEPARATOR="+SEPARATOR);
 		
-		StringBuilder csv = new StringBuilder();
-		csv.append(CSV_HEADER);
+		StringBuilder csvRecordsRequest = new StringBuilder();
+		StringBuilder csvRecordsUser = new StringBuilder();
+		
+		csvRecordsRequest.append(CSV_HEADER);
+		csvRecordsUser.append(CSV_HEADER_START + SEPARATOR + "avg");
 		
 		//----------------------------------
 		// Create Request Data
 		for(GatlytronCarbonRecord record : records) {
 			
 			if(record.isRequestRecord()) {
-				this.addCSVRequestRecords(csv, record);
+				this.addCSVRecordsRequest(csvRecordsRequest, record);
 			}else {
-				
+				this.addCSVRecordsUser(csvRecordsUser, record);
 			}
 		}
 		
-		String postBody = csv.toString();
+		String postBodyRequest = csvRecordsRequest.toString();
+		String postBodyUser = csvRecordsUser.toString();
 		
-		logger.debug("==== EMP: CSV Body ====");
-		logger.debug(postBody);
-		System.out.println(postBody);
+		logger.debug("==== EMP: CSV Body (Requests) ====");
+		logger.debug(postBodyRequest);
+		//System.out.println(postBodyRequest);
+		
+		logger.debug("==== EMP: CSV Body (User) ====");
+		logger.debug(postBodyUser);
+		//System.out.println(postBodyUser);
+		
 		
 		//----------------------------------
-		// create CSV Records
+		// Send CSV Records Request
+		callEMPAPI(apiEndpoint, postBodyRequest);
+		callEMPAPI(apiEndpoint, postBodyUser);
+		
+	}
+
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	private void callEMPAPI(URI apiEndpoint, String postBody) {
 		HttpRequest request = HttpRequest.newBuilder(apiEndpoint)
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.header("API-Token", apiToken)
@@ -144,21 +164,66 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		
 		try {
 			HttpResponse<String> response = 
-					client.send(
-							  request
-							, HttpResponse.BodyHandlers.ofString()
-						);
+					client.send( request, HttpResponse.BodyHandlers.ofString() );
+			
 		} catch (Exception e) {
 			logger.error("EMP: An Error occured while calling the API.", e);
 		}
-		
-		
 	}
 	
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	private void addCSVRequestRecords(StringBuilder csv, GatlytronCarbonRecord record) {
+	private void addCSVRecordsUser(StringBuilder csv, GatlytronCarbonRecord record) {
+		
+		if(record.isRequestRecord()) {
+			logger.warn("Unexpected type of Carbon record. Expected type 'user' but got type 'request'.");
+			return;
+		}
+		
+		//-------------------------------
+		// Initialize Values
+		String category = categoryPrefix+record.getSimulation();
+		String userGroup = record.getUserGroup();
+		
+		//-------------------------------
+		// Escape Quotes
+		category = category.replace("\"", "\\\"");
+		userGroup = userGroup.replace("\"", "\\\"");
+		
+		//-------------------------------
+		// Create base
+		String commonInfo = 
+				  "\""+category+"\""
+				+ SEPARATOR
+				+ "\""+userGroup;
+		
+		String recordActive  = commonInfo + ":usersActive\"" + SEPARATOR + ATTRIBUTES_USER; 
+		String recordWaiting  = commonInfo + ":usersWaiting\"" + SEPARATOR + ATTRIBUTES_USER; 
+		String recordDone = commonInfo  + ":usersDone\"" + SEPARATOR + ATTRIBUTES_USER; 
+		
+		//-------------------------------
+		// Common information
+
+		BigDecimal valueActive = record.getValue("users_active");
+		BigDecimal valueWaiting = record.getValue("users_waiting");
+		BigDecimal valueDone = record.getValue("users_done");
+		
+		recordActive += SEPARATOR + ( (valueActive != null) ? valueActive : "") ;
+		recordWaiting += SEPARATOR + ( (valueWaiting != null) ? valueWaiting : "");
+		recordDone += SEPARATOR + ( (valueDone != null) ? valueDone : "");
+
+		
+		csv.append("\r\n"+recordActive);
+		csv.append("\r\n"+recordWaiting);
+		csv.append("\r\n"+recordDone);
+
+	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	private void addCSVRecordsRequest(StringBuilder csv, GatlytronCarbonRecord record) {
 		
 		if(record.isUserRecord()) {
 			logger.warn("Unexpected type of Carbon record. Expected type 'request' but got type 'user'.");
@@ -178,10 +243,10 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		//-------------------------------
 		// Create base
 		String commonInfo = 
-				  "\""+category+"\""
-				+ SEPARATOR
-				+ "\""+entityName+"\""
-				+ SEPARATOR;
+				"\""+category+"\""
+						+ SEPARATOR
+						+ "\""+entityName+"\""
+						+ SEPARATOR;
 		
 		String recordOK  = commonInfo+ATTRIBUTES_OK; 
 		String recordKO  = commonInfo+ATTRIBUTES_KO; 
@@ -189,7 +254,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		
 		//-------------------------------
 		// Common information
-
+		
 		for(String metric : GatlytronCarbonRecord.metricNames) {
 			
 			BigDecimal valueOK = record.getValue("ok_"+metric);
@@ -201,11 +266,11 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
-		if(record.hasRequestData()) {
+		if( Gatlytron.isKeepEmptyRecords() || record.hasRequestData()) {
 			csv.append("\r\n"+recordALL);
 			
-			if(!record.hasRequestDataOK()) { csv.append("\r\n"+recordOK); }
-			if(!record.hasRequestDataKO()) {csv.append("\r\n"+recordKO); }
+			if(Gatlytron.isKeepEmptyRecords() || record.hasRequestDataOK()) { csv.append("\r\n"+recordOK); }
+			if(Gatlytron.isKeepEmptyRecords() || record.hasRequestDataKO()) { csv.append("\r\n"+recordKO); }
 		}
 		
 	}

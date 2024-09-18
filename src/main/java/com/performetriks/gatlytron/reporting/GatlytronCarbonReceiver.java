@@ -129,9 +129,25 @@ public class GatlytronCarbonReceiver {
      * 
      ***************************************************************************/
 	private static void sendRecordsToReporter() {
+		
+		//-------------------------
+		// Filter Records
+		ArrayList<GatlytronCarbonRecord> finalRecords = new ArrayList<>();
+		for (GatlytronCarbonRecord record : existingRecords.values()){
+			
+			if( Gatlytron.isKeepEmptyRecords()
+			 || record.hasRequestData() 
+			 || record.isUserRecord() 
+			 ){
+				finalRecords.add(record);
+			}
+		}
+		
+		//-------------------------
+		// Send Clone of list to each Reporter
 		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
 			ArrayList<GatlytronCarbonRecord> clone = new ArrayList<>();
-			clone.addAll(existingRecords.values());
+			clone.addAll(finalRecords);
 		    reporter.report(clone);
 		}
 		

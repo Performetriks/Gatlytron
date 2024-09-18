@@ -393,7 +393,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		
 		BigDecimal value = this.getValue(type+"_count");
 		
-		return ! (value == null || value.compareTo(BigDecimal.ZERO) == 0) ;
+		return  (value != null && value.compareTo(BigDecimal.ZERO) != 0) ;
 
 	}
 	

@@ -12,8 +12,15 @@ import java.util.ArrayList;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronReporterSysout implements GatlytronReporter {
+public class GatlytronReporterSysoutCSV implements GatlytronReporter {
 
+	private String separator = ";";
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	public GatlytronReporterSysoutCSV (String separator){
+		this.separator = separator;
+	}
 
 	/****************************************************************************
 	 * 
@@ -21,10 +28,9 @@ public class GatlytronReporterSysout implements GatlytronReporter {
 	@Override
 	public void report(ArrayList<GatlytronCarbonRecord> records) {
 		
+		System.out.println( GatlytronCarbonRecord.getCSVHeader(separator) );
 		for(GatlytronCarbonRecord record : records ) {
-			if( record.hasRequestData() || record.isUserRecord() ) {
-				System.out.println( record.toJsonString() );
-			}
+			System.out.println( record.toCSV(separator) );
 		}
 
 	}
