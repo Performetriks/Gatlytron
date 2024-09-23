@@ -54,11 +54,22 @@ public class SimulationExample extends Simulation {
 ```
 
 
+
+
 ## Running Specific Simulations
 If you define multiple simulations in your project, to run a specific simulation define the parameter "-Dgatling.simulationClass":
 
 ```
 mvn compile gatling:test -Dgatling.simulationClass=com.performetriks.gatlytron.test.simulation.SimulationCheckDebug
+```
+
+## Logging
+Gatlytron provides some methods to set log levels for logback in code. This helps keeping all the config in one place instead of having it distributed in code and config files.
+
+``` java
+Gatlytron.setDebug(false); // common debug flag, can be accessed with Gatlytron.isDebug()
+Gatlytron.setLogLevelRoot(Level.INFO);
+Gatlytron.setLogLevel(Level.INFO, "com.performetriks.gatlytron");
 ```
 
 # Reporting
@@ -95,6 +106,7 @@ To enable it, add `Gatlytron.enableGraphiteReceiver(<port>);` and `Gatlytron.add
 ```java
 { 	
 	Gatlytron.enableGraphiteReceiver(2003);
+	//Gatlytron.setKeepEmptyRecords(false); 
 	Gatlytron.addReporter(new GatlytronReporterJson("./target/gatlytron.json", true));
    Gatlytron.addReporter(new GatlytronReporterCSV("./target/gatlytron.csv", ";"));
    Gatlytron.addReporter(new GatlytronReporterSysoutJson());

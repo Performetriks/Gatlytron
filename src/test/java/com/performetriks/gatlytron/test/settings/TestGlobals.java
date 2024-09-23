@@ -83,7 +83,7 @@ public class TestGlobals {
     	
     	//------------------------------
     	// JDBC DB Reporter
-    	Gatlytron.addReporter(
+    	/*Gatlytron.addReporter(
     			new GatlytronReporterDatabaseJDBC("org.h2.Driver"
     					, "jdbc:h2:tcp://localhost:8889/./datastore/h2database;MODE=MYSQL;IGNORECASE=TRUE"
     					, REPORTING_TABLE_NAME
@@ -96,7 +96,7 @@ public class TestGlobals {
 					}
 				}
     		);
-    	
+    	*/
     	
 
 	}

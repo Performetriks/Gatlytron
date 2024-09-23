@@ -82,12 +82,6 @@ public class Gatlytron {
 		Gatlytron.keepEmptyRecords = skipEmptyRecords;
 	}
 
-	/******************************************************************
-	 * 
-	 ******************************************************************/
-	public static boolean isDebug() {
-		return debug;
-	}
 
 	/******************************************************************
 	 * Sets the level of the logback root logger.
@@ -116,6 +110,13 @@ public class Gatlytron {
 	 ******************************************************************/
 	public static void setDebug(boolean debug) {
 		Gatlytron.debug = debug;
+	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static boolean isDebug() {
+		return debug;
 	}
 	
 	
