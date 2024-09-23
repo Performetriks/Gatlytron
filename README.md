@@ -189,7 +189,8 @@ Now you can add the Reporter for the database. The reporter will create the tabl
 You can use the class `GatlytronReporterDatabaseJDBC` to connect to any SQL database that is availabie through JDBC.
 You need to include the dependency which provides the driver for the database you want to connect to.
 Following an example for an H2 database:
-```xml
+
+``` xml
 <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
 <!dependency>
 	<groupId>com.h2database</groupId>
