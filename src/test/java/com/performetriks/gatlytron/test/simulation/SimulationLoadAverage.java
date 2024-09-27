@@ -10,7 +10,7 @@ import io.gatling.javaapi.core.Simulation;
  
 public class SimulationLoadAverage extends Simulation {
  
-    private static final Duration TEST_DURATION = Duration.ofMinutes(3);
+    private static final Duration TEST_DURATION = Duration.ofMinutes(90);
  
     {
     	TestGlobals.commonInitialization();
@@ -19,7 +19,7 @@ public class SimulationLoadAverage extends Simulation {
         // Average Load Example Scenario
         //======================================================================
         setUp(
-             new SampleScenario().buildStandardLoad(10, 600, 0, 2)
+             new SampleScenario().buildStandardLoad(30, 6000, 0, 2)
         ).protocols(TestGlobals.getProtocol())
          .maxDuration(TEST_DURATION)
         ;
