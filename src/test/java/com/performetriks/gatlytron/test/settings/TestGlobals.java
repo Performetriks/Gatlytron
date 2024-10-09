@@ -21,7 +21,7 @@ import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 public class TestGlobals {
 
-	public static final String URL_BASE = "http://www.nasa.gov/";
+	public static final String URL_BASE = "http://localhost:8888/";
 	
 	public static String REPORTING_TABLE_NAME = "gatlytron";
 	
