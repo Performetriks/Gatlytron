@@ -218,5 +218,25 @@ Gatlytron.addReporter(
 			}
 		}
 	);
-
 ```
+
+## Setup EMP Dashboards
+Gatlytron provides templates for EMP dashboards. 
+If you want to use EMP to show your Gatling simulation data, here is how:
+
+1. Download the latest release of EMP: https://github.com/xresch/EngineeredMonitoringPlatform/releases
+2. Setup Totorial for EMP: https://www.youtube.com/watch?v=0Ug1daCedfs
+
+**EMP:** 
+For showing data sent to EMP, just import the template dashboard: https://github.com/Performetriks/Gatlytron/tree/main/docs/templates
+	
+**Postgres:**
+1. In EMP, go to "Admin >> Context Settings >> Add >> Postgres Environment" and fill in the connection details.
+2. Import Gatlytron Dashboard template for Postgres: https://github.com/Performetriks/Gatlytron/tree/main/docs/templates
+3. On the Postgres Dashboard:
+  	- Open the Dashboard
+  	- Click the "Edit" button in the top left
+  	- Click on the button "Params"
+  	- Change "ID" of 3 parameters:
+  		- **database_id:** Select the context setting from the dropdown.
+  		- **'simulation' and 'request':** In the queries remove existing "environment={...}" and use Ctrl+Space for autocomplete and inserting the new one which you have created.
