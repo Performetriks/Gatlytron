@@ -112,7 +112,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
 		
 		URI apiEndpoint = URI.create(empURL+"/app/api?apiName=EAVStats&actionName=pushStatsCSV"
 				+ "&SEPARATOR="+SEPARATOR);

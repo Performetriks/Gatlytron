@@ -41,6 +41,7 @@ public class GatlytronCarbonReceiver {
     
     private static int sleepInterval = 500;
     
+    private static GatlytronCarbonRecord firstRecord = null;
     /***************************************************************************
      *
      ***************************************************************************/
@@ -106,8 +107,13 @@ public class GatlytronCarbonReceiver {
 		&& !serverSocket.isClosed()) {
 			
 			while( (graphiteMessage = in.readLine()) != null ) {
+				
+				//----------------------------------
+				// Create Record add to existingRecords
 				GatlytronCarbonRecord record = new GatlytronCarbonRecord(graphiteMessage, existingRecords);
 				
+				//----------------------------------
+				// Collect Records until 
 				if(lastTime == null) {
 					lastTime = record.getTime();
 				}else if( !lastTime.equals(record.getTime()) ) {
@@ -119,6 +125,13 @@ public class GatlytronCarbonReceiver {
 
 					existingRecords.put(record, record); // put into new collection
 					
+				}
+				
+				//----------------------------------
+				// If first, Report Test settings
+				if(firstRecord == null) {
+					firstRecord = record;
+					sendTestSettingsToDBReporter();
 				}
 			}
 		}
@@ -148,11 +161,29 @@ public class GatlytronCarbonReceiver {
 		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
 			ArrayList<GatlytronCarbonRecord> clone = new ArrayList<>();
 			clone.addAll(finalRecords);
-			logger.debug("Send Graphite/Carbon data to: "+reporter.getClass().getSimpleName());
-		    reporter.report(clone);
+			logger.debug("Send Graphite/Carbon data to: "+reporter.getClass().getName());
+		    reporter.reportRecords(clone);
 		}
 		
 		existingRecords = new LinkedHashMap<>();
+	}
+	
+	/***************************************************************************
+	 * Send the test settings to Database Reporters.
+	 * 
+	 ***************************************************************************/
+	private static void sendTestSettingsToDBReporter() {
+		
+		//-------------------------
+		// Send Clone of list to each Reporter
+		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
+			if(reporter instanceof GatlytronReporterDatabase) {
+				logger.debug("Send TestSettings Data to: "+reporter.getClass().getName());
+				((GatlytronReporterDatabase)reporter).reportTestSettings(firstRecord.getSimulation());
+			}
+		}
+		
+		
 	}
 	
    /***************************************************************************

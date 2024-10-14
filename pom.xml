@@ -7,7 +7,7 @@
 
 	<groupId>com.performetriks</groupId>
 	<artifactId>gatlytron</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 
 	<packaging>jar</packaging>
 	
@@ -55,22 +55,6 @@
 		<developerConnection>scm:git:ssh://github.com/Performetriks/Gatlytron.git</developerConnection>
 		<url>https://github.com/Performetriks/Gatlytron/tree/master</url>
 	</scm>
-
-
-	<!-- ================= DISTRIBUTION MANAGEMENT ================== -->
-	<!-- NOTE: If upload fails try to upload manually: -->
-	<!-- https://central.sonatype.org/publish/publish-manual/ -->
-
-	<!--distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement-->
 	
 	<!-- ================= DEPENDENCIES ================== -->
 	<dependencies>
@@ -91,11 +75,11 @@
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
-		<!--dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>2.2.224</version> 
-		</dependency-->
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
 		<dependency>

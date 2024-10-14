@@ -19,7 +19,7 @@ public class GatlytronReporterSysoutJson implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
 		
 		for(GatlytronCarbonRecord record : records ) {
 			System.out.println( record.toJsonString() );

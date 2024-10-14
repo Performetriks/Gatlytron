@@ -3,6 +3,7 @@ package com.performetriks.gatlytron.reporting;
 import java.util.ArrayList;
 
 import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.database.GatlytronDBInterface;
 
 /***************************************************************************
  * This reporter stores the records in a database which is accessible with JDBC.
@@ -13,9 +14,10 @@ import com.performetriks.gatlytron.database.DBInterface;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter {
+public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporterDatabase {
 
 	private DBInterface db;
+	private GatlytronDBInterface gtronDB;
 	private String tableName;
 	
 	/****************************************************************************
@@ -39,43 +41,34 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 		
 		db = DBInterface.createDBInterface(uniqueName, driverName, jdbcURL, username, password);
 		
-		String createTableSQL = this.getCreateTableSQL();
-		this.createTable(createTableSQL);
+		gtronDB = this.getGatlytronDB(db, tableName);
+
+		gtronDB.createTables();
 	}
 	
 	/****************************************************************************
-	 * Implement this class to return a SQL string to create the table.
-	 * You can use the following method to create a template.
-	 * Depending on your database, you might need to adjust the data types etc.
-	 * 
-	 * GatlytronCarbonRecord.getSQLCreateTableTemplate(tableName)
+	 * Implement this class to return instance of GatlytronDBInterface.
+	 * This allows you to make changes to SQLs defined in the GatlytronInterface
+	 * to make any adaptions needed for your specific database.
 	 * 
 	 ****************************************************************************/
-	public abstract String getCreateTableSQL();
+	public abstract GatlytronDBInterface getGatlytronDB(DBInterface dbInterface, String tableName);
 
-	
-	/****************************************************************************
-	 * 
-	 ****************************************************************************/
-	private void createTable(String createTableSQL) {
-		
-		if(db == null) { return; }
-		
-		db.preparedExecute(createTableSQL);
-
-	}
-			
 
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
-		
-		for(GatlytronCarbonRecord record : records ) {
-			record.insertIntoDatabase(db, tableName);
-		}
-
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+		gtronDB.reportRecords(records);
+	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	@Override
+	public void reportTestSettings(String simulationName) {
+		gtronDB.reportTestSettings(simulationName);
 	}
 	
 	/****************************************************************************
@@ -83,7 +76,7 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 	 ****************************************************************************/
 	@Override
 	public void terminate() {
-		// nothing to do
+		
 	}
 
 }

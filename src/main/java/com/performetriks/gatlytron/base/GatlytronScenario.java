@@ -34,11 +34,71 @@ public class GatlytronScenario {
 	private ChainBuilder scenarioSteps;
 	private boolean debug = Gatlytron.isDebug();
 
+	private int users = -1;
+	private int execsHour = -1;
+	private long offset = -1;
+	private int rampUp = -1;
+	private int rampUpInterval = -1;
+	private int pacingSeconds = -1;
+	
+	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
+			+ "		    time BIGINT \r\n"
+			+ "		  , execID VARCHAR(4096) \r\n"
+			+ "		  , simulation VARCHAR(4096) \r\n"
+			+ "		  , scenario VARCHAR(4096) \r\n"
+			+ "		  , users INT \r\n"
+			+ "		  , execsHour INT \r\n"
+			+ "		  , startOffset INT \r\n"
+			+ "		  , rampUp INT \r\n"
+			+ "		  , rampUpInterval INT \r\n"
+			+ "		  , pacingSeconds INT \r\n"
+			+ ")"
+			;
+	
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+	
 	/***************************************************************************
 	 *
 	 ***************************************************************************/
 	public GatlytronScenario(String scenarioName) {
 		this.scenarioName = scenarioName;
+		
+		Gatlytron.addScenario(this);
+	}
+	
+	/***********************************************************************
+	 * Returns a SQL template for creating the database table.
+	 ***********************************************************************/
+	public static String getSQLCreateTableTemplate(String tableName) {
+		return sqlCreateTableTemplate.replace("{tablename}", tableName);
+	}
+	
+	/***********************************************************************
+	 * Returns an insert statement 
+	 ***********************************************************************/
+	public boolean insertIntoDatabase(DBInterface db, String tableName, String simulationName) {
+		
+		if(db == null || tableName == null) { return false; }
+
+		
+		String insertSQL = sqlInsertIntoTemplate.replace("{tablename}", tableName);
+	
+		ArrayList<Object> valueList = new ArrayList<>();
+		
+		valueList.add(Gatlytron.STARTTIME_SECONDS);
+		valueList.add(Gatlytron.EXECUTION_ID);
+		valueList.add(simulationName);
+		valueList.add(scenarioName);
+		valueList.add(users);
+		valueList.add(execsHour);
+		valueList.add(offset);
+		valueList.add(rampUp);
+		valueList.add(rampUpInterval);
+		valueList.add(pacingSeconds);
+		
+		return db.preparedExecute(insertSQL, valueList.toArray());
+		
 	}
 
 	
@@ -70,12 +130,22 @@ public class GatlytronScenario {
 		if (scenarioSteps == null) {
 			throw new IllegalStateException("Scenario Steps cannot be null.");
 		}
+		
+		this.users = users;
+		this.execsHour = execsHour;
+		this.offset = offset;
+		this.rampUp = rampUp;
+		
 		// -----------------------------------------------
 		// Calculate Load Parameters
 		// -----------------------------------------------
 		int pacingSeconds = 3600 / (execsHour / users);
-		int rampUpInterval = pacingSeconds / users * rampUp;
+		int rampUpInterval = (int)Math.ceil( (1f * pacingSeconds / users) * rampUp );
 
+		
+		// -----------------------------------------------
+		// Log infos
+		// -----------------------------------------------
 		logger.info("============== Load Parameters ==============");
 		logger.info("Scenario: " + scenarioName);
 		logger.info("Target Users: " + users);
@@ -85,7 +155,21 @@ public class GatlytronScenario {
 		logger.info("RampUp Interval(s): " + rampUpInterval);
 		logger.info("Pacing(s): " + pacingSeconds);
 		logger.info("============================================");
-
+		
+		// -----------------------------------------------
+		// Log Warnings
+		// -----------------------------------------------
+		if(rampUpInterval == 0) {
+			logger.warn("===> Ramp up interval is 0, all users will be started at the same time.");
+		}
+		
+		if(pacingSeconds < 10) {
+			logger.warn("===> Pacing is below 10 seconds, make sure your scenario duration can fit into that time.");
+		}
+		
+		this.rampUpInterval = rampUpInterval;
+		this.pacingSeconds = pacingSeconds;
+		
 		ScenarioBuilder SCENARIO = buildScenario(pacingSeconds);
 
 		return SCENARIO.injectClosed(constantConcurrentUsers(0).during(Duration.ofSeconds(offset)),

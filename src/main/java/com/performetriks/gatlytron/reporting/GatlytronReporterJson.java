@@ -67,7 +67,7 @@ public class GatlytronReporterJson implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
 
 		try {
 

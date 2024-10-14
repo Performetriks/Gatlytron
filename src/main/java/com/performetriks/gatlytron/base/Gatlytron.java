@@ -1,6 +1,7 @@
 package com.performetriks.gatlytron.base;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,14 @@ public class Gatlytron {
 	private static final Logger logger = LoggerFactory.getLogger(Gatlytron.class);
 	
 	private static ArrayList<GatlytronReporter> reporterList = new ArrayList<>();
+	private static ArrayList<GatlytronScenario> scenarioList = new ArrayList<>();
 	
 	private static boolean debug = false;
 	private static boolean keepEmptyRecords = false;
+	
+	public static final String EXECUTION_ID = UUID.randomUUID().toString();
+	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
+	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
 	
 	/******************************************************************
 	 * Enables the Gatlytron Graphite Receiver to do custom reports.
@@ -53,9 +59,25 @@ public class Gatlytron {
 		return (ArrayList<GatlytronReporter>) reporterList.clone();
 	}
 	
+	/******************************************************************
+	 * For internal use only.
+	 * Adds a scenario to the list of scenarios.
+	 ******************************************************************/
+	public static void addScenario(GatlytronScenario scenario) {
+		scenarioList.add(scenario);
+	}
 	
 	/******************************************************************
-	 * Returns the list of added reporters.
+	 * Returns the list of scenarios.
+	 * 
+	 ******************************************************************/
+	@SuppressWarnings("unchecked")
+	public static ArrayList<GatlytronScenario> getScenarioList() {
+		return (ArrayList<GatlytronScenario>) scenarioList.clone();
+	}
+	
+	/******************************************************************
+	 * Terminates the reporters.
 	 * 
 	 ******************************************************************/
 	@SuppressWarnings("unchecked")

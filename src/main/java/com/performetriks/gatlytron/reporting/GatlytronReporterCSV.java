@@ -57,7 +57,7 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
 		BufferedWriter writer = null;
 		try {
 			

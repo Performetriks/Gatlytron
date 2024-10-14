@@ -26,7 +26,7 @@ public class GatlytronReporterSysoutCSV implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
 		
 		System.out.println( GatlytronCarbonRecord.getCSVHeader(separator) );
 		for(GatlytronCarbonRecord record : records ) {

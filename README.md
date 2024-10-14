@@ -146,6 +146,22 @@ gatling {
 There are Gatlytron reporters which allow you to report metrics to a database.
 For this to work you will need to include the respective driver dependency. 
 
+### Tables
+There will be two tables created in the database:
+* **{tableName}:** The base table containing all the metrics. (fields are explained above under section "Reporting")
+* **{tableName}_testsettings:** This table will contain the settings for the scenarios that have been executed:
+	* **time:** Time in epoch seconds.
+	* **execID:** A unique id for the test execution.
+	* **simulation:** The name of the simulation.
+	* **scenario:** The name of the scenario.
+	* **users:** The target number of users for the scenario.
+	* **execsHour:** The target number of executions per hour for the scenario.
+	* **startOffset:** The start offset in seconds for the scenario.
+	* **rampUp:**  The number of users to ramp up per interval.
+	* **rampUpInterval:** The ramp up interval in seconds.
+	* **pacingSeconds:** The pacing of the use case in seconds. 
+	
+
 ### Reporting to Postgres
 Following an example for PostGres SQL:
 

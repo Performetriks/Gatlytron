@@ -3,6 +3,7 @@ package com.performetriks.gatlytron.reporting;
 import java.util.ArrayList;
 
 import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.database.GatlytronDBInterface;
 
 /***************************************************************************
  * This reporter stores the data in a Postgres Database.
@@ -14,9 +15,10 @@ import com.performetriks.gatlytron.database.DBInterface;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronReporterDatabasePostGres implements GatlytronReporter {
+public class GatlytronReporterDatabasePostGres implements GatlytronReporterDatabase {
 
 	private DBInterface db;
+	GatlytronDBInterface gtronDB;
 	private String tableName;
 	
 	/****************************************************************************
@@ -42,33 +44,24 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporter {
 		
 		db = DBInterface.createDBInterfacePostgres(uniqueName, servername, port, dbName, username, password);
 		
-		this.createTable();
-	}
-	
-	/****************************************************************************
-	 * 
-	 ****************************************************************************/
-	private void createTable() {
-		
-		if(db == null) { return; }
-		
-		String createTable = GatlytronCarbonRecord.getSQLCreateTableTemplate(tableName);
-		db.preparedExecute(createTable);
-		
-		
-	}
-			
+		gtronDB = new GatlytronDBInterface(db, tableName);
+		gtronDB.createTables();
+	}			
 
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void report(ArrayList<GatlytronCarbonRecord> records) {
-		
-		for(GatlytronCarbonRecord record : records ) {
-			record.insertIntoDatabase(db, tableName);
-		}
-
+	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+		gtronDB.reportRecords(records);
+	}
+	
+	/****************************************************************************
+	 * 
+	 ****************************************************************************/
+	@Override
+	public void reportTestSettings(String simulationName) {
+		gtronDB.reportTestSettings(simulationName);
 	}
 	
 	/****************************************************************************

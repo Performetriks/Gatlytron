@@ -1,7 +1,5 @@
 package com.performetriks.gatlytron.reporting;
 
-import java.util.ArrayList;
-
 /***************************************************************************
  * Interface for reporting data received through Graphite protocol.
  * 
@@ -11,10 +9,8 @@ import java.util.ArrayList;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public interface GatlytronReporter {
+public interface GatlytronReporterDatabase extends GatlytronReporter {
 
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records);
-	
-	public void terminate();
+	public abstract void reportTestSettings(String simulationName);
 	
 }

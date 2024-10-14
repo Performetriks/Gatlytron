@@ -6,14 +6,12 @@ import static io.gatling.javaapi.core.CoreDsl.csv;
 import static io.gatling.javaapi.http.HttpDsl.http;
 
 import com.performetriks.gatlytron.base.Gatlytron;
-import com.performetriks.gatlytron.reporting.GatlytronCarbonRecord;
+import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.database.GatlytronDBInterface;
 import com.performetriks.gatlytron.reporting.GatlytronReporterCSV;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabaseJDBC;
 import com.performetriks.gatlytron.reporting.GatlytronReporterDatabasePostGres;
-import com.performetriks.gatlytron.reporting.GatlytronReporterEMP;
 import com.performetriks.gatlytron.reporting.GatlytronReporterJson;
-import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutCSV;
-import com.performetriks.gatlytron.reporting.GatlytronReporterSysoutJson;
 
 import ch.qos.logback.classic.Level;
 import io.gatling.javaapi.core.FeederBuilder;
@@ -61,12 +59,12 @@ public class TestGlobals {
     	
     	//------------------------------
     	// EMP Reporter
-    	Gatlytron.addReporter(
+    	/*Gatlytron.addReporter(
     			new GatlytronReporterEMP(
     					"http://localhost:8888"
     					,"gatlytron-test-token-MSGIUzrLyUsOypYOkekVgmlfjMpLbRCA"
     				)
-    			);
+    			);*/
     	
     	//------------------------------
     	// PostGres DB Reporter
@@ -83,7 +81,7 @@ public class TestGlobals {
     	
     	//------------------------------
     	// JDBC DB Reporter
-    	/*Gatlytron.addReporter(
+    	Gatlytron.addReporter(
     			new GatlytronReporterDatabaseJDBC("org.h2.Driver"
     					, "jdbc:h2:tcp://localhost:8889/./datastore/h2database;MODE=MYSQL;IGNORECASE=TRUE"
     					, REPORTING_TABLE_NAME
@@ -91,12 +89,12 @@ public class TestGlobals {
     					, "sa") {
 					
 					@Override
-					public String getCreateTableSQL() {
-						return GatlytronCarbonRecord.getSQLCreateTableTemplate(REPORTING_TABLE_NAME);
+					public GatlytronDBInterface getGatlytronDB(DBInterface dbInterface, String tableNamePrefix) {
+						return new GatlytronDBInterface(dbInterface, tableNamePrefix);
 					}
 				}
     		);
-    	*/
+    	
     	
 
 	}
