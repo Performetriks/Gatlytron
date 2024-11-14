@@ -152,21 +152,40 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 			//-----------------------------------
 			// Parse Message
 			String[] splittedRecord = carbonMessage.split(" ");
-			String[] splittedMetricPath = splittedRecord[0].split("\\.");
-			if(splittedMetricPath.length != 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
-			
-			simulation = splittedMetricPath[1];
-			String type = splittedMetricPath[3];  
-			String metric = splittedMetricPath[4];
+			String[] splittedPath = splittedRecord[0].split("\\.");
 			String value = splittedRecord[1];
 			time = splittedRecord[2];
 			
+			//-----------------------------------
+			// Disassemble Metric Path
+			// =======================
+			// path[0] >> contains "gatling" (ignored)
+			// path[1] >> contains simulation name
+			// path[2 to (pathLength-3)] >> contains the "request" or "user" name
+			// path[pathLength-2] >> contains type (e.g. all/ok/ko)
+			// path[pathLength-1] >> contains metric
+			
+			int pathLength = splittedPath.length;
+			if(pathLength < 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
+			simulation = splittedPath[1];
+			String type = splittedPath[3];  
+			String metric = splittedPath[pathLength - 1] ;
+			
+			String requestOrUsers = "";
+			for(int i = 2; i < splittedPath.length-2; i++  ) {
+				requestOrUsers += splittedPath[i] + ".";
+			}
+			
+			if( !requestOrUsers.isEmpty() ) {
+				requestOrUsers = requestOrUsers.substring(0, requestOrUsers.length()-1);
+			}
+						
 			switch(type) {
 				
 				case "ok":
 				case "ko":
 				case "all":
-					request = splittedMetricPath[2];
+					request = requestOrUsers;
 				break;
 					
 				
@@ -175,6 +194,12 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 					type = "users";
 				break;
 			}
+			
+//			System.out.println("========================");
+//			System.out.println("type:"+type);
+//			System.out.println("request:"+request);
+//			System.out.println("user_group:"+user_group);
+//			System.out.println("value:"+value);
 			
 			
 			//-----------------------------------
