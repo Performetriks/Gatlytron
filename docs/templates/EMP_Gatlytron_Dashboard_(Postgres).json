@@ -12,7 +12,7 @@
     "JSON_EDITOR_GROUPS": {},
     "ALLOW_EDIT_SETTINGS": false,
     "TIME_CREATED": 1726666829202,
-    "LAST_UPDATED": 1731860886781,
+    "LAST_UPDATED": 1731862435426,
     "IS_PUBLIC": false,
     "START_FULLSCREEN": false,
     "IS_DELETABLE": true,
@@ -291,7 +291,7 @@
         "FK_ID_DASHBOARD": 107,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
-        "Y": 164,
+        "Y": 166,
         "WIDTH": 63,
         "HEIGHT": 40,
         "TITLE": "Gantt Chart",
@@ -347,7 +347,7 @@
         "FK_ID_DASHBOARD": 107,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
-        "Y": 128,
+        "Y": 130,
         "WIDTH": 63,
         "HEIGHT": 36,
         "TITLE": "Compared Statistics",
@@ -365,7 +365,7 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": true,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tcompare_to \u003d object(\r\n\t\t\t\t\t \u0027earliest\u0027, earliest()\r\n\t\t\t\t\t,\u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| meta\r\n\t\u0027timerange\u0027 \u003d tojson(param(\u0027compare_to\u0027))\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ ( meta(\u0027timerange\u0027).latest/ 1000) +`\r\n\t\t  AND time \u003e\u003d `+ ( meta(\u0027timerange\u0027).earliest / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n;\r\n| meta\r\n\ttimerange \u003d object(\r\n\t\t\t\t   \u0027earliest\u0027, earliest()\r\n\t\t\t\t , \u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| mimic\r\n;\r\n| resultcompare\r\n\tby\u003d[request]\r\n\tpercentformat \u003d [[\u0027percent\u0027, -1, 1, \"bg\", \"\"], [align, center]]\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(request, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n| display \r\n\tas\u003dtable\r\n\tdownload\u003dtrue",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tcompare_to \u003d object(\r\n\t\t\t\t\t \u0027earliest\u0027, earliest()\r\n\t\t\t\t\t,\u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| meta\r\n\t\u0027timerange\u0027 \u003d tojson(param(\u0027compare_to\u0027))\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ ( meta(\u0027timerange\u0027).latest/ 1000) +`\r\n\t\t  AND time \u003e\u003d `+ ( meta(\u0027timerange\u0027).earliest / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n;\r\n| meta\r\n\ttimerange \u003d object(\r\n\t\t\t\t   \u0027earliest\u0027, earliest()\r\n\t\t\t\t , \u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| mimic\r\n;\r\n| resultcompare\r\n\tby\u003d[request]\r\n\tpercentformat \u003d [[\u0027percent\u0027, $threshold_good$, $threshold_bad$, \"bg\", \"cfw-gray\"], [align, center]]\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(request, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n| display \r\n\tas\u003dtable\r\n\tdownload\u003dtrue",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
@@ -376,8 +376,8 @@
         "TYPE": "cfw_parameter",
         "X": 0,
         "Y": 121,
-        "WIDTH": 15,
-        "HEIGHT": 7,
+        "WIDTH": 63,
+        "HEIGHT": 9,
         "TITLE": null,
         "TITLE_LINK": null,
         "TITLE_INFO": null,
@@ -393,9 +393,11 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "description": null,
+          "description": "Compare the data selected with this time range picker (A), to the data shown above, selected with the dashboards time range picker (B). Preferably this time range you choose here should be earlier than the one selected for the dashboard. Thresholds are in percentages.",
           "JSON_PARAMETERS": {
-            "171": "compare_to"
+            "171": "compare_to",
+            "172": "threshold_good",
+            "173": "threshold_bad"
           },
           "addtotop": false,
           "showbutton": true,
@@ -543,6 +545,30 @@
         "PARAM_TYPE": "TIMEFRAMEPICKER",
         "NAME": "compare_to",
         "VALUE": "{\"offset\":\"30-m\",\"earliest\":null,\"latest\":null,\"clientTimezoneOffset\":0}",
+        "MODE": "MODE_SUBSTITUTE",
+        "IS_MODE_CHANGE_ALLOWED": false,
+        "IS_DYNAMIC": false
+      },
+      {
+        "PK_ID": 172,
+        "FK_ID_DASHBOARD": 107,
+        "WIDGET_TYPE": null,
+        "LABEL": "Number",
+        "PARAM_TYPE": "NUMBER",
+        "NAME": "threshold_good",
+        "VALUE": "-15",
+        "MODE": "MODE_SUBSTITUTE",
+        "IS_MODE_CHANGE_ALLOWED": false,
+        "IS_DYNAMIC": false
+      },
+      {
+        "PK_ID": 173,
+        "FK_ID_DASHBOARD": 107,
+        "WIDGET_TYPE": null,
+        "LABEL": "Number",
+        "PARAM_TYPE": "NUMBER",
+        "NAME": "threshold_bad",
+        "VALUE": "15",
         "MODE": "MODE_SUBSTITUTE",
         "IS_MODE_CHANGE_ALLOWED": false,
         "IS_DYNAMIC": false
