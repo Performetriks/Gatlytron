@@ -24,13 +24,15 @@ public class SampleScenario extends GatlytronScenario {
         	//.debug(TestGlobals.DEBUG) // default is obtained from Gatlytron.isDebug()
             .feederBuilder(TestGlobals.getDataFeeder())
             .scenarioSteps(
-                exec(
-                http(SCENARIO_NAME+".fetchInfo")
-                        .get(URL_API)
-                        //.body(ElFileBody("postbody.json")) //.asJson()
-                        //.headers(getHeader())
-                        //.check(bodyString().saveAs("responseBody"))
-                )
+            	group("MyTest").on(
+	                exec( 
+	                http(SCENARIO_NAME+".fetchInfo")
+	                        .get(URL_API)
+	                        //.body(ElFileBody("postbody.json")) //.asJson()
+	                        //.headers(getHeader())
+	                        //.check(bodyString().saveAs("responseBody"))
+	                )
+            	)
         );
  
     }

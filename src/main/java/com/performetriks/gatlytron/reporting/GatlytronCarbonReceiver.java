@@ -3,7 +3,6 @@ package com.performetriks.gatlytron.reporting;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -42,6 +41,9 @@ public class GatlytronCarbonReceiver {
     private static int sleepInterval = 500;
     
     private static GatlytronCarbonRecord firstRecord = null;
+    
+    private static boolean isTerminated = false;
+    
     /***************************************************************************
      *
      ***************************************************************************/
@@ -78,7 +80,9 @@ public class GatlytronCarbonReceiver {
 					try {
 						handleCarbonData();
 					} catch (IOException e) {
-						logger.warn("GatlytronCarbonReceiver: While reading carbon data: "+e.getMessage());
+						if(!isTerminated) {
+							logger.warn("GatlytronCarbonReceiver: Exception while reading carbon data: "+e.getMessage(), e);
+						}
 					}
 					
 					//---------------------------------
@@ -86,7 +90,7 @@ public class GatlytronCarbonReceiver {
 					try {
 						Thread.sleep(sleepInterval);
 					} catch (InterruptedException e) {
-						// ignore
+						logger.info("GatlytronCarbonReceiver: Thread Interrupted");
 					}
 				}
 			}
@@ -190,23 +194,22 @@ public class GatlytronCarbonReceiver {
     *
     ***************************************************************************/
 	public static void terminate() {
-
+		
+		isTerminated = true;
 		//---------------------------------
 		// Terminate Thread
-		thread.interrupt();
-		try {
-			Thread.sleep(sleepInterval);
-		} catch (InterruptedException e) {
-			logger.error("Thread interrupted while waiting for carbon protocol data.", e);
-			Thread.currentThread().interrupt();
+		if(thread != null) {
+			thread.interrupt();
 		}
 		
 		//---------------------------------
 		// Closing Server Socket
-		try {
-	        serverSocket.close();
-		} catch (IOException e) {
-			logger.error("Error while closing server socket connection.", e);
+		if(serverSocket != null) {
+			try {
+		        serverSocket.close();
+			} catch (IOException e) {
+				logger.warn("Terminate: Error while closing server socket connection: "+e.getMessage());
+			}
 		}
 		
 		
@@ -215,22 +218,22 @@ public class GatlytronCarbonReceiver {
 		try {
 			handleCarbonData();
 		} catch (IOException e) {
-			logger.error("Error while reading carbon data.", e);
+			logger.warn("Terminate: Error while reading carbon data: "+e.getMessage());
 		}
 
-		if( !existingRecords.isEmpty() ) {
+		if(existingRecords != null && !existingRecords.isEmpty() ) {
 			sendRecordsToReporter();
-			
 		}
 
 		//---------------------------------
 		// Closing Client Socket and Stream
-		try {
-
-			//in.close(); - causes the process to hang an never terminate
-	        clientSocket.close();
-		} catch (IOException e) {
-			logger.error("Error while closing client socket connection.", e);
+		if(clientSocket != null) {
+			try {
+				//in.close(); - causes the process to hang an never terminate
+		        clientSocket.close();
+			} catch (IOException e) {
+				logger.warn("Terminate: Error while closing client socket connection: "+e.getMessage());
+			}
 		}
 	       
 	}
