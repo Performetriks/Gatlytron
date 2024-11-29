@@ -45,7 +45,7 @@ public class TestGlobals {
 		Gatlytron.setLogLevel(Level.DEBUG, "com.performetriks.gatlytron");
 		//Gatlytron.setKeepEmptyRecords(false);
 		
-    	Gatlytron.enableGraphiteReceiver(2003);
+    	//Gatlytron.enableGraphiteReceiver(2003);
     	
     	//------------------------------
     	// File Reporter
@@ -103,7 +103,7 @@ public class TestGlobals {
 	 * 
 	 ****************************************************************************/
 	public static void commonTermination() {
-		Gatlytron.terminate();
+		//Gatlytron.terminate();
 	}
 	
 	/****************************************************************************

@@ -7,12 +7,18 @@ import java.security.ProtectionDomain;
 
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
 
+/***************************************************************************
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
 public class BytecodeTransformer implements ClassFileTransformer {
-	
 	
 	/*******************************************************************************
 	 * 
@@ -23,18 +29,11 @@ public class BytecodeTransformer implements ClassFileTransformer {
 		
 		byte[] byteCode = classfileBuffer;
 
-		//Agent.log("[INFO] "+className);
-//		if (className.startsWith("io/gatling/core/stats")) {
-//			System.out.println("[CALL TRANSFORM] "+className);
-//		}
+		//InjectionAgent.log("[INFO] "+className);
 		
 		if (className.equals("io/gatling/core/stats/DataWritersStatsEngine")) {
-			System.out.println("Found CLASS!!!  Woohoo!!! "+className);
-			//byteCode = adjustScalaDataWriterStatsEngine(loader, className, classfileBuffer, byteCode); 
-			return byteCode;
-		}else if (className.equals("io/gatling/core/stats/StatsEngine")) {
-			System.out.println("Found CLASS!!!  Woohoo!!! "+className);
-			//byteCode = adjustScalaDataWriterStatsEngine(loader, className, classfileBuffer, byteCode); 
+			
+			byteCode = adjustScalaDataWriterStatsEngine(loader, className, classfileBuffer, byteCode); 
 			return byteCode;
 		}	
 
@@ -48,31 +47,40 @@ public class BytecodeTransformer implements ClassFileTransformer {
 	private byte[] adjustScalaDataWriterStatsEngine(ClassLoader loader, String className, byte[] classfileBuffer, byte[] byteCode) {
 		
 		try {
+			
+			InjectionAgent.log("INFO", "Inject Bytecode into class: "+className);
+			
+			//----------------------------------
+			// Load Class
 			ClassPool pool = ClassPool.getDefault();
 			pool.insertClassPath(new LoaderClassPath(loader));
 			
-			CtClass htmlTemplateClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
+			CtClass transformedClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
 
-			InjectionAgent.log("[INFO] Start Instrumenting AbstractTemplateHTML: "+className);
+			//----------------------------------
+			// Debug: Print list of all Methods
+			//for(CtMethod method : transformedClass.getDeclaredMethods() ) {
+			//	InjectionAgent.log("DEBUG", method.getName());
+			//}
 			
-			//------------------------
-			// Change Html Method
-			//------------------------
-			CtClass requestClass = pool.get("javax.servlet.http.HttpServletRequest");
-			CtConstructor constructor =  htmlTemplateClass.getDeclaredConstructor(new CtClass[]{requestClass});
+			//----------------------------------
+			// Transform Method: logResponse
+			CtMethod methodLogResponse = transformedClass.getDeclaredMethod("logResponse");
 
-			constructor.insertAfter("this.addCSSFile(\"/custom/css/injected.css\");"); 
-			constructor.insertAfter("this.addJSFileBottom(\"/custom/js/injected.js\");"); 
-
-			byteCode = htmlTemplateClass.toBytecode();
-			htmlTemplateClass.detach();
+			methodLogResponse.insertBefore("com.performetriks.gatlytron.injection.InjectedDataReceiver"
+										+".logResponse(scenario, groups, requestName, startTimestamp, endTimestamp, status, responseCode, message);");
+			
+			//----------------------------------
+			// Detach
+			byteCode = transformedClass.toBytecode();
+			transformedClass.detach();
 			
 		} catch (Exception e) {
-			InjectionAgent.log("[ERROR] AgentTransformer.adjustHTMLTemplate()", e);
+			InjectionAgent.log("ERROR", "Error while transforming class: "+className, e);
 			
 		}
 		
-		InjectionAgent.log("[INFO] End Instrumenting AbstractTemplateHTML");
+		InjectionAgent.log("INFO", "End Instrumenting class: "+className);
 		
 		return byteCode;
 	}
@@ -88,7 +96,7 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			
 			CtClass snapshotView = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
 
-			InjectionAgent.log("[INFO] Start Instrumenting SnapshotView: "+className);
+			InjectionAgent.log("INFO", "Start Instrumenting SnapshotView: "+className);
 			
 			//------------------------
 			// Change Html Method
@@ -136,11 +144,11 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			snapshotView.detach();
 			
 		} catch (Exception e) {
-			InjectionAgent.log("[ERROR] AgentTransformer.adjustSnapshotView()", e);
+			InjectionAgent.log("ERROR","AgentTransformer.adjustSnapshotView()", e);
 			
 		}
 		
-		InjectionAgent.log("[INFO] End Instrumenting SnapshotView");
+		InjectionAgent.log("INFO", "End Instrumenting SnapshotView");
 		
 		return byteCode;
 	}
@@ -157,7 +165,7 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			
 			CtClass healthView = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
 
-			InjectionAgent.log("[INFO] Start Instrumenting HealthView: "+className);
+			InjectionAgent.log("INFO", "Start Instrumenting HealthView: "+className);
 			
 			CtClass requestWrapperClass = pool.get("com.pengtoolbox.util.html.RequestWrapper");
 			CtClass requestEventClass = pool.get("com.pengtoolbox.util.html.RequestEvent");
@@ -169,11 +177,11 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			healthView.detach();
 			
 		} catch (Exception e) {
-			InjectionAgent.log("[ERROR] AgentTransformer.adjustHealthView()", e);
+			InjectionAgent.log("ERROR","AgentTransformer.adjustHealthView()", e);
 			
 		}
 		
-		InjectionAgent.log("[INFO] End Instrumenting HealthView");
+		InjectionAgent.log("INFO","End Instrumenting HealthView");
 		
 		return byteCode;
 

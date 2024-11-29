@@ -3,7 +3,7 @@
 	
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>./target/gatling.log</file>
-        <append>true</append>
+        <append>false</append>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{15} - %msg%n%rEx</pattern>
         </encoder>
@@ -20,7 +20,8 @@
 	<!-- uncomment and set to TRACE to log all HTTP requests -->
 	<!--<logger name="io.gatling.http.engine.response" level="TRACE" />-->
 
-	<root level="WARN">
+	<root level="TRACE">
+		<appender-ref ref="FILE" />
 		<appender-ref ref="CONSOLE" />
 	</root>
 

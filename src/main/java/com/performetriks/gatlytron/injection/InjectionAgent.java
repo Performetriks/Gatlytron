@@ -2,13 +2,21 @@ package com.performetriks.gatlytron.injection;
 
 import java.lang.instrument.Instrumentation;
 
+/***************************************************************************
+ * 
+ * Copyright Owner: Performetriks GmbH, Switzerland
+ * License: MIT License
+ * 
+ * @author Reto Scheiwiller
+ * 
+ ***************************************************************************/
 public class InjectionAgent {
 
 	/*****************************************************************************
 	 * 
 	 *****************************************************************************/
 	public static void agentmain(String args, Instrumentation instr) {
-		InjectionAgent.log("[INFO] execute agentmain()...");
+		InjectionAgent.log("INFO", "execute agentmain()...");
 		
 		premain(args, instr);
 	}
@@ -19,7 +27,7 @@ public class InjectionAgent {
 	 *****************************************************************************/
 	public static void premain(String args, Instrumentation instr) {
 			
-		InjectionAgent.log("\r\n[INFO] ======================== Load Gatlytron Agent  ======================== ");
+		InjectionAgent.log("INFO", "Add Bytecode Transformer");
 		instr.addTransformer(new BytecodeTransformer());
 	}
 
@@ -27,14 +35,14 @@ public class InjectionAgent {
 	/*****************************************************************************
 	 * 
 	 *****************************************************************************/
-	public static void log(String message) {
-		System.out.println(message);
+	public static void log(String level, String message) {
+		System.out.println("["+level+"] Gatlytron InjectionAgent: "+message);
 	}
 	
 	/*****************************************************************************
 	 * 
 	 *****************************************************************************/
-	public static void log(String message, Throwable e) {
+	public static void log(String level, String message, Throwable e) {
 		
 		StringBuffer errorBuffer = new StringBuffer(e.toString());
 		
@@ -44,7 +52,7 @@ public class InjectionAgent {
 		
 		message += errorBuffer.toString();
 		
-		InjectionAgent.log(message);
+		InjectionAgent.log(level, message);
 	}
 
 }
