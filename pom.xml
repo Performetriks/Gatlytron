@@ -19,8 +19,10 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gatling.version>3.11.5</gatling.version>
-		<gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
+		
+		<gatling.version>3.13.1</gatling.version>
+		<gatling-maven-plugin.version>4.11.0</gatling-maven-plugin.version>
+		
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
@@ -59,11 +61,19 @@
 	<!-- ================= DEPENDENCIES ================== -->
 	<dependencies>
 
+		<!-- https://mvnrepository.com/artifact/io.gatling.highcharts/gatling-charts-highcharts -->
 		<dependency>
 			<groupId>io.gatling.highcharts</groupId>
 			<artifactId>gatling-charts-highcharts</artifactId>
 			<version>${gatling.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
+		<dependency>
+		    <groupId>org.javassist</groupId>
+		    <artifactId>javassist</artifactId>
+		    <version>3.30.2-GA</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
@@ -94,6 +104,19 @@
 			<artifactId>commons-dbcp2</artifactId>
 			<version>2.12.0</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>1.5.12</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 >
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+		    <version>2.0.16</version>
+		</dependency-->
 
 	</dependencies>
 
@@ -101,6 +124,74 @@
 	<build>
 		<plugins>
 			
+			<!-- ================= ASSEMBLY ================== -->
+			<!--plugin>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <version>2.2</version>
+		        <configuration>
+		            <descriptorRefs>
+		                <descriptorRef>jar-with-dependencies</descriptorRef>
+		            </descriptorRefs>
+		            <archive>
+		                <index>true</index>
+		                <manifest>
+		                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+		                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+		                </manifest>
+		                <manifestEntries>
+		                    <Premain-Class>com.performetriks.gatlytron.injection.InjectionAgent</Premain-Class>
+		                </manifestEntries>
+		            </archive>
+		        </configuration>
+		        <executions>
+		            <execution>
+		                <id>make-assembly</id>
+		                <phase>package</phase>
+		                <goals>
+		                    <goal>single</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin-->
+		    
+		    <!-- ================= SHADE ================== -->
+		    <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>3.1.1</version>
+              <configuration>
+                <filters>
+                  <!-- https://stackoverflow.com/a/6743609 -->
+                  <filter>
+                    <artifact>*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/*.DSA</exclude>
+                      <exclude>META-INF/*.SF</exclude>
+                      <exclude>META-INF/*.RSA</exclude>
+                    </excludes>
+                  </filter>
+                </filters>
+              </configuration>
+              <executions>
+                <execution>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                    <transformers>
+                      <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <manifestEntries>
+		                    <Premain-Class>com.performetriks.gatlytron.injection.InjectionAgent</Premain-Class>
+                  		</manifestEntries>
+                      </transformer>
+                    </transformers>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            
+    
 			<!-- ================= COMPILER ================== -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -117,6 +208,13 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${maven-jar-plugin.version}</version>
+				
+
+				<configuration>
+		          <archive>
+		            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+		          </archive>
+		        </configuration>
 			</plugin>
 			
 			<!-- ================= GATLING ================== -->
