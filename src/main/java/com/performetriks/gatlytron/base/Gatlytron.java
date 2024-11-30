@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.performetriks.gatlytron.reporting.GatlytronCarbonReceiver;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
 
 import ch.qos.logback.classic.Level;
@@ -33,14 +32,6 @@ public class Gatlytron {
 	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
 	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
 	
-	/******************************************************************
-	 * Enables the Gatlytron Graphite Receiver to do custom reports.
-	 * @param port
-	 ******************************************************************/
-	public static void enableGraphiteReceiver(int port) {
-		logger.info("Starting Carbon Receiver");
-		GatlytronCarbonReceiver.start(port);
-	}
 	
 	/******************************************************************
 	 * Add reporters to the list.
@@ -83,8 +74,7 @@ public class Gatlytron {
 	@SuppressWarnings("unchecked")
 	public static void terminate() {
 		logger.info("Terminating Gatlytron");
-		GatlytronCarbonReceiver.terminate();
-		
+
 		for(GatlytronReporter reporter : reporterList) {
 			reporter.terminate();
 		}

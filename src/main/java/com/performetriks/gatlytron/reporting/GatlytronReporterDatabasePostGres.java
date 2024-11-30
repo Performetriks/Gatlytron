@@ -52,7 +52,7 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporterDatab
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
 		gtronDB.reportRecords(records);
 	}
 	

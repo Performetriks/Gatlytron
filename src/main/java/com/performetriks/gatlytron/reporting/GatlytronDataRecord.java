@@ -22,7 +22,7 @@ import com.performetriks.gatlytron.database.DBInterface;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronCarbonRecord {
+public class GatlytronDataRecord {
 
 /*
 Following are the expected input string formats:
@@ -45,7 +45,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 
  */
 	
-	private static final Logger logger = LoggerFactory.getLogger(GatlytronCarbonRecord.class);
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronDataRecord.class);
 	
 	private String time = null;
 	private String simulation = null;
@@ -145,7 +145,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	/***********************************************************************
 	 * Parse the Gatling Carbon Message
 	 ***********************************************************************/
-	public GatlytronCarbonRecord(String carbonMessage, LinkedHashMap<GatlytronCarbonRecord, GatlytronCarbonRecord> existingRecords) {
+	public GatlytronDataRecord(String carbonMessage, LinkedHashMap<GatlytronDataRecord, GatlytronDataRecord> existingRecords) {
 		
 		if(carbonMessage != null) {
 
@@ -204,7 +204,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 			
 			//-----------------------------------
 			// Parse Message
-			GatlytronCarbonRecord targetForData = existingRecords.get(this);
+			GatlytronDataRecord targetForData = existingRecords.get(this);
 			
 			if(targetForData == null) {
 				targetForData = this;

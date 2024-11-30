@@ -59,7 +59,7 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
 		gtronDB.reportRecords(records);
 	}
 	

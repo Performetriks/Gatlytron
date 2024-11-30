@@ -38,7 +38,7 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 		this.separator = separator;
 		try {
 			path = Path.of(filepath);
-			String header = GatlytronCarbonRecord.getCSVHeader(separator);
+			String header = GatlytronDataRecord.getCSVHeader(separator);
 			Files.deleteIfExists(path);
 			
 			Files.write(path, header.getBytes() 
@@ -57,13 +57,13 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
 		BufferedWriter writer = null;
 		try {
 			
 			writer = new BufferedWriter(new FileWriter(filepath, true));
 	    
-			for(GatlytronCarbonRecord record : records ) {
+			for(GatlytronDataRecord record : records ) {
 				writer.write(record.toCSV(separator)+"\r\n");
 			}
 			

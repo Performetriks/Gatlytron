@@ -39,7 +39,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	
 	static {
 		
-		for(String metric : GatlytronCarbonRecord.metricNames) {
+		for(String metric : GatlytronDataRecord.metricNames) {
 			CSV_HEADER += SEPARATOR+metric;
 		}
 
@@ -112,7 +112,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
 		
 		URI apiEndpoint = URI.create(empURL+"/app/api?apiName=EAVStats&actionName=pushStatsCSV"
 				+ "&SEPARATOR="+SEPARATOR);
@@ -125,7 +125,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		
 		//----------------------------------
 		// Create Request Data
-		for(GatlytronCarbonRecord record : records) {
+		for(GatlytronDataRecord record : records) {
 			
 			if(record.isRequestRecord()) {
 				this.addCSVRecordsRequest(csvRecordsRequest, record);
@@ -168,7 +168,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	private void addCSVRecordsUser(StringBuilder csv, GatlytronCarbonRecord record) {
+	private void addCSVRecordsUser(StringBuilder csv, GatlytronDataRecord record) {
 		
 		if(record.isRequestRecord()) {
 			logger.warn("Unexpected type of Carbon record. Expected type 'user' but got type 'request'.");
@@ -217,7 +217,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	private void addCSVRecordsRequest(StringBuilder csv, GatlytronCarbonRecord record) {
+	private void addCSVRecordsRequest(StringBuilder csv, GatlytronDataRecord record) {
 		
 		if(record.isUserRecord()) {
 			logger.warn("Unexpected type of Carbon record. Expected type 'request' but got type 'user'.");
@@ -249,7 +249,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		//-------------------------------
 		// Common information
 		
-		for(String metric : GatlytronCarbonRecord.metricNames) {
+		for(String metric : GatlytronDataRecord.metricNames) {
 			
 			BigDecimal valueOK = record.getValue("ok_"+metric);
 			BigDecimal valueKO = record.getValue("ko_"+metric);

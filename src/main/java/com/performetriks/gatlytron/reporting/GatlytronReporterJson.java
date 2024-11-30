@@ -67,11 +67,11 @@ public class GatlytronReporterJson implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records) {
+	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
 
 		try {
 
-			for(GatlytronCarbonRecord record : records ) {
+			for(GatlytronDataRecord record : records ) {
 				writer.write(record.toJsonString() + "\r\n" + arrayPrefix);
 				
 			}

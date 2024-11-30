@@ -13,7 +13,7 @@ import java.util.ArrayList;
  ***************************************************************************/
 public interface GatlytronReporter {
 
-	public void reportRecords(ArrayList<GatlytronCarbonRecord> records);
+	public void reportRecords(ArrayList<GatlytronDataRecord> records);
 	
 	public void terminate();
 	

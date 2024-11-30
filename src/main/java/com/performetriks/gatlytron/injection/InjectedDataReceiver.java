@@ -1,7 +1,11 @@
 package com.performetriks.gatlytron.injection;
 
+import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.stats.GatlytronRecordSingle;
+
 import io.gatling.commons.stats.Status;
 import scala.Option;
+import scala.collection.JavaConverters;
 import scala.collection.immutable.List;
 
 /***************************************************************************
@@ -16,7 +20,7 @@ public class InjectedDataReceiver {
 	
 	public static void logResponse(
 			  String scenario
-			, List groups
+			, List<String> groups
 			, String requestName
 			, long startTimestamp
 			, long endTimestamp
@@ -25,15 +29,38 @@ public class InjectedDataReceiver {
 			, Option message
 			){
 		
-		System.out.println("================== Data Types ==============");
-		System.out.println("scenario:"+scenario);
-		System.out.println("groups:"+groups.size());
-		System.out.println("requestName:"+requestName);
-		System.out.println("startTimestamp:"+startTimestamp);
-		System.out.println("endTimestamp:"+endTimestamp);
-		System.out.println("status:"+status.name());
-		System.out.println("responseCode:"+responseCode);
-		System.out.println("message:"+message);
-		System.out.println("============================================");
+		
+		
+		//----------------------------------
+		// Create Record
+		GatlytronRecordSingle record = new GatlytronRecordSingle(
+				scenario
+				, JavaConverters.asJava(groups)
+				, requestName
+				, startTimestamp
+				, endTimestamp
+				, status.name()
+				, responseCode.get().toString()
+				, message.toString()
+				);
+		
+		System.out.println(record.toLogString());
+		
+		//----------------------------------
+		// Debug
+//		if(Gatlytron.isDebug()) {
+//			System.out.println("================== Data Types ==============");
+//			System.out.println("scenario:"+scenario);
+//			System.out.println("groups:"+groups.mkString("-%|%-"));
+//			System.out.println("requestName:"+requestName);
+//			System.out.println("startTimestamp:"+startTimestamp);
+//			System.out.println("endTimestamp:"+endTimestamp);
+//			System.out.println("status:"+status.name());
+//			System.out.println("responseCode:"+responseCode.get().toString());
+//			System.out.println("message:"+message);
+//			System.out.println("============================================");
+//		}
+		
+		
 	}
 }
