@@ -71,6 +71,20 @@ public class BytecodeTransformer implements ClassFileTransformer {
 										+".logResponse(scenario, groups, requestName, startTimestamp, endTimestamp, status, responseCode, message);");
 			
 			//----------------------------------
+			// Transform Method: logUserStart
+			CtMethod methodLogUserStart = transformedClass.getDeclaredMethod("logUserStart");
+			
+			methodLogUserStart.insertBefore("com.performetriks.gatlytron.injection.InjectedDataReceiver"
+					+".logUserStart(scenario);");
+			
+			//----------------------------------
+			// Transform Method: logUserEnd
+			CtMethod methodLogUserEnd = transformedClass.getDeclaredMethod("logUserEnd");
+			
+			methodLogUserEnd.insertBefore("com.performetriks.gatlytron.injection.InjectedDataReceiver"
+					+".logUserEnd(scenario);");
+			
+			//----------------------------------
 			// Detach
 			byteCode = transformedClass.toBytecode();
 			transformedClass.detach();

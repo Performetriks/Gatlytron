@@ -17,57 +17,73 @@ public class GatlytronRecordSingle {
 	private String scenario = "unnamedScenario";
 	
 	private List<String> groups = new ArrayList<>();
-	private String requestName = "unnamedRequest";
+	private GatlytronRecordType type = GatlytronRecordType.UNKNOWN;
+	private String metricName = "unnamedRequest";
 	private String identifierString = "";
 	private long startTimestamp = -1;
 	private long endTimestamp = -1;
-	private long duration = -1;
 	private String status = "??";
-	private String responseCode = "XXX";
+	private String responseCode = "000";
 	private String message = "none";
+	private long metricValue = -1;
 	
 	private String logString = null;
 
+	public enum GatlytronRecordType{
+		  REQUEST("REQ")
+		, USER("USR")
+		, UNKNOWN("???")
+		;
+		
+		private String threeLetters;
+		
+		private GatlytronRecordType(String threeLetters) {
+			this.threeLetters = threeLetters;
+		}
+		
+		public String threeLetters() {
+			return threeLetters;
+		}
+	}
 	/******************************************************************
 	 * 
 	 ******************************************************************/
 	public GatlytronRecordSingle(
-			String scenario
+			  GatlytronRecordType type
+			, String scenario
 			, List<String> groups
-			, String requestName
+			, String metricName
 			, long startTimestamp
 			, long endTimestamp
 			, String status
 			, String responseCode
 			, String message
+			, long metricValue
 			){
 
 		//-----------------------
 		// Initialize null-safe
+		if(type != null ) {		this.type = type; }
+		if(groups != null ) {	this.groups = groups; }
+		
 		if(scenario != null && !scenario.isBlank() ) {			this.scenario = scenario; }
-		if(groups != null ) {									this.groups = groups; }
-		if(requestName != null && !requestName.isBlank() ) {	this.requestName = requestName; }
+		if(metricName != null && !metricName.isBlank() ) {	this.metricName = metricName; }
 		if(status != null && !status.isBlank() ) {				this.status = status; }
 		if(responseCode != null && !responseCode.isBlank() ) {	this.responseCode = responseCode; }
 		if(message != null && !message.isBlank() ) {			this.message = message; }
 		
 		this.startTimestamp = startTimestamp; 
 		this.endTimestamp = endTimestamp; 
-		
-		//-----------------------
-		// Calculate Duration
-		if(this.endTimestamp > 0) {
-			this.duration = this.endTimestamp - this.startTimestamp;
-		}
+		this.metricValue = metricValue; 
 		
 		//-----------------------
 		// Create Fullname
 		this.identifierString += scenario;
-		if( !groups.isEmpty() ) {
+		if( !this.groups.isEmpty() ) {
 			this.identifierString += "/" + getGroupsAsString("/", "");
 		}	
 		
-		this.identifierString += requestName;
+		this.identifierString += metricName;
 		this.identifierString += status;
 		
 	}
@@ -96,14 +112,15 @@ public class GatlytronRecordSingle {
 		StringBuilder builder = new StringBuilder();
 		
 		builder
+			.append( type.threeLetters() ).append(" ")
 			.append( status ).append(" ")
 			.append( responseCode ).append(" ")
 			.append( startTimestamp ).append(" ")
 			.append( endTimestamp ).append(" ")
 			.append( scenario.replaceAll(" ", "_") ).append(" ")
 			.append( getGroupsAsString("/", "noGroup").replaceAll(" ", "_") ).append(" ")
-			.append( requestName.replaceAll(" ", "_") ).append(" ")
-			.append( duration ).append(" ")
+			.append( metricName.replaceAll(" ", "_") ).append(" ")
+			.append( metricValue ).append(" ")
 				;
 		
 		logString = builder.toString();

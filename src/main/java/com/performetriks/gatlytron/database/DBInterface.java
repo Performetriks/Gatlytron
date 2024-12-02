@@ -298,7 +298,6 @@ public class DBInterface {
 	
 	/********************************************************************************************
 	 * 
-	 * @param request HttpServletRequest containing session data used for logging information(null allowed).
 	 * @param sql string with placeholders
 	 * @param values the values to be placed in the prepared statement
 	 * @return true if update count is > 0, false otherwise
@@ -528,8 +527,7 @@ public class DBInterface {
 
 	/********************************************************************************************
 	 * 
-	 * @param request HttpServletRequest containing session data used for logging information(null allowed).
-	 * @param sql string with placeholders
+	 * @param prepared the prepared statement with placeholders
 	 * @param values the values to be placed in the prepared statement. Supports String, Integer,
 	 *               Boolean, Float, Date, Timestamp, Blob, Clob, Byte
 	 * @throws SQLException 
@@ -576,8 +574,7 @@ public class DBInterface {
 	
 	/********************************************************************************************
 	 * 
-	 * @param request HttpServletRequest containing session data used for logging information(null allowed).
-	 * @param resultSet which should be closed.
+	 * @param conn the connection to be closed
 	 ********************************************************************************************/
 	public void close(Connection conn){
 		
@@ -593,7 +590,6 @@ public class DBInterface {
 	}
 	/********************************************************************************************
 	 * 
-	 * @param request HttpServletRequest containing session data used for logging information(null allowed).
 	 * @param resultSet which should be closed.
 	 ********************************************************************************************/
 	public void close(ResultSet resultSet){

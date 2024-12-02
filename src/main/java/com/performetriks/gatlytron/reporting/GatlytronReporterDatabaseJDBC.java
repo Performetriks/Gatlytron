@@ -22,7 +22,7 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 	
 	/****************************************************************************
 	 * 
-	 * @param drivername the name of the JDBC driver class
+	 * @param driverName the name of the JDBC driver class
 	 * @param jdbcURL the url used to connect to the jdbc database
 	 * @param tableName the name that should be used for the table (will be created)
 	 * @param username the username for accessing the database

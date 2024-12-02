@@ -36,7 +36,7 @@ public class GatlytronReporterJson implements GatlytronReporter {
 	
 	/****************************************************************************
 	 * 
-	 * @param the path of the file to write the data to.
+	 * @param filepath the path of the file to write the data to.
 	 * @param makeArray set to true to make the file content a JSON Array.
 	 *					If false, writes a JSON Object string per line.
 	 ****************************************************************************/
@@ -73,7 +73,6 @@ public class GatlytronReporterJson implements GatlytronReporter {
 
 			for(GatlytronDataRecord record : records ) {
 				writer.write(record.toJsonString() + "\r\n" + arrayPrefix);
-				
 			}
 
 		} catch (IOException e) {
