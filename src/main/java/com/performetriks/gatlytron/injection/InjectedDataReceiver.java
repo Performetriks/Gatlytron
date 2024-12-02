@@ -44,23 +44,12 @@ public class InjectedDataReceiver {
 				, message.toString()
 				);
 		
-		System.out.println(record.toLogString());
 		
 		//----------------------------------
-		// Debug
-//		if(Gatlytron.isDebug()) {
-//			System.out.println("================== Data Types ==============");
-//			System.out.println("scenario:"+scenario);
-//			System.out.println("groups:"+groups.mkString("-%|%-"));
-//			System.out.println("requestName:"+requestName);
-//			System.out.println("startTimestamp:"+startTimestamp);
-//			System.out.println("endTimestamp:"+endTimestamp);
-//			System.out.println("status:"+status.name());
-//			System.out.println("responseCode:"+responseCode.get().toString());
-//			System.out.println("message:"+message);
-//			System.out.println("============================================");
-//		}
-		
+		// Print Sysout
+		if(Gatlytron.isRawDataToSysout()) {
+			System.out.println(record.toLogString());
+		}
 		
 	}
 }

@@ -28,6 +28,9 @@ public class Gatlytron {
 	private static boolean debug = false;
 	private static boolean keepEmptyRecords = false;
 	
+	private static boolean rawDataToSysout = false;
+	private static boolean rawStatsToLogFile = false;
+	
 	public static final String EXECUTION_ID = UUID.randomUUID().toString();
 	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
 	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
@@ -86,6 +89,7 @@ public class Gatlytron {
 	public static boolean isKeepEmptyRecords() {
 		return keepEmptyRecords;
 	}
+	
 
 	/******************************************************************
 	 * 
@@ -93,6 +97,22 @@ public class Gatlytron {
 	public static void setKeepEmptyRecords(boolean skipEmptyRecords) {
 		Gatlytron.keepEmptyRecords = skipEmptyRecords;
 	}
+	
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static boolean isRawDataToSysout() {
+		return rawDataToSysout;
+	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static void setRawDataToSysout(boolean rawDataToSysout) {
+		Gatlytron.rawDataToSysout = rawDataToSysout;
+	}
+
 
 
 	/******************************************************************
