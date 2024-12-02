@@ -1,11 +1,18 @@
 package com.performetriks.gatlytron.base;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.performetriks.gatlytron.reporting.GatlytronDataRecord;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
 
 import ch.qos.logback.classic.Level;
@@ -29,11 +36,13 @@ public class Gatlytron {
 	private static boolean keepEmptyRecords = false;
 	
 	private static boolean rawDataToSysout = false;
-	private static boolean rawStatsToLogFile = false;
+	private static String rawdataLogPath = null;
+	private static BufferedWriter rawDataLogWriter = null;
 	
 	public static final String EXECUTION_ID = UUID.randomUUID().toString();
 	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
 	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
+	
 	
 	
 	/******************************************************************
@@ -69,19 +78,7 @@ public class Gatlytron {
 	public static ArrayList<GatlytronScenario> getScenarioList() {
 		return (ArrayList<GatlytronScenario>) scenarioList.clone();
 	}
-	
-	/******************************************************************
-	 * Terminates the reporters.
-	 * 
-	 ******************************************************************/
-	@SuppressWarnings("unchecked")
-	public static void terminate() {
-		logger.info("Terminating Gatlytron");
 
-		for(GatlytronReporter reporter : reporterList) {
-			reporter.terminate();
-		}
-	}
 
 	/******************************************************************
 	 * 
@@ -112,8 +109,44 @@ public class Gatlytron {
 	public static void setRawDataToSysout(boolean rawDataToSysout) {
 		Gatlytron.rawDataToSysout = rawDataToSysout;
 	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static void setRawDataLogPath(String rawdataLogPath) {
+		Gatlytron.rawdataLogPath = rawdataLogPath;
+		
+		try {
+			rawDataLogWriter = new BufferedWriter(new FileWriter(rawdataLogPath, true));
+		} catch (IOException e) {
+			logger.error("Error while initializing raw data log writer.", e);
+		}
+	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static String getRawDataLogPath() {
+		return Gatlytron.rawdataLogPath;
+		
+		
+	}
+	
+	/******************************************************************
+	 * INTERNAL USE ONLY
+	 * This method writes the raw data to the raw data log file. 
+	 ******************************************************************/
+	public static void writeToRawDataLog(String rawData) {
 
-
+		if(rawDataLogWriter == null) { return; }
+		
+		try {
+			rawDataLogWriter.write(rawData);
+		} catch (IOException e) {
+			logger.error("Error while writing raw data.", e);
+		}
+			
+	}
 
 	/******************************************************************
 	 * Sets the level of the logback root logger.
@@ -149,6 +182,35 @@ public class Gatlytron {
 	 ******************************************************************/
 	public static boolean isDebug() {
 		return debug;
+	}
+	
+	/******************************************************************
+	 * Terminates the reporters.
+	 * 
+	 ******************************************************************/
+	public static void terminate() {
+		logger.info("Terminating Gatlytron");
+
+		//--------------------------------
+		// Close Raw Log Writer
+		if(rawDataLogWriter != null) {
+			try {
+				rawDataLogWriter.flush();
+				rawDataLogWriter.close();
+			} catch (IOException e) {
+				logger.error("Error while closing raw data log writer.", e);
+			}
+		}
+		
+		//--------------------------------
+		// Terminate Reporters
+		for(GatlytronReporter reporter : reporterList) {
+			try {
+				reporter.terminate();
+			} catch (Throwable e) {
+				logger.warn("Error while terminating Reporter: "+e.getMessage(), e);
+			}
+		}
 	}
 	
 	

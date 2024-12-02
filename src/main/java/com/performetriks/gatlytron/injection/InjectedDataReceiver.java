@@ -1,6 +1,12 @@
 package com.performetriks.gatlytron.injection;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.reporting.GatlytronDataRecord;
 import com.performetriks.gatlytron.stats.GatlytronRecordSingle;
 
 import io.gatling.commons.stats.Status;
@@ -29,8 +35,6 @@ public class InjectedDataReceiver {
 			, Option message
 			){
 		
-		
-		
 		//----------------------------------
 		// Create Record
 		GatlytronRecordSingle record = new GatlytronRecordSingle(
@@ -51,5 +55,10 @@ public class InjectedDataReceiver {
 			System.out.println(record.toLogString());
 		}
 		
+		//----------------------------------
+		// Print Raw
+		Gatlytron.writeToRawDataLog(record.toLogString()+"\n");
+		
 	}
+
 }

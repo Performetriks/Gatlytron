@@ -25,6 +25,8 @@ public class GatlytronRecordSingle {
 	private String status = "??";
 	private String responseCode = "XXX";
 	private String message = "none";
+	
+	private String logString = null;
 
 	/******************************************************************
 	 * 
@@ -85,6 +87,12 @@ public class GatlytronRecordSingle {
 	 ******************************************************************/
 	public String toLogString() {
 		
+		//--------------------------
+		// Return Cached String
+		if(logString != null) { return logString; }
+		
+		//--------------------------
+		// Create Log String
 		StringBuilder builder = new StringBuilder();
 		
 		builder
@@ -98,7 +106,8 @@ public class GatlytronRecordSingle {
 			.append( duration ).append(" ")
 				;
 		
-		return builder.toString();
+		logString = builder.toString();
+		return logString;
 	}
 	
 	
