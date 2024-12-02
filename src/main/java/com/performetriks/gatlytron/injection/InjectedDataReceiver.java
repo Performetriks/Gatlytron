@@ -1,14 +1,10 @@
 package com.performetriks.gatlytron.injection;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import com.performetriks.gatlytron.base.Gatlytron;
-import com.performetriks.gatlytron.reporting.GatlytronDataRecord;
 import com.performetriks.gatlytron.stats.GatlytronRecordSingle;
+import com.performetriks.gatlytron.stats.GatlytronStats;
 import com.performetriks.gatlytron.stats.GatlytronRecordSingle.GatlytronRecordType;
 
 import io.gatling.commons.stats.Status;
@@ -85,6 +81,7 @@ public class InjectedDataReceiver {
 	}
 	
 	/***************************************************************************
+	 * Call of this method is injected into gatling code.
 	 * 
 	 ***************************************************************************/
 	public static void logUserStart(String scenario) {
@@ -139,6 +136,7 @@ public class InjectedDataReceiver {
 	}
 	
 	/***************************************************************************
+	 * Call of this method is injected into gatling.
 	 * 
 	 ***************************************************************************/
 	public static void logUserEnd(String scenario) {
@@ -146,6 +144,7 @@ public class InjectedDataReceiver {
 	}
 	
 	/***************************************************************************
+	 * Call of this method is injected into gatling.
 	 * 
 	 ***************************************************************************/
 	public static void logResponse(
@@ -218,6 +217,10 @@ public class InjectedDataReceiver {
 		//----------------------------------
 		// Print Raw
 		Gatlytron.writeToRawDataLog(record.toLogString()+"\n");
+		
+		//----------------------------------
+		// Stats 
+		GatlytronStats.addRecord(record);
 		
 	}
 

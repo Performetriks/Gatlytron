@@ -3,16 +3,12 @@ package com.performetriks.gatlytron.base;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.performetriks.gatlytron.reporting.GatlytronDataRecord;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
 
 import ch.qos.logback.classic.Level;
@@ -147,6 +143,7 @@ public class Gatlytron {
 		}
 			
 	}
+	
 
 	/******************************************************************
 	 * Sets the level of the logback root logger.

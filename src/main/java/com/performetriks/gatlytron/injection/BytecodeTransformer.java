@@ -35,6 +35,10 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			
 			byteCode = adjustScalaDataWriterStatsEngine(loader, className, classfileBuffer, byteCode); 
 			return byteCode;
+		}else if (className.equals("io/gatling/core/stats/writer/ConsoleDataWriter")) {
+			
+			byteCode = adjustScalaConsoleDataWriter(loader, className, classfileBuffer, byteCode); 
+			return byteCode;
 		}	
 
 		return byteCode;
@@ -84,6 +88,48 @@ public class BytecodeTransformer implements ClassFileTransformer {
 			methodLogUserEnd.insertBefore("com.performetriks.gatlytron.injection.InjectedDataReceiver"
 					+".logUserEnd(scenario);");
 			
+			//----------------------------------
+			// Detach
+			byteCode = transformedClass.toBytecode();
+			transformedClass.detach();
+			
+		} catch (Exception e) {
+			InjectionAgent.log("ERROR", "Error while transforming class: "+className, e);
+			
+		}
+		
+		InjectionAgent.log("INFO", "End Instrumenting class: "+className);
+		
+		return byteCode;
+	}
+	
+	/*******************************************************************************
+	 * 
+	 *******************************************************************************/
+	private byte[] adjustScalaConsoleDataWriter(ClassLoader loader, String className, byte[] classfileBuffer, byte[] byteCode) {
+		
+		try {
+			
+			InjectionAgent.log("INFO", "Inject Bytecode into class: "+className);
+			
+			//----------------------------------
+			// Load Class
+			ClassPool pool = ClassPool.getDefault();
+			pool.insertClassPath(new LoaderClassPath(loader));
+			
+			CtClass transformedClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+			//----------------------------------
+			// Transform Method: logResponse
+			CtMethod methodOnInit = transformedClass.getDeclaredMethod("onInit");
+
+			methodOnInit.insertBefore("com.performetriks.gatlytron.stats.GatlytronStats"
+										+".setConsoleWritePeriod("
+										   + "this.configuration.data().console().writePeriod()"
+										+ ");");
+			
+
+
 			//----------------------------------
 			// Detach
 			byteCode = transformedClass.toBytecode();
@@ -169,7 +215,7 @@ public class BytecodeTransformer implements ClassFileTransformer {
 	
 	
 	/*******************************************************************************
-	 * 
+	 * just an example, not used
 	 *******************************************************************************/
 	private static byte[] modifyVariableExample(ClassLoader loader, String className, byte[] classfileBuffer, byte[] byteCode) {
 			

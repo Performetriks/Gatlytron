@@ -19,7 +19,7 @@ public class GatlytronRecordSingle {
 	private List<String> groups = new ArrayList<>();
 	private GatlytronRecordType type = GatlytronRecordType.UNKNOWN;
 	private String metricName = "unnamedRequest";
-	private String identifierString = "";
+	private String statsIdentifier = "";
 	private long startTimestamp = -1;
 	private long endTimestamp = -1;
 	private String status = "??";
@@ -78,16 +78,25 @@ public class GatlytronRecordSingle {
 		
 		//-----------------------
 		// Create Fullname
-		this.identifierString += scenario;
+		this.statsIdentifier += type;
+		this.statsIdentifier += scenario;
 		if( !this.groups.isEmpty() ) {
-			this.identifierString += "/" + getGroupsAsString("/", "");
+			this.statsIdentifier += "/" + getGroupsAsString("/", "");
 		}	
 		
-		this.identifierString += metricName;
-		this.identifierString += status;
+		this.statsIdentifier += metricName;
+		this.statsIdentifier += status;
+		this.statsIdentifier += responseCode;
 		
 	}
 	
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getStatsIdentifier() {
+		return statsIdentifier;
+	}
 	/******************************************************************
 	 * 
 	 ******************************************************************/
