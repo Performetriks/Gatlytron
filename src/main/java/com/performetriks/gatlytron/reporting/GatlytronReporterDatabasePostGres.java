@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.performetriks.gatlytron.database.DBInterface;
 import com.performetriks.gatlytron.database.GatlytronDBInterface;
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
 
 /***************************************************************************
  * This reporter stores the data in a Postgres Database.
@@ -52,7 +53,7 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporterDatab
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
+	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		gtronDB.reportRecords(records);
 	}
 	

@@ -2,6 +2,8 @@ package com.performetriks.gatlytron.reporting;
 
 import java.util.ArrayList;
 
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
+
 /***************************************************************************
  * Interface for reporting data received through Graphite protocol.
  * 
@@ -13,7 +15,7 @@ import java.util.ArrayList;
  ***************************************************************************/
 public interface GatlytronReporter {
 
-	public void reportRecords(ArrayList<GatlytronDataRecord> records);
+	public void reportRecords(ArrayList<GatlytronRecordStats> records);
 	
 	public void terminate();
 	

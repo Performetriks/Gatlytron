@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.base.GatlytronScenario;
-import com.performetriks.gatlytron.reporting.GatlytronDataRecord;
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
 
 public class GatlytronDBInterface {
 	
@@ -29,7 +29,7 @@ public class GatlytronDBInterface {
 		this.tablenameMain = tablenamePrefix;
 		this.tablenameTestsettings = tablenamePrefix+"_testsettings";
 
-		createTableSQLMain = GatlytronDataRecord.getSQLCreateTableTemplate(tablenameMain);
+		createTableSQLMain = GatlytronRecordStats.getSQLCreateTableTemplate(tablenameMain);
 		createTableSQLTestSettings = GatlytronScenario.getSQLCreateTableTemplate(tablenameTestsettings);
 	}
 	
@@ -48,9 +48,9 @@ public class GatlytronDBInterface {
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
+	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		
-		for(GatlytronDataRecord record : records ) {
+		for(GatlytronRecordStats record : records ) {
 			record.insertIntoDatabase(db, tablenameMain);
 		}
 

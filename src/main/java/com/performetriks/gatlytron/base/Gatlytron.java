@@ -10,8 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
+import com.performetriks.gatlytron.stats.GatlytronStatsEngine;
 
 import ch.qos.logback.classic.Level;
+import io.gatling.core.config.GatlingConfiguration;
+import scala.concurrent.duration.FiniteDuration;
 
 /***************************************************************************
  * 
@@ -40,6 +43,18 @@ public class Gatlytron {
 	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
 	
 	
+	/******************************************************************
+	 * Starts Gatlytron and the reporting engine.
+	 * 
+	 * @param reportingInterval number of seconds for the reporting
+	 * used to aggregate statistics and reporting them to the various
+	 * reporters.
+	 * 
+	 ******************************************************************/
+	public static void start(int reportingInterval) {
+		
+		GatlytronStatsEngine.start(reportingInterval);
+	}
 	
 	/******************************************************************
 	 * Add reporters to the list.
@@ -129,6 +144,15 @@ public class Gatlytron {
 	}
 	
 	/******************************************************************
+	 * Returns The console write Period in seconds.
+	 ******************************************************************/
+	public static int getConsoleWritePeriodSeconds() {
+		FiniteDuration duration = GatlingConfiguration.load().data().console().writePeriod();
+		
+		return (int)duration.toSeconds();
+	}
+	
+	/******************************************************************
 	 * INTERNAL USE ONLY
 	 * This method writes the raw data to the raw data log file. 
 	 ******************************************************************/
@@ -188,6 +212,10 @@ public class Gatlytron {
 	public static void terminate() {
 		logger.info("Terminating Gatlytron");
 
+		//--------------------------------
+		// Stop Stats Engine
+		GatlytronStatsEngine.stop();
+		
 		//--------------------------------
 		// Close Raw Log Writer
 		if(rawDataLogWriter != null) {

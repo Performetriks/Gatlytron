@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
+
 /***************************************************************************
  * This reporter writes json data to a file. the file will be written as
  * one json object per line. Every line is a valid JSON string.
@@ -67,11 +69,11 @@ public class GatlytronReporterJson implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
+	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 
 		try {
 
-			for(GatlytronDataRecord record : records ) {
+			for(GatlytronRecordStats record : records ) {
 				writer.write(record.toJsonString() + "\r\n" + arrayPrefix);
 			}
 

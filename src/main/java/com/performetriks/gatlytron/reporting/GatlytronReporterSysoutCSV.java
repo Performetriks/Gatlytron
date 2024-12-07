@@ -2,6 +2,8 @@ package com.performetriks.gatlytron.reporting;
 
 import java.util.ArrayList;
 
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
+
 /***************************************************************************
  * This reporter prints the records as JSON data to sysout.
  * Useful for debugging.
@@ -26,10 +28,10 @@ public class GatlytronReporterSysoutCSV implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
+	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		
-		System.out.println( GatlytronDataRecord.getCSVHeader(separator) );
-		for(GatlytronDataRecord record : records ) {
+		System.out.println( GatlytronRecordStats.getCSVHeader(separator) );
+		for(GatlytronRecordStats record : records ) {
 			System.out.println( record.toCSV(separator) );
 		}
 

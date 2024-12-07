@@ -1,4 +1,4 @@
-package com.performetriks.gatlytron.reporting;
+package com.performetriks.gatlytron.stats;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,9 +12,7 @@ import com.google.gson.JsonObject;
 import com.performetriks.gatlytron.database.DBInterface;
 
 /***************************************************************************
- * 
- * 
- * 
+ * This record holds one record of statistical data.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License
@@ -22,32 +20,11 @@ import com.performetriks.gatlytron.database.DBInterface;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronDataRecord {
-
-/*
-Following are the expected input string formats:
-gatling.{simulationName}.users.{scenarioName}.active 1 1725619275
-gatling.{simulationName}.users.{scenarioName}.waiting 0 1725619275
-gatling.{simulationName}.users.{scenarioName}.done 1 1725619275
-
-gatling.{simulationName}.{requestName}.{ok|ko|all}.count 1 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.min 272 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.max 273 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.mean 273 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.stdDev 0 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles50 273 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles75 273 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles95 273 1725627230
-gatling.{simulationName}.{requestName}.{ok|ko|all}.percentiles99 273 1725627230
-
-Target tabular format:
-TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_done, ok_count, ok_min ...
-
- */
+public class GatlytronRecordStats {
 	
-	private static final Logger logger = LoggerFactory.getLogger(GatlytronDataRecord.class);
+	private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
 	
-	private String time = null;
+	private long time;
 	private String simulation = null;
 	private String request = null;
 	private String user_group = null;
@@ -141,81 +118,60 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 		
 		
 	}
+	
 
 	/***********************************************************************
-	 * Parse the Gatling Carbon Message
+	 * Creates a record containing request statistics.
+	 * 
 	 ***********************************************************************/
-	public GatlytronDataRecord(String carbonMessage, LinkedHashMap<GatlytronDataRecord, GatlytronDataRecord> existingRecords) {
+	public GatlytronRecordStats(
+							  LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> existingRecords
+							, String status
+						    , long timeMillis
+							, String simulation
+							, String metricName
+							, BigDecimal count 
+							, BigDecimal mean 
+							, BigDecimal min 		
+							, BigDecimal max 			
+							, BigDecimal stdev 	
+							, BigDecimal p50 		
+							, BigDecimal p75 		
+							, BigDecimal p95 		
+							, BigDecimal p99 	
+						){	
 		
-		if(carbonMessage != null) {
+		//-----------------------------------
+		// Parse Message
+		this.time = timeMillis;
+		this.simulation = simulation;
+		this.request = metricName;
 
-			//-----------------------------------
-			// Parse Message
-			String[] splittedRecord = carbonMessage.split(" ");
-			String[] splittedPath = splittedRecord[0].split("\\.");
-			String value = splittedRecord[1];
-			time = splittedRecord[2];
-			
-			//-----------------------------------
-			// Disassemble Metric Path
-			// =======================
-			// path[0] >> contains "gatling" (ignored)
-			// path[1] >> contains simulation name
-			// path[2 to (pathLength-3)] >> contains the "request" or "user" name
-			// path[pathLength-2] >> contains type (e.g. all/ok/ko)
-			// path[pathLength-1] >> contains metric
-			
-			int pathLength = splittedPath.length;
-			if(pathLength < 5) { logger.warn("!!!Unexpected message format: "+carbonMessage); return; }
-			simulation = splittedPath[1];
-			String type = splittedPath[3];  
-			String metric = splittedPath[pathLength - 1] ;
-			
-			String requestOrUsers = "";
-			for(int i = 2; i < splittedPath.length-2; i++  ) {
-				requestOrUsers += splittedPath[i] + ".";
-			}
-			
-			if( !requestOrUsers.isEmpty() ) {
-				requestOrUsers = requestOrUsers.substring(0, requestOrUsers.length()-1);
-			}
-						
-			switch(type) {
-				
-				case "ok":
-				case "ko":
-				case "all":
-					request = requestOrUsers;
-				break;
-					
-				
-				default:
-					user_group = type;
-					type = "users";
-				break;
-			}
-			
-//			System.out.println("========================");
-//			System.out.println("type:"+type);
-//			System.out.println("request:"+request);
-//			System.out.println("user_group:"+user_group);
-//			System.out.println("value:"+value);
-			
-			
-			//-----------------------------------
-			// Parse Message
-			GatlytronDataRecord targetForData = existingRecords.get(this);
-			
-			if(targetForData == null) {
-				targetForData = this;
-				existingRecords.put(this, this);
-			}
-			
-			targetForData.addValue(type, metric, value);
-			
+		
+		//-----------------------------------
+		// Get Target Record
+		GatlytronRecordStats targetForData = existingRecords.get(this);
+		
+		if(targetForData == null) {
+			targetForData = this;
+			existingRecords.put(this, this);
 		}
-	}
-	
+		
+		//-----------------------------------
+		// Add Values
+		String statusLower = status.trim().toLowerCase();  
+		
+		targetForData.addValue(statusLower, "count", count.toPlainString());
+		targetForData.addValue(statusLower, "min", min.toPlainString());
+		targetForData.addValue(statusLower, "max", max.toPlainString());
+		targetForData.addValue(statusLower, "mean", mean.toPlainString());
+		targetForData.addValue(statusLower, "stdev", stdev.toPlainString());
+		targetForData.addValue(statusLower, "p50", p50.toPlainString());
+		targetForData.addValue(statusLower, "p75", p75.toPlainString());
+		targetForData.addValue(statusLower, "p95", p95.toPlainString());
+		targetForData.addValue(statusLower, "p99", p99.toPlainString());
+		
+	}	
 	
 	/***********************************************************************
 	 * 
@@ -310,7 +266,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	
 		ArrayList<Object> valueList = new ArrayList<>();
 		
-		valueList.add(Integer.parseInt(time));
+		valueList.add(time);
 		valueList.add(simulation);
 		valueList.add(request);
 		valueList.add(user_group);
@@ -343,7 +299,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	/***********************************************************************
 	 * Returns the time of this record.
 	 ***********************************************************************/
-	public String getTime() {
+	public long getTime() {
 		return time;
 	}
 	
@@ -391,7 +347,7 @@ TIMESTAMP, SIMULATION, REQUEST, USER_GROUP, users_active, users_waiting, users_d
 	 * Checks if there is no data in this record.
 	 ***********************************************************************/
 	public boolean hasRequestData() {
-		return this.hasRequestData("all");
+		return this.hasRequestData("ok") || this.hasRequestData("ko") ;
 	}
 	
 	/***********************************************************************

@@ -1,11 +1,12 @@
 package com.performetriks.gatlytron.injection;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 import com.performetriks.gatlytron.base.Gatlytron;
-import com.performetriks.gatlytron.stats.GatlytronRecordSingle;
-import com.performetriks.gatlytron.stats.GatlytronStats;
-import com.performetriks.gatlytron.stats.GatlytronRecordSingle.GatlytronRecordType;
+import com.performetriks.gatlytron.stats.GatlytronRecordRaw;
+import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
+import com.performetriks.gatlytron.stats.GatlytronStatsEngine;
 
 import io.gatling.commons.stats.Status;
 import scala.Option;
@@ -23,9 +24,9 @@ import scala.collection.immutable.List;
 public class InjectedDataReceiver {
 	
 	// Contains scenario name and user count
-	private static LinkedHashMap<String, Integer> scenarioUsersActive = new LinkedHashMap<>();
-	private static LinkedHashMap<String, Integer> scenarioUsersTotalStarted = new LinkedHashMap<>();
-	private static LinkedHashMap<String, Integer> scenarioUsersTotalStopped = new LinkedHashMap<>();
+	private static final LinkedHashMap<String, Integer> scenarioUsersActive = new LinkedHashMap<>();
+	private static final LinkedHashMap<String, Integer> scenarioUsersTotalStarted = new LinkedHashMap<>();
+	private static final LinkedHashMap<String, Integer> scenarioUsersTotalStopped = new LinkedHashMap<>();
 	
 	/***************************************************************************
 	 * 
@@ -34,12 +35,10 @@ public class InjectedDataReceiver {
 		
 		//-------------------------------
 		// Initialize
-		if(!scenarioUsersActive.containsKey(scenario)) {
-			scenarioUsersActive.put(scenario, 0);
-			scenarioUsersTotalStarted.put(scenario, 0);
-			scenarioUsersTotalStopped.put(scenario, 0);
-		}
-		
+		if(!scenarioUsersActive.containsKey(scenario)) {		scenarioUsersActive.put(scenario, 0); }
+		if(!scenarioUsersTotalStarted.containsKey(scenario)) {	scenarioUsersTotalStarted.put(scenario, 0); }
+		if(!scenarioUsersTotalStopped.containsKey(scenario)) {	scenarioUsersTotalStopped.put(scenario, 0); }
+				
 		//-------------------------------
 		// Make Count
 		int current = scenarioUsersActive.get(scenario);
@@ -195,7 +194,7 @@ public class InjectedDataReceiver {
 		
 		//----------------------------------
 		// Create Record
-		GatlytronRecordSingle record = new GatlytronRecordSingle(
+		GatlytronRecordRaw record = new GatlytronRecordRaw(
 				  type
 				, scenario
 				, groups
@@ -205,7 +204,7 @@ public class InjectedDataReceiver {
 				, status
 				, responseCode
 				, message
-				, metricValue
+				, new BigDecimal(metricValue)
 				);
 		
 		//----------------------------------
@@ -220,7 +219,7 @@ public class InjectedDataReceiver {
 		
 		//----------------------------------
 		// Stats 
-		GatlytronStats.addRecord(record);
+		GatlytronStatsEngine.addRecord(record);
 		
 	}
 

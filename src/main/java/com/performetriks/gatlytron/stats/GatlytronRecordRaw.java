@@ -1,10 +1,11 @@
 package com.performetriks.gatlytron.stats;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 /***************************************************************************
- * This class holds one single record retrieved from Gatling.
+ * This class holds one single raw record retrieved from Gatling.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License
@@ -12,7 +13,7 @@ import java.util.List;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public class GatlytronRecordSingle {
+public class GatlytronRecordRaw {
 	
 	private String scenario = "unnamedScenario";
 	
@@ -25,7 +26,8 @@ public class GatlytronRecordSingle {
 	private String status = "??";
 	private String responseCode = "000";
 	private String message = "none";
-	private long metricValue = -1;
+	
+	private BigDecimal metricValue = null;
 	
 	private String logString = null;
 
@@ -48,7 +50,7 @@ public class GatlytronRecordSingle {
 	/******************************************************************
 	 * 
 	 ******************************************************************/
-	public GatlytronRecordSingle(
+	public GatlytronRecordRaw(
 			  GatlytronRecordType type
 			, String scenario
 			, List<String> groups
@@ -58,7 +60,7 @@ public class GatlytronRecordSingle {
 			, String status
 			, String responseCode
 			, String message
-			, long metricValue
+			, BigDecimal metricValue
 			){
 
 		//-----------------------
@@ -135,6 +137,103 @@ public class GatlytronRecordSingle {
 		logString = builder.toString();
 		return logString;
 	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getScenario() {
+		return scenario;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public List<String> getGroups() {
+		return groups;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public GatlytronRecordType getType() {
+		return type;
+	}
+
+	/******************************************************************
+	 * Returns the full name of the metric:
+	 * 	{scenario}.{group}.{metricName}
+	 ******************************************************************/
+	public String getMetricPath() {
+		
+		if(groups.isEmpty()) {
+			return scenario.replaceAll(" ", "_")
+		   + "." + metricName.replaceAll(" ", "_")
+		   ;
+		}
+		
+		return scenario.replaceAll(" ", "_") 
+				+ "." + getGroupsAsString(".", "noGroup").replaceAll(" ", "_")
+				+ "." + metricName.replaceAll(" ", "_");
+		
+	}
+	
+	/******************************************************************
+	 * Returns the simple name of the metric
+	 ******************************************************************/
+	public String getMetricName() {
+		return metricName;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public long getStartTimestamp() {
+		return startTimestamp;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public long getEndTimestamp() {
+		return endTimestamp;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getStatus() {
+		return status;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getResponseCode() {
+		return responseCode;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getMessage() {
+		return message;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public BigDecimal getMetricValue() {
+		return metricValue;
+	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getLogString() {
+		return logString;
+	}
+	
+	
 	
 	
 }

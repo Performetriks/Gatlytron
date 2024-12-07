@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
+
 /***************************************************************************
  * This reporter writes report data to a CSV file.
  * You might choose the separator for your CSV data so that you can properly delimit your data.
@@ -38,7 +40,7 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 		this.separator = separator;
 		try {
 			path = Path.of(filepath);
-			String header = GatlytronDataRecord.getCSVHeader(separator);
+			String header = GatlytronRecordStats.getCSVHeader(separator);
 			Files.deleteIfExists(path);
 			
 			Files.write(path, header.getBytes() 
@@ -57,13 +59,13 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 	 * 
 	 ****************************************************************************/
 	@Override
-	public void reportRecords(ArrayList<GatlytronDataRecord> records) {
+	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		BufferedWriter writer = null;
 		try {
 			
 			writer = new BufferedWriter(new FileWriter(filepath, true));
 	    
-			for(GatlytronDataRecord record : records ) {
+			for(GatlytronRecordStats record : records ) {
 				writer.write(record.toCSV(separator)+"\r\n");
 			}
 			
