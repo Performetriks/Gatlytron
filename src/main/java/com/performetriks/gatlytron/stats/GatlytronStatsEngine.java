@@ -154,7 +154,7 @@ public class GatlytronStatsEngine {
 					  statsRecords
 					, firstRecord.getStatus()
 				    , System.currentTimeMillis()
-					, "MySimulationName"
+					, Gatlytron.getSimulationName()
 					, firstRecord.getMetricPath()
 					, count 
 					, avg 

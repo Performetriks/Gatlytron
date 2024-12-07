@@ -31,6 +31,7 @@ public class Gatlytron {
 	private static ArrayList<GatlytronReporter> reporterList = new ArrayList<>();
 	private static ArrayList<GatlytronScenario> scenarioList = new ArrayList<>();
 	
+	private static String simulationName = "UnknownSimulation";
 	private static boolean debug = false;
 	private static boolean keepEmptyRecords = false;
 	
@@ -191,6 +192,21 @@ public class Gatlytron {
 	    logger.setLevel(level);
 	}
 	
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static String getSimulationName() {
+		return simulationName;
+	}
+
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static void setSimulationName(String simulationName) {
+		Gatlytron.simulationName = simulationName;
+	}
+
 	/******************************************************************
 	 * 
 	 ******************************************************************/
