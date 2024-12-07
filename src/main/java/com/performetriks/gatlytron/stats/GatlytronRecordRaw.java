@@ -160,20 +160,18 @@ public class GatlytronRecordRaw {
 	}
 
 	/******************************************************************
-	 * Returns the full name of the metric:
-	 * 	{scenario}.{group}.{metricName}
+	 * Returns the full path of the metric including groups:
+	 *   {group}.{metricName}
 	 ******************************************************************/
 	public String getMetricPath() {
 		
 		if(groups.isEmpty()) {
-			return scenario.replaceAll(" ", "_")
-		   + "." + metricName.replaceAll(" ", "_")
+			return metricName.replaceAll(" ", "_")
 		   ;
 		}
 		
-		return scenario.replaceAll(" ", "_") 
-				+ "." + getGroupsAsString(".", "noGroup").replaceAll(" ", "_")
-				+ "." + metricName.replaceAll(" ", "_");
+		return getGroupsAsString(".", "noGroup").replaceAll(" ", "_")
+		 + "." + metricName.replaceAll(" ", "_");
 		
 	}
 	

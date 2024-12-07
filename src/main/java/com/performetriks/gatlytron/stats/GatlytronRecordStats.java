@@ -26,7 +26,8 @@ public class GatlytronRecordStats {
 	
 	private long time;
 	private String simulation = null;
-	private String request = null;
+	private String scenario = null;
+	private String metricName = null;
 	private String user_group = null;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
@@ -68,27 +69,28 @@ public class GatlytronRecordStats {
 		, "ko_p75"
 		, "ko_p95"
 		, "ko_p99"
-			
-		, "all_count"
-		, "all_min"
-		, "all_max"
-		, "all_mean"
-		, "all_stdev"
-		, "all_p50"
-		, "all_p75"
-		, "all_p95"
-		, "all_p99"
-	};
+	};		
+//		, "all_count"
+//		, "all_min"
+//		, "all_max"
+//		, "all_mean"
+//		, "all_stdev"
+//		, "all_p50"
+//		, "all_p75"
+//		, "all_p95"
+//		, "all_p99"
+//	};
 	
-	private static String csvHeaderTemplate = "time,simulation,request,user_group";
+	private static String csvHeaderTemplate = "time,simulation,scenario,request,user_group";
 	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
 			+ "		  time BIGINT,\r\n"
 			+ "		  simulation VARCHAR(4096),\r\n"
+			+ "		  scenario VARCHAR(4096),\r\n"
 			+ "		  request VARCHAR(4096),\r\n"
 			+ "		  user_group VARCHAR(4096)"
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,simulation,request,user_group";
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,simulation,scenario,request,user_group";
 
 	static {
 		
@@ -108,7 +110,7 @@ public class GatlytronRecordStats {
 
 		//-----------------------------------------
 		// SQL Insert Into Template
-		String sqlInsertValues = "VALUES (?, ?, ?, ?";
+		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?";
 		for(String name : valueNames) {
 			sqlInsertIntoTemplate += ","+name;
 			sqlInsertValues += ", ?";
@@ -129,6 +131,7 @@ public class GatlytronRecordStats {
 							, String status
 						    , long timeMillis
 							, String simulation
+							, String scenario
 							, String metricName
 							, BigDecimal count 
 							, BigDecimal mean 
@@ -145,7 +148,8 @@ public class GatlytronRecordStats {
 		// Parse Message
 		this.time = timeMillis;
 		this.simulation = simulation;
-		this.request = metricName;
+		this.scenario = scenario;
+		this.metricName = metricName;
 
 		
 		//-----------------------------------
@@ -181,8 +185,8 @@ public class GatlytronRecordStats {
 		
 		BigDecimal parsedInt = new BigDecimal(value);
 		String finalMetric = metric
-								.replace("percentiles", "p")
-								.replace("stdDev", "stdev")
+//								.replace("percentiles", "p")
+//								.replace("stdDev", "stdev")
 								;  // make it shorter to reduce footprint
 
 		values.put(type +"_"+finalMetric, parsedInt);
@@ -205,15 +209,16 @@ public class GatlytronRecordStats {
 	public String toCSV(String separator) {
 		
 		String csv = time 
-					+ separator + simulation 
-					+ separator + request 
+					+ separator + simulation.replace(separator, "_") 
+					+ separator + scenario.replace(separator, "_")  
+					+ separator + metricName.replace(separator, "_")  
 					+ separator + user_group
 					;
 				
 		for(String name : valueNames) {
 			BigDecimal val = values.get(name);
 			val = (val == null) ? BigDecimal.ZERO : val;
-			csv += separator + val; 
+			csv += separator + val.toPlainString(); 
 		}
 		
 		return csv;
@@ -237,7 +242,8 @@ public class GatlytronRecordStats {
 		
 		object.addProperty("time", time);
 		object.addProperty("simulation", simulation);
-		object.addProperty("request", request);
+		object.addProperty("scenario", scenario);
+		object.addProperty("request", metricName);
 		object.addProperty("user_group", user_group);
 		
 		for(String name : valueNames) {
@@ -268,7 +274,8 @@ public class GatlytronRecordStats {
 		
 		valueList.add(time);
 		valueList.add(simulation);
-		valueList.add(request);
+		valueList.add(scenario);
+		valueList.add(metricName);
 		valueList.add(user_group);
 		
 		for(String name : valueNames) {
@@ -285,7 +292,7 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	@Override
 	public int hashCode() {
-		return (time + simulation + request + user_group).hashCode();
+		return (time + simulation + metricName + user_group).hashCode();
 	}
 	
 	/***********************************************************************
@@ -311,10 +318,17 @@ public class GatlytronRecordStats {
 	}
 	
 	/***********************************************************************
+	 * Returns the name of the gatling simulation.
+	 ***********************************************************************/
+	public String getScenario() {
+		return simulation;
+	}
+	
+	/***********************************************************************
 	 * Returns the name of the request, or null if this is a user record.
 	 ***********************************************************************/
 	public String getRequest() {
-		return request;
+		return metricName;
 	}
 	
 	/***********************************************************************
@@ -344,21 +358,21 @@ public class GatlytronRecordStats {
 	}
 	
 	/***********************************************************************
-	 * Checks if there is no data in this record.
+	 * Checks if there is any data in this record.
 	 ***********************************************************************/
 	public boolean hasRequestData() {
 		return this.hasRequestData("ok") || this.hasRequestData("ko") ;
 	}
 	
 	/***********************************************************************
-	 * Checks if there is no 'ok' data in this record.
+	 * Checks if there is 'ok' data in this record.
 	 ***********************************************************************/
 	public boolean hasRequestDataOK() {
 		return this.hasRequestData("ok");
 	}
 	
 	/***********************************************************************
-	 * Checks if there is no 'ok' data in this record.
+	 * Checks if there is 'ok' data in this record.
 	 ***********************************************************************/
 	public boolean hasRequestDataKO() {
 		return this.hasRequestData("ko");
@@ -382,7 +396,7 @@ public class GatlytronRecordStats {
 	 * Returns true if this is a request record.
 	 ***********************************************************************/
 	public boolean isRequestRecord() {
-		return  (request != null);
+		return  (metricName != null);
 	}
 	
 	/***********************************************************************

@@ -11,7 +11,7 @@ public class GatlytronDBInterface {
 	private DBInterface db;
 	
 	public final String tablenamePrefix;
-	public final String tablenameMain;
+	public final String tablenameStats;
 	public final String tablenameTestsettings;
 	
 	private String createTableSQLMain;
@@ -26,10 +26,10 @@ public class GatlytronDBInterface {
 		
 		this.db = db;
 		this.tablenamePrefix = tablenamePrefix;
-		this.tablenameMain = tablenamePrefix;
+		this.tablenameStats = tablenamePrefix+"_stats";
 		this.tablenameTestsettings = tablenamePrefix+"_testsettings";
 
-		createTableSQLMain = GatlytronRecordStats.getSQLCreateTableTemplate(tablenameMain);
+		createTableSQLMain = GatlytronRecordStats.getSQLCreateTableTemplate(tablenameStats);
 		createTableSQLTestSettings = GatlytronScenario.getSQLCreateTableTemplate(tablenameTestsettings);
 	}
 	
@@ -51,7 +51,7 @@ public class GatlytronDBInterface {
 	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		
 		for(GatlytronRecordStats record : records ) {
-			record.insertIntoDatabase(db, tablenameMain);
+			record.insertIntoDatabase(db, tablenameStats);
 		}
 
 	}

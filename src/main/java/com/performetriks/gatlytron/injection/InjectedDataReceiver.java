@@ -23,6 +23,8 @@ import scala.collection.immutable.List;
  ***************************************************************************/
 public class InjectedDataReceiver {
 	
+	private static final Object SYNC_LOCK = new Object();
+	
 	// Contains scenario name and user count
 	private static final LinkedHashMap<String, Integer> scenarioUsersActive = new LinkedHashMap<>();
 	private static final LinkedHashMap<String, Integer> scenarioUsersTotalStarted = new LinkedHashMap<>();
@@ -35,10 +37,12 @@ public class InjectedDataReceiver {
 		
 		//-------------------------------
 		// Initialize
-		if(!scenarioUsersActive.containsKey(scenario)) {		scenarioUsersActive.put(scenario, 0); }
-		if(!scenarioUsersTotalStarted.containsKey(scenario)) {	scenarioUsersTotalStarted.put(scenario, 0); }
-		if(!scenarioUsersTotalStopped.containsKey(scenario)) {	scenarioUsersTotalStopped.put(scenario, 0); }
-				
+		synchronized (SYNC_LOCK) {
+			if(!scenarioUsersActive.containsKey(scenario)) {		scenarioUsersActive.put(scenario, 0); }
+			if(!scenarioUsersTotalStarted.containsKey(scenario)) {	scenarioUsersTotalStarted.put(scenario, 0); }
+			if(!scenarioUsersTotalStopped.containsKey(scenario)) {	scenarioUsersTotalStopped.put(scenario, 0); }
+		}
+	
 		//-------------------------------
 		// Make Count
 		int current = scenarioUsersActive.get(scenario);
