@@ -9,7 +9,9 @@ import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
 import com.performetriks.gatlytron.stats.GatlytronStatsEngine;
 
 import io.gatling.commons.stats.Status;
+import scala.Int;
 import scala.Option;
+import scala.Some;
 import scala.collection.JavaConverters;
 import scala.collection.immutable.List;
 
@@ -165,6 +167,7 @@ public class InjectedDataReceiver {
 		if(endTimestamp > 0 ) {
 			duration = endTimestamp - startTimestamp;
 		}
+		
 		createRecord(
 				  GatlytronRecordType.REQUEST
 				, scenario
@@ -173,7 +176,7 @@ public class InjectedDataReceiver {
 				, startTimestamp
 				, endTimestamp
 				, status.name()
-				, responseCode.get().toString()
+				, ( ( responseCode.isDefined() ) ? responseCode.toString() : "000" )
 				, message.toString()
 				, duration
 				);	
