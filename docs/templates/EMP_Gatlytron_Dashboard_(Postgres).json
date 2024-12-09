@@ -1,6 +1,6 @@
 {"success": true,"messages": [],"payload": [
   {
-    "PK_ID": 107,
+    "PK_ID": 135,
     "FK_ID_USER": 1,
     "NAME": "Gatlytron Dashboard (Postgres)",
     "DESCRIPTION": null,
@@ -11,8 +11,8 @@
     "JSON_EDITORS": {},
     "JSON_EDITOR_GROUPS": {},
     "ALLOW_EDIT_SETTINGS": false,
-    "TIME_CREATED": 1726666829202,
-    "LAST_UPDATED": 1731941975827,
+    "TIME_CREATED": 1733758063963,
+    "LAST_UPDATED": 1733767123190,
     "IS_PUBLIC": false,
     "START_FULLSCREEN": false,
     "IS_DELETABLE": true,
@@ -23,8 +23,8 @@
     "username": "admin",
     "widgets": [
       {
-        "PK_ID": 275,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 663,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_parameter",
         "X": 0,
         "Y": 0,
@@ -50,7 +50,7 @@
             "103": "simulation",
             "107": "interval",
             "108": "interval_unit",
-            "111": "chart_settings"
+            "209": "chart_type"
           },
           "addtotop": false,
           "showbutton": true,
@@ -63,8 +63,8 @@
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 277,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 664,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 6,
@@ -85,20 +85,20 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{type: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, user_group\r\n\t\t\t, users_active\r\n\t\t\t, users_waiting\r\n\t\t\t, users_done \r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND user_group IS NOT NULL\r\n\t`\r\n| sort time\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, user_group] users_active\u003dAVG(users_active)\r\n| chart \r\n\tby\u003d[\"user_group\"] \r\n\ttype\u003d\"area\" \r\n\tx\u003dtimegroup\r\n\ty\u003d\"users_active\" \r\n\tshowaxes\u003dtrue\r\n\tpointradius\u003d2\r\n\t# following overrides the settings above\r\n\tsettings \u003d tojson(param(\"chart_settings\", {}))\r\n\t",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_type\u003d\"area\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, ok_mean\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027USR\u0027\r\n\t\t  AND metric \u003d \u0027users.active\u0027\r\n\t`\r\n| sort time\r\n| rename ok_mean \u003d activeUsers\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, scenario] activeUsers\u003dAVG(activeUsers)\r\n| chart \r\n\tby\u003d[\"scenario\"] \r\n\ttype \u003d param(chart_type)\r\n\tx\u003d timegroup\r\n\ty\u003d activeUsers\r\n\tshowaxes\u003dtrue\r\n\tstacked\u003dtrue\r\n\tpointradius\u003d2\r\n\t",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 282,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 665,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 24,
         "WIDTH": 31,
         "HEIGHT": 8,
-        "TITLE": "Users Waiting",
+        "TITLE": "Users: Total Started",
         "TITLE_LINK": null,
         "TITLE_INFO": null,
         "TITLE_FONTSIZE": null,
@@ -113,20 +113,20 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{type: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, user_group\r\n\t\t\t, users_active\r\n\t\t\t, users_waiting\r\n\t\t\t, users_done \r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND user_group IS NOT NULL\r\n\t`\r\n| sort time\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, user_group] users_waiting\u003dAVG(users_waiting)\r\n| chart \r\n\tby\u003d[\"user_group\"] \r\n\ttype\u003d\"steppedarea\" \r\n\tx\u003dtimegroup\r\n\ty\u003d\"users_waiting\" \r\n\tstacked\u003dfalse\r\n\tshowaxes\u003dfalse\r\n\tshowlegend\u003dfalse\r\n\t",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, ok_mean\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027USR\u0027\r\n\t\t  AND metric \u003d \u0027users.total_started\u0027\r\n\t`\r\n| sort time\r\n| rename ok_mean \u003d usersTotalStarted\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, scenario] usersTotalStarted\u003dAVG(usersTotalStarted)\r\n| chart \r\n\tby\u003d[\"scenario\"] \r\n\ttype \u003d \"sparkline\" \r\n\tx \u003d timegroup\r\n\ty \u003d usersTotalStarted\r\n\tshowaxes\u003dtrue\r\n\tpointradius\u003d2\r\n\t# following overrides the settings above\r\n\t",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 283,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 666,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 32,
         "WIDTH": 31,
         "HEIGHT": 8,
-        "TITLE": "Users Done",
+        "TITLE": "Users: Total Stopped",
         "TITLE_LINK": null,
         "TITLE_INFO": null,
         "TITLE_FONTSIZE": null,
@@ -141,14 +141,14 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{type: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, user_group\r\n\t\t\t, users_active\r\n\t\t\t, users_waiting\r\n\t\t\t, users_done \r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND user_group IS NOT NULL\r\n\t`\r\n| sort time\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, user_group] users_done\u003dAVG(users_done)\r\n| chart \r\n\tby\u003d[\"user_group\"] \r\n\ttype\u003d\"steppedarea\" \r\n\tx\u003dtimegroup\r\n\ty\u003d\"users_done\" \r\n\tstacked\u003dfalse\r\n\tshowaxes\u003dfalse\r\n\tshowlegend\u003dfalse\r\n\t",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, ok_mean\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027USR\u0027\r\n\t\t  AND metric \u003d \u0027users.total_stopped\u0027\r\n\t`\r\n| sort time\r\n| rename ok_mean \u003d usersTotalStopped\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats by\u003d[timegroup, scenario] usersTotalStopped\u003dAVG(usersTotalStopped)\r\n| chart \r\n\tby\u003d[\"simulation\"] \r\n\ttype \u003d \"sparkline\" \r\n\tx \u003d timegroup\r\n\ty \u003d usersTotalStopped\r\n\tshowaxes\u003dtrue\r\n\tpointradius\u003d2\r\n\t# following overrides the settings above\r\n\t",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 285,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 667,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 61,
@@ -169,14 +169,14 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup, request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| stats # now make statistics by request and create groups for charts\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"min\")\r\n\t\"mean\"\t\u003davg(\"mean\")\r\n\t\"max\"\t\u003dmax(\"max\")\r\n\t\"stdev\"\t\u003davg(\"stdev\")\r\n\t\"p50\"\t\u003dperc(\"p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"p99\", 99)\r\n\t\"counts\" \u003d records()\r\n\t\"metrics\" \u003d records()\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(request, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n\t\r\n| formatchart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"ok_count\", \"ko_count\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003dglobals(\"sparktype\") \r\n\theight\u003dglobals(\"sparkheight\") \r\n\twidth\u003dglobals(\"sparkwidth\") \r\n\tpointradius\u003d1 \r\n| formatchart \r\n\tfields\u003d[\"metrics\"] \r\n\tby\u003d[]\r\n\ty\u003d[\"min\", \"mean\", \"p95\", \"max\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003dglobals(\"sparktype\") \r\n\theight\u003dglobals(\"sparkheight\") \r\n\twidth\u003dglobals(\"sparkwidth\") \r\n\tpointradius\u003d1\r\n\r\n| display \r\n\tas\u003dtable \r\n\tsizes \u003d [10, 25, 50, 100]\r\n\tdefaultsize\u003d10",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_type\u003d\"area\"\r\n| global\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup, metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| stats # now make statistics by request and create groups for charts\r\n\tby\u003d[metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"min\")\r\n\t\"mean\"\t\u003davg(\"mean\")\r\n\t\"max\"\t\u003dmax(\"max\")\r\n\t\"stdev\"\t\u003davg(\"stdev\")\r\n\t\"p50\"\t\u003dperc(\"p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"p99\", 99)\r\n\t\"counts\" \u003d records()\r\n\t\"metrics\" \u003d records()\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(request, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n\t\r\n| formatchart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"ok_count\", \"ko_count\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003dparam(\"chart_type\", \"area\") \r\n\theight\u003dglobals(\"sparkheight\") \r\n\twidth\u003dglobals(\"sparkwidth\") \r\n\tshowaxes\u003dfalse\r\n\tshowlegend \u003d false\r\n\tpointradius\u003d1 \r\n| formatchart \r\n\tfields\u003d[\"metrics\"] \r\n\tby\u003d[]\r\n\ty\u003d[\"min\", \"mean\", \"p95\", \"max\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003dparam(\"chart_type\", \"area\") \r\n\theight\u003dglobals(\"sparkheight\") \r\n\twidth\u003dglobals(\"sparkwidth\") \r\n\tshowaxes\u003dfalse\r\n\tshowlegend \u003d false\r\n\tpointradius\u003d1\r\n| display \r\n\tas\u003dtable \r\n\tsizes \u003d [10, 25, 50, 100]\r\n\tdefaultsize\u003d10",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 296,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 668,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 31,
         "Y": 6,
@@ -184,7 +184,7 @@
         "HEIGHT": 18,
         "TITLE": "Overall Response Time",
         "TITLE_LINK": null,
-        "TITLE_INFO": null,
+        "TITLE_INFO": "The average response time of all requests with status OK.",
         "TITLE_FONTSIZE": null,
         "TITLE_POSITION": "top",
         "TITLE_ALIGN": "start",
@@ -197,14 +197,14 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{type: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup] \r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| chart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"min\", \"mean\", \"p95\", \"max\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003darea\r\n\tpointradius\u003d0 \r\n\ttension\u003d0\r\n\tmultichart\u003dtrue\r\n# following overrides the settings above\r\n\tsettings \u003d tojson(param(\"chart_settings\", {}))",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_type\u003d\"area\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest()+`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup] \r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| chart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"min\", \"mean\", \"p95\", \"max\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003dparam(\u0027chart_type\u0027)\r\n\tpointradius\u003d0 \r\n\ttension\u003d0\r\n\tmultichart\u003dfalse",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 297,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 669,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 31,
         "Y": 24,
@@ -225,14 +225,14 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{type: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n| chart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"ok_count\", \"ko_count\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003darea\r\n\tpointradius\u003d0 \r\n\ttension\u003d0\r\n\tmultichart\u003dtrue\r\n# following overrides the settings above\r\n\tsettings \u003d tojson(param(\"chart_settings\", {}))",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_type \u003d \"area\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t\t  \r\n\t`\r\n\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[timegroup] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n| chart \r\n\tfields\u003d[\"counts\"] \t\r\n\ty\u003d[\"ok_count\", \"ko_count\"]\t\r\n\tx\u003dtimegroup \r\n\ttype\u003d param(chart_type)\r\n\tpointradius\u003d0 \r\n\ttension\u003d0\r\n\tmultichart\u003dfalse\r\n",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 298,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 670,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 128,
@@ -253,14 +253,14 @@
         "MANUAL_LOAD": true,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003dcsv menu\u003dfalse",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, code\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[simulation, scenario, metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003dcsv menu\u003dfalse",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 299,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 671,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 21,
         "Y": 128,
@@ -281,14 +281,14 @@
         "MANUAL_LOAD": true,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003djson menu\u003dfalse",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, code\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[simulation, scenario, metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003djson menu\u003dfalse",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 300,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 672,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 9,
         "Y": 187,
@@ -296,7 +296,7 @@
         "HEIGHT": 40,
         "TITLE": "Gantt Chart",
         "TITLE_LINK": null,
-        "TITLE_INFO": "This Gantt char shows first and last execution time by requests. Useful to she if things were executed during the whole test. ",
+        "TITLE_INFO": "This Gantt chart shows first and last execution time by requests. Useful to see if things were executed during the whole test. ",
         "TITLE_FONTSIZE": null,
         "TITLE_POSITION": "top",
         "TITLE_ALIGN": "start",
@@ -309,14 +309,14 @@
         "MANUAL_LOAD": true,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t\t  AND ok_count \u003e 0\r\n\t`\r\n| set time \u003d time * 1000\r\n\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"FROM\"\t\u003dmin(time)\r\n\t\"TO\"\t\u003dmax(time)\r\n| chart \r\n\tby\u003d[request] \r\n\ttype\u003d\u0027gantt\u0027\r\n\tx\u003dFROM # start time in epoch milliseconds\r\n\ty\u003dTO   # end time in epoch milliseconds\r\n\tshowaxes\u003dfalse",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count \u003e 0\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[metric] \r\n\t\"FROM\"\t\u003d min(time)\r\n\t\"TO\"\t\u003d max(time)\r\n| chart \r\n\tby\u003d[metric] \r\n\ttype\u003d\u0027gantt\u0027\r\n\tx\u003dFROM # start time in epoch milliseconds\r\n\ty\u003dTO   # end time in epoch milliseconds\r\n\tshowaxes\u003dfalse",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 301,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 673,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 42,
         "Y": 128,
@@ -337,14 +337,14 @@
         "MANUAL_LOAD": true,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003dxml menu\u003dfalse",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_settings\u003d{charttype: \"area\"}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"15vw\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, scenario\r\n\t\t\t, metric\r\n\t\t\t, code\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n| crates\r\n\tname\u003dtimegroup\r\n\tby\u003dtime\r\n\ttype\u003dtime \r\n\tstep\u003dparam(\u0027interval\u0027, interval()) \r\n\ttimeunit\u003dparam(\u0027interval_unit\u0027, intervalunit())\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[simulation, scenario, metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n| display as\u003dxml menu\u003dfalse",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 522,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 674,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 151,
@@ -365,14 +365,14 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": true,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n\tcompare_to \u003d object(\r\n\t\t\t\t\t \u0027earliest\u0027, earliest()\r\n\t\t\t\t\t,\u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| meta\r\n\t\u0027timerange\u0027 \u003d tojson(param(\u0027compare_to\u0027))\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ ( meta(\u0027timerange\u0027).latest/ 1000) +`\r\n\t\t  AND time \u003e\u003d `+ ( meta(\u0027timerange\u0027).earliest / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[request] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n;\r\n| meta\r\n\ttimerange \u003d object(\r\n\t\t\t\t   \u0027earliest\u0027, earliest()\r\n\t\t\t\t , \u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| mimic\r\n;\r\n| resultcompare\r\n\tby\u003d[request]\r\n\tpercentformat \u003d [[\u0027percent\u0027, $threshold_good$, $threshold_bad$, \"bg\", \"cfw-gray\"], [align, center]]\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(request, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n| display \r\n\tas\u003dtable\r\n\tdownload\u003dtrue",
+          "query": "| paramdefaults\r\n\tsimulation\u003d\"n/a\"\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tcompare_to \u003d object(\r\n\t\t\t\t\t \u0027earliest\u0027, earliest()\r\n\t\t\t\t\t,\u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| meta\r\n\t\u0027timerange\u0027 \u003d tojson(param(\u0027compare_to\u0027))\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_count\r\n\t\t\t, ko_count\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_stdev\r\n\t\t\t, ok_p50\r\n\t\t\t, ok_p75\r\n\t\t\t, ok_p95\r\n\t\t\t, ok_p99\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ meta(\u0027timerange\u0027).latest +`\r\n\t\t  AND time \u003e\u003d `+ meta(\u0027timerange\u0027).earliest +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND type \u003d \u0027REQ\u0027\r\n\t`\r\n\r\n| stats #reduce data points to timegroup\r\n\tby\u003d[metric] \r\n\t\"ok_count\"\t\u003dsum(\"ok_count\")\r\n\t\"ko_count\"\t\u003dsum(\"ko_count\")\r\n\t\"min\"\t\u003dmin(\"ok_min\")\r\n\t\"mean\"\t\u003davg(\"ok_mean\")\r\n\t\"max\"\t\u003dmax(\"ok_max\")\r\n\t\"stdev\"\t\u003davg(\"ok_stdev\")\r\n\t\"p50\"\t\u003dperc(\"ok_p50\", 50)\r\n\t\"p75\"\t\u003dperc(\"ok_p75\", 75)\r\n\t\"p95\"\t\u003dperc(\"ok_p95\", 95)\r\n\t\"p99\"\t\u003dperc(\"ok_p99\", 99)\r\n;\r\n| meta\r\n\ttimerange \u003d object(\r\n\t\t\t\t   \u0027earliest\u0027, earliest()\r\n\t\t\t\t , \u0027latest\u0027, latest()\r\n\t\t\t\t)\r\n| mimic\r\n;\r\n| resultcompare\r\n\tby\u003d[metric]\r\n\tpercentformat \u003d [[\u0027percent\u0027, $threshold_good$, $threshold_bad$, \"bg\", \"cfw-gray\"], [align, center]]\r\n| formatfield\r\n\trequest\u003d[\r\n\t\t\t  [\u0027css\u0027, \"max-width\", \"20vw\"]\r\n\t\t\t ,[\u0027css\u0027, \"text-wrap\", \"wrap\"]\r\n\t\t\t ,[\u0027css\u0027, \"word-wrap\", \"break-word\"]\r\n\t\t]\r\n\t\t\t\r\n\tfields(metric, \"counts\", \"metrics\")\u003d[\u0027align\u0027, \"right\"]\r\n\t[mean, stdev]\u003d[\u0027decimals\u0027, 1]\r\n| display \r\n\tas\u003dtable\r\n\tdownload\u003dtrue",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 523,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 675,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_parameter",
         "X": 0,
         "Y": 142,
@@ -405,15 +405,15 @@
           "checkpassword": false,
           "password": null,
           "JSON_AFFECTED_WIDGETS": {
-            "522": "Compared Statistics"
+            "674": "Compared Statistics"
           },
           "load_previous_values": true
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 524,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 676,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 95,
@@ -434,14 +434,14 @@
         "MANUAL_LOAD": true,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults \r\n\tdatabase_id\u003d -1\r\n\tinterval\u003d1\r\n\tinterval_unit\u003d\u0027d\u0027\r\n\tchart_settings\u003d{}\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"17vw\"\r\n| meta name\u003d\"data\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, request\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_p95\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n\r\n| set time \u003d time * 1000\r\n;\r\n#####################################\r\n# MIN\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_min\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_min\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# AVG\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_mean\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_mean\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# P95\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_p95\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_p95\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# MAX\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_max\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_max\" )\r\n| keep PERC, meta(name)\r\n;\r\n\r\n\r\n#####################################\r\n# Join\r\n| meta name \u003d \"INDEX\"\r\n| source empty records \u003d 100\r\n| set PERC \u003d count() + 1\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\" # join MIN\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join AVG\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join P95\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join MAX\r\n| resultremove \"data\"\r\n| rename PERC \u003d Percentile\r\n| chart \r\n\ty\u003d[\"ok_min\", \"ok_mean\", \"ok_p95\", \"ok_max\"]\t\r\n\tx\u003dPercentile\r\n\tpointradius\u003d2\r\n\tspangaps\u003dtrue\r\n\txtype\u003dlinear\r\n\txlabel \u003d \"Percentile\"\r\n\tylabel \u003d \"Response Time\"\r\n\t\r\n\t\r\n",
+          "query": "| paramdefaults \r\n\tdatabase_id\u003d -1\r\n\tinterval\u003d1\r\n\tinterval_unit\u003d\u0027d\u0027\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n\tchart_type\u003d \"area\"\r\n| global\r\n\tcharttype \u003d tojson(param(\"chart_settings\", {})).charttype\r\n\tsparktype\u003d case( \r\n\t\t\t\t\t(globals(charttype) ~\u003d \u0027.*area\u0027), \"sparkarea\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*bar\u0027), \"sparkbar\"\r\n\t\t\t\t\t, (globals(charttype) ~\u003d \u0027.*line\u0027), \"sparkline\"\r\n\t\t\t\t\t, true, \"sparkarea\"\r\n\t\t\t\t)\r\n\tsparkheight\u003d\"75px\"\r\n\tsparkwidth\u003d\"17vw\"\r\n| meta name\u003d\"data\"\r\n| source postgres \r\n\tenvironment\u003dparam(database_id) \r\n\tquery\u003d `\r\n\t\tSELECT \r\n\t\t\t  time\r\n\t\t\t, simulation\r\n\t\t\t, metric\r\n\t\t\t, ok_min\r\n\t\t\t, ok_max\r\n\t\t\t, ok_mean\r\n\t\t\t, ok_p95\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t\t  AND simulation LIKE \u0027%`+ param(\"simulation\", \"none\") +`%\u0027\r\n\t\t  AND ok_count IS NOT NULL\r\n\t`\r\n;\r\n#####################################\r\n# MIN\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_min\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_min\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# AVG\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_mean\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_mean\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# P95\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_p95\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_p95\" )\r\n| keep PERC, meta(name)\r\n;\r\n#####################################\r\n# MAX\r\n| resultcopy \t\"data\"\r\n| meta \t\t\tname \u003d \"ok_max\"\r\n| percentiles   PERC \u003d meta(name)\r\n| set \t\t\tPERC \u003d ceil(PERC)\r\n| stats\t\t\tby\u003d[PERC] meta(name) \u003d AVG( \"ok_max\" )\r\n| keep PERC, meta(name)\r\n;\r\n\r\n\r\n#####################################\r\n# Join\r\n| meta name \u003d \"INDEX\"\r\n| source empty records \u003d 100\r\n| set PERC \u003d count() + 1\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\" # join MIN\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join AVG\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join P95\r\n;\r\n| resultjoin on\u003dPERC join\u003d\"right\"  # join MAX\r\n| resultremove \"data\"\r\n| rename PERC \u003d Percentile\r\n| chart \r\n\ty\u003d[\"ok_min\", \"ok_mean\", \"ok_p95\", \"ok_max\"]\t\r\n\tx\u003dPercentile\r\n\ttype\u003d\"line\"\r\n\tpointradius\u003d2\r\n\tspangaps\u003dtrue\r\n\txtype\u003dlinear\r\n\txlabel \u003d \"Percentile\"\r\n\tylabel \u003d \"Response Time\"\r\n\t\r\n\t\r\n",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
       },
       {
-        "PK_ID": 527,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 677,
+        "FK_ID_DASHBOARD": 135,
         "TYPE": "cfw_widget_queryresults",
         "X": 0,
         "Y": 40,
@@ -462,7 +462,7 @@
         "MANUAL_LOAD": false,
         "PARAM_WIDGET_LOAD": false,
         "JSON_SETTINGS": {
-          "query": "| paramdefaults\r\n\tdatabase_id\u003d-1\r\n\ttablename\u003d\u0027gatlytron\u0027\r\n| meta\r\n\tlasttime \u003d \"X\"\r\n\tcssstyle \u003d null\r\n| source postgres \r\n\tenvironment\u003dparam(database_id)\r\n\tquery\u003d `\r\n\t\tSELECT *\r\n\t\tFROM ` +param(tablename, \u0027gatlytron\u0027) + `_testsettings\r\n\t\tWHERE time \u003c\u003d `+ (latest() / 1000) +`\r\n\t\t  AND time \u003e\u003d `+ (earliest() / 1000) +`\r\n\t`\r\n| set  time \u003d time * 1000\r\n| sort time reverse \u003d true\r\n| set \r\n\thue \u003d (time / 1000) % 255\r\n\ttime \u003d timeformat(\"yyyy-MM-dd\u0027T\u0027HH:mm:ss\", time)\r\n| formatcss fields\u003d[time] style\u003d \"background-color: hsla(\"+hue+\",66%,40%, 1.0);\"\r\n| remove execid, hue\r\n| rename pacingseconds \u003d pacing\r\n| display menu\u003dbutton",
+          "query": "| paramdefaults\r\n\tdatabase_id\u003d-1\r\n\ttableprefix\u003d\u0027gatlytron\u0027\r\n| meta\r\n\tlasttime \u003d \"X\"\r\n\tcssstyle \u003d null\r\n| source postgres \r\n\tenvironment\u003dparam(database_id)\r\n\tquery\u003d `\r\n\t\tSELECT *\r\n\t\tFROM ` +param(tableprefix, \u0027gatlytron\u0027) + `_testsettings\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ earliest() +`\r\n\t`\r\n| sort time reverse \u003d true\r\n| set \r\n\thue \u003d (time / 1000) % 255\r\n\ttime \u003d timeformat(\"yyyy-MM-dd\u0027T\u0027HH:mm:ss\", time)\r\n| formatcss fields\u003d[time] style\u003d \"background-color: hsla(\"+hue+\",66%,40%, 1.0);\"\r\n| remove execid, hue\r\n| rename pacingseconds \u003d pacing\r\n| display menu\u003dbutton",
           "sampledata": false
         },
         "JSON_TASK_PARAMETERS": {}
@@ -470,20 +470,20 @@
     ],
     "parameters": [
       {
-        "PK_ID": 103,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 204,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Query Select",
         "PARAM_TYPE": "QUERY_EDITOR",
         "NAME": "simulation",
-        "VALUE": "| source postgres \r\n\tenvironment\u003d{\"id\":5,\"name\":\"Postgres Localhost\"} \r\n\tquery\u003d `\r\n\t\tSELECT DISTINCT simulation FROM gatlytron\r\n\t\tWHERE time \u003c\u003d `+(latest() / 1000)+`\r\n\t\t  AND time \u003e\u003d `+( timeOffset(earliest(), -30, \"d\")  / 1000)+`\r\n\t`",
+        "VALUE": "| source postgres \r\n\tenvironment\u003d{\"id\":5,\"name\":\"Postgres Localhost\"} \r\n\tquery\u003d `\r\n\t\tSELECT DISTINCT simulation FROM gatlytron_stats\r\n\t\tWHERE time \u003c\u003d `+ latest() +`\r\n\t\t  AND time \u003e\u003d `+ timeOffset(earliest(), -30, \"d\") +`\r\n\t`",
         "MODE": "MODE_SUBSTITUTE",
         "IS_MODE_CHANGE_ALLOWED": false,
         "IS_DYNAMIC": true
       },
       {
-        "PK_ID": 105,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 205,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Postgres Environment",
         "PARAM_TYPE": "SELECT",
@@ -494,20 +494,20 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 106,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 206,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Text",
         "PARAM_TYPE": "TEXT",
-        "NAME": "tablename",
+        "NAME": "tableprefix",
         "VALUE": "gatlytron",
         "MODE": "MODE_SUBSTITUTE",
         "IS_MODE_CHANGE_ALLOWED": false,
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 107,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 207,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Number",
         "PARAM_TYPE": "NUMBER",
@@ -518,8 +518,8 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 108,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 208,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Select",
         "PARAM_TYPE": "VALUE_LABEL",
@@ -530,8 +530,8 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 109,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 209,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Chart Types",
         "PARAM_TYPE": "UNMODIFIABLE_TEXT",
@@ -542,32 +542,20 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 111,
-        "FK_ID_DASHBOARD": 107,
-        "WIDGET_TYPE": null,
-        "LABEL": "Chart Settings",
-        "PARAM_TYPE": "CHART_SETTINGS",
-        "NAME": "chart_settings",
-        "VALUE": "{\"charttype\":\"area\",\"xtype\":\"time\",\"ytype\":\"linear\",\"ymin\":0,\"ymax\":null,\"height\":null,\"stacked\":false,\"showlegend\":false,\"showaxes\":true,\"spangaps\":false,\"pointradius\":2,\"tension\":0,\"multichart\":false,\"multicharttitle\":false,\"multichartcolumns\":1}",
-        "MODE": "MODE_SUBSTITUTE",
-        "IS_MODE_CHANGE_ALLOWED": false,
-        "IS_DYNAMIC": false
-      },
-      {
-        "PK_ID": 131,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 211,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Query Select",
         "PARAM_TYPE": "QUERY_EDITOR",
         "NAME": "request",
-        "VALUE": "| source postgres \r\n\tenvironment\u003d{\"id\":5,\"name\":\"Postgres Localhost\"} \r\n\tquery\u003d `\r\n\t\tSELECT DISTINCT request FROM gatlytron\r\n\t\tWHERE time \u003c\u003d `+(latest() / 1000)+`\r\n\t\t  AND time \u003e\u003d `+( timeOffset(earliest(), -30, \"d\")  / 1000)+`\r\n\t\t  AND simulation \u003d \u0027$simulation$\u0027\r\n\t\t  ORDER BY request\r\n\t`",
+        "VALUE": "| source postgres \r\n\tenvironment\u003d{\"id\":5,\"name\":\"Postgres Localhost\"} \r\n\tquery\u003d `\r\n\t\tSELECT DISTINCT metric FROM gatlytron_stats\r\n\t\tWHERE time \u003c\u003d `+latest()+`\r\n\t\t  AND time \u003e\u003d `+ timeOffset(earliest(), -30, \"d\") +`\r\n\t\t  AND simulation \u003d \u0027$simulation$\u0027\r\n\t\t  ORDER BY metric\r\n\t`",
         "MODE": "MODE_SUBSTITUTE",
         "IS_MODE_CHANGE_ALLOWED": false,
         "IS_DYNAMIC": true
       },
       {
-        "PK_ID": 171,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 212,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Time Range",
         "PARAM_TYPE": "TIMEFRAMEPICKER",
@@ -578,8 +566,8 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 172,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 213,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Number",
         "PARAM_TYPE": "NUMBER",
@@ -590,8 +578,8 @@
         "IS_DYNAMIC": false
       },
       {
-        "PK_ID": 173,
-        "FK_ID_DASHBOARD": 107,
+        "PK_ID": 214,
+        "FK_ID_DASHBOARD": 135,
         "WIDGET_TYPE": null,
         "LABEL": "Number",
         "PARAM_TYPE": "NUMBER",

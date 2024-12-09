@@ -86,7 +86,7 @@ public class GatlytronScenario {
 	
 		ArrayList<Object> valueList = new ArrayList<>();
 		
-		valueList.add(Gatlytron.STARTTIME_SECONDS);
+		valueList.add(Gatlytron.STARTTIME_MILLIS);
 		valueList.add(Gatlytron.EXECUTION_ID);
 		valueList.add(simulationName);
 		valueList.add(scenarioName);

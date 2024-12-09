@@ -13,8 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.performetriks.gatlytron.base.Gatlytron;
+import com.performetriks.gatlytron.injection.InjectedDataReceiver;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
-import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
+import com.performetriks.gatlytron.reporting.GatlytronReporterDatabase;
 
 /***************************************************************************
  * 
@@ -33,36 +34,41 @@ public class GatlytronStatsEngine {
 	// key is a group name, value are all records that are part of the group
 	private static TreeMap<String, ArrayList<GatlytronRecordRaw> > groupedRecords = new TreeMap<>();
 
-	private static int reportInterval = 15;
 	private static Thread reporterThread;
 	private static boolean isStopped;
+	
+	private static boolean isFirstReport = true;
 	
 	/***************************************************************************
 	 * Starts the reporting of the statistics.
 	 *  
 	 ***************************************************************************/
 	public static void start(int reportInterval) {
-		GatlytronStatsEngine.reportInterval = reportInterval;
 		
-		reporterThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				
-				try {
-					while( !Thread.currentThread().isInterrupted()
-						&& !isStopped
-						){
-						Thread.sleep(reportInterval * 1000);
-						aggregateAndReport();
+		//--------------------------------------
+		// Only Start once
+		if(reporterThread == null) {
+			
+			reporterThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					
+					try {
+						while( !Thread.currentThread().isInterrupted()
+							&& !isStopped
+							){
+							Thread.sleep(reportInterval * 1000);
+							aggregateAndReport();
+						}
+					
+					}catch(InterruptedException e) {
+						logger.info("GatlytronStatsEngine has been stopped.");
 					}
-				
-				}catch(InterruptedException e) {
-					logger.info("GatlytronStatsEngine has been stopped.");
 				}
-			}
-		});
-		
-		reporterThread.start();
+			});
+			
+			reporterThread.start();
+		}
 	}
 	
 	/***************************************************************************
@@ -95,12 +101,16 @@ public class GatlytronStatsEngine {
 	 * 
 	 ***************************************************************************/
 	private static void aggregateAndReport() {
-		
-		LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> statsRecords = new LinkedHashMap<>();
+
+		//----------------------------------------
+		// Create User Records
+		InjectedDataReceiver.createUserRecords(); 
 		
 		//----------------------------------------
 		// Steal Reference to not block writing
 		// new records
+		LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> statsRecords = new LinkedHashMap<>();
+		
 		TreeMap<String, ArrayList<GatlytronRecordRaw> > groupedRecordsCurrent;
 		synchronized (SYNC_LOCK) {
 			groupedRecordsCurrent = groupedRecords;
@@ -169,6 +179,14 @@ public class GatlytronStatsEngine {
 		// Report Stats
 		sendRecordsToReporter(statsRecords);
 		
+		
+		//-------------------------------
+		// Report Test Settings
+		if(isFirstReport) {
+			isFirstReport = false;
+			sendTestSettingsToDBReporter();
+		}
+		
 	}
 	
 	/***************************************************************************
@@ -206,6 +224,24 @@ public class GatlytronStatsEngine {
 			}
 		}
 
+	}
+	
+	/***************************************************************************
+	 * Send the test settings to Database Reporters.
+	 * 
+	 ***************************************************************************/
+	private static void sendTestSettingsToDBReporter() {
+		
+		//-------------------------
+		// Send Clone of list to each Reporter
+		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
+			if(reporter instanceof GatlytronReporterDatabase) {
+				logger.debug("Send TestSettings Data to: "+reporter.getClass().getName());
+				((GatlytronReporterDatabase)reporter).reportTestSettings(Gatlytron.getSimulationName());
+			}
+		}
+		
+		
 	}
 	
 	/***************************************************************************

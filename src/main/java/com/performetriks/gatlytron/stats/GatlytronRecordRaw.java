@@ -83,15 +83,12 @@ public class GatlytronRecordRaw {
 		
 		//-----------------------
 		// Create Stats Group identifier
-		this.statsIdentifier += type.toString();
-		this.statsIdentifier += scenario;
+		this.statsIdentifier += type.threeLetters() + simulation + scenario;
 		if( !this.groups.isEmpty() ) {
 			this.statsIdentifier += "/" + getGroupsAsString("/", "");
 		}	
 		
-		this.statsIdentifier += metricName;
-		this.statsIdentifier += status;
-		this.statsIdentifier += responseCode;
+		this.statsIdentifier += metricName + status + responseCode;
 		
 	}
 	

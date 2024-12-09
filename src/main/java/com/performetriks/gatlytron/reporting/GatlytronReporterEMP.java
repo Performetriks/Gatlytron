@@ -49,10 +49,8 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						;
 	}
 	
-	private static final String ATTRIBUTES_OK = "\"{type: \\\"ok\\\"}\""; 
-	private static final String ATTRIBUTES_KO = "\"{type: \\\"ko\\\"}\""; 
-	private static final String ATTRIBUTES_ALL = "\"{type: \\\"all\\\"}\""; 
-	private static final String ATTRIBUTES_USER = "\"{type: \\\"user\\\"}\""; 
+	private static final String ATTRIBUTES_OK = "\"{status: \\\"ok\\\", type: \\\"$typePlaceholder$\\\"}\""; 
+	private static final String ATTRIBUTES_KO = "\"{status: \\\"ko\\\", type: \\\"$typePlaceholder$\\\"}\""; ; 
 	
 	private String empURL;
 	private String apiToken;
@@ -172,6 +170,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		// Initialize Values
 		String category = categoryPrefix+record.getSimulation();
 		String entityName = record.getMetricName();
+		String type = record.getType().threeLetters();
 		
 		//-------------------------------
 		// Escape Quotes
@@ -186,9 +185,8 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						+ "\""+entityName+"\""
 						+ SEPARATOR;
 		
-		String recordOK  = commonInfo+ATTRIBUTES_OK; 
-		String recordKO  = commonInfo+ATTRIBUTES_KO; 
-		String recordALL = commonInfo+ATTRIBUTES_ALL; 
+		String recordOK  = commonInfo + ATTRIBUTES_OK.replace("$typePlaceholder$",  type); 
+		String recordKO  = commonInfo + ATTRIBUTES_KO.replace("$typePlaceholder$", type); 
 		
 		//-------------------------------
 		// Common information
@@ -197,15 +195,12 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			
 			BigDecimal valueOK = record.getValue("ok_"+metric);
 			BigDecimal valueKO = record.getValue("ko_"+metric);
-			BigDecimal valueALL = record.getValue("all_"+metric);
 			
 			recordOK += SEPARATOR + ( (valueOK != null) ? valueOK : "") ;
 			recordKO += SEPARATOR + ( (valueKO != null) ? valueKO : "");
-			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
 		if( Gatlytron.isKeepEmptyRecords() || record.hasData()) {
-			csv.append("\r\n"+recordALL);
 			
 			if(Gatlytron.isKeepEmptyRecords() || record.hasDataOK()) { csv.append("\r\n"+recordOK); }
 			if(Gatlytron.isKeepEmptyRecords() || record.hasDataKO()) { csv.append("\r\n"+recordKO); }

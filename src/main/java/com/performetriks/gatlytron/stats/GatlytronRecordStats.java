@@ -31,6 +31,7 @@ public class GatlytronRecordStats {
 	private String scenario;
 	private String metricName;
 	private String code;
+	private String statsIdentifier;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
 	// list of metric names
@@ -150,6 +151,7 @@ public class GatlytronRecordStats {
 		this.scenario = record.getScenario();
 		this.metricName = record.getMetricName();
 		this.code = record.getResponseCode();
+		this.statsIdentifier = record.getStatsIdentifier();
 
 		
 		//-----------------------------------
@@ -295,7 +297,7 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	@Override
 	public int hashCode() {
-		return (time + type.toString() + simulation + metricName).hashCode();
+		return statsIdentifier.hashCode();
 	}
 	
 	/***********************************************************************

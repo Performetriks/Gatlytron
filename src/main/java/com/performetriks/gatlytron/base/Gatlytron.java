@@ -41,7 +41,6 @@ public class Gatlytron {
 	
 	public static final String EXECUTION_ID = UUID.randomUUID().toString();
 	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
-	public static final long STARTTIME_SECONDS = STARTTIME_MILLIS / 1000;
 	
 	
 	/******************************************************************

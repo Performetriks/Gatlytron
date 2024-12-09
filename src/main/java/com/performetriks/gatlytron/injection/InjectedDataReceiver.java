@@ -90,54 +90,7 @@ public class InjectedDataReceiver {
 	 * 
 	 ***************************************************************************/
 	public static void logUserStart(String scenario) {
-		
 		countUsers(scenario, true);
-		long now = System.currentTimeMillis();
-		
-		//---------------------------------------
-		// Users Active
-		createRecord(
-				  GatlytronRecordType.USER
-				, scenario
-				, null
-				, "users.active"
-				, now
-				, now
-				, "OK"
-				, "000"
-				, "NONE"
-				, getUsersActive(scenario)
-			);	
-		
-		//---------------------------------------
-		// Users Started
-		createRecord(
-				  GatlytronRecordType.USER
-				, scenario
-				, null
-				, "users.total_started"
-				, now
-				, now
-				, "OK"
-				, "000"
-				, "NONE"
-				, getUsersStarted(scenario)
-			);	
-		
-		//---------------------------------------
-		// Users Started
-		createRecord(
-				GatlytronRecordType.USER
-				, scenario
-				, null
-				, "users.total_stopped"
-				, now
-				, now
-				, "OK"
-				, "000"
-				, "NONE"
-				, getUsersStopped(scenario)
-				);	
 	}
 	
 	/***************************************************************************
@@ -145,7 +98,7 @@ public class InjectedDataReceiver {
 	 * 
 	 ***************************************************************************/
 	public static void logUserEnd(String scenario) {
-		
+		countUsers(scenario, false);
 	}
 	
 	/***************************************************************************
@@ -183,6 +136,69 @@ public class InjectedDataReceiver {
 	}
 	
 	
+	
+	
+	/***************************************************************************
+	 * INTERNAL METHOD
+	 * Will be called by the GatlytronStatsEngine to create records, periodically.
+	 * 
+	 ***************************************************************************/
+	public static void createUserRecords() {
+		
+		long now = System.currentTimeMillis();
+		
+		//---------------------------------------
+		// Users Active
+		for(String scenario : scenarioUsersActive.keySet()) {
+			createRecord(
+					  GatlytronRecordType.USER
+					, scenario
+					, null
+					, "users.active"
+					, now
+					, now
+					, "OK"
+					, "000"
+					, "NONE"
+					, getUsersActive(scenario)
+				);	
+		}
+
+		
+		//---------------------------------------
+		// Users Started
+		for(String scenario : scenarioUsersTotalStarted.keySet()) {
+			createRecord(
+					  GatlytronRecordType.USER
+					, scenario
+					, null
+					, "users.total_started"
+					, now
+					, now
+					, "OK"
+					, "000"
+					, "NONE"
+					, getUsersStarted(scenario)
+				);	
+		}
+		
+		//---------------------------------------
+		// Users Stopped
+		for(String scenario : scenarioUsersTotalStopped.keySet()) {
+			createRecord(
+					GatlytronRecordType.USER
+					, scenario
+					, null
+					, "users.total_stopped"
+					, now
+					, now
+					, "OK"
+					, "000"
+					, "NONE"
+					, getUsersStopped(scenario)
+				);	
+		}
+	}
 	/***************************************************************************
 	 * 
 	 ***************************************************************************/
@@ -190,7 +206,7 @@ public class InjectedDataReceiver {
 			  GatlytronRecordType type
 			, String scenario
 			, java.util.List<String> groups
-			, String requestName
+			, String metricName
 			, long startTimestamp
 			, long endTimestamp
 			, String status
@@ -206,7 +222,7 @@ public class InjectedDataReceiver {
 				, Gatlytron.getSimulationName()
 				, scenario
 				, groups
-				, requestName
+				, metricName
 				, startTimestamp
 				, endTimestamp
 				, status
