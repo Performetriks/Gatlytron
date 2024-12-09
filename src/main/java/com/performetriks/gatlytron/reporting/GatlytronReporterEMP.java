@@ -128,11 +128,8 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		// Create Request Data
 		for(GatlytronRecordStats record : records) {
 			
-			if(record.isRequestRecord()) {
-				this.addCSVRecordsRequest(csvRecordsRequest, record);
-			}else {
-				this.addCSVRecordsUser(csvRecordsUser, record);
-			}
+			this.addCSVRecord(csvRecordsRequest, record);
+
 		}
 		
 		String postBodyRequest = csvRecordsRequest.toString();
@@ -165,70 +162,16 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			logger.error("EMP: An Error occured while calling the API.", e);
 		}
 	}
-	
+		
 	/****************************************************************************
 	 * 
 	 ****************************************************************************/
-	private void addCSVRecordsUser(StringBuilder csv, GatlytronRecordStats record) {
-		
-		if(record.isRequestRecord()) {
-			logger.warn("Unexpected type of Carbon record. Expected type 'user' but got type 'request'.");
-			return;
-		}
-		
+	private void addCSVRecord(StringBuilder csv, GatlytronRecordStats record) {
+				
 		//-------------------------------
 		// Initialize Values
 		String category = categoryPrefix+record.getSimulation();
-		String userGroup = record.getUserGroup();
-		
-		//-------------------------------
-		// Escape Quotes
-		category = category.replace("\"", "\\\"");
-		userGroup = userGroup.replace("\"", "\\\"");
-		
-		//-------------------------------
-		// Create base
-		String commonInfo = 
-				  "\""+category+"\""
-				+ SEPARATOR
-				+ "\""+userGroup;
-		
-		String recordActive  = commonInfo + ":usersActive\"" + SEPARATOR + ATTRIBUTES_USER; 
-		String recordWaiting  = commonInfo + ":usersWaiting\"" + SEPARATOR + ATTRIBUTES_USER; 
-		String recordDone = commonInfo  + ":usersDone\"" + SEPARATOR + ATTRIBUTES_USER; 
-		
-		//-------------------------------
-		// Common information
-
-		BigDecimal valueActive = record.getValue("users_active");
-		BigDecimal valueWaiting = record.getValue("users_waiting");
-		BigDecimal valueDone = record.getValue("users_done");
-		
-		recordActive += SEPARATOR + ( (valueActive != null) ? valueActive : "") ;
-		recordWaiting += SEPARATOR + ( (valueWaiting != null) ? valueWaiting : "");
-		recordDone += SEPARATOR + ( (valueDone != null) ? valueDone : "");
-
-		
-		csv.append("\r\n"+recordActive);
-		csv.append("\r\n"+recordWaiting);
-		csv.append("\r\n"+recordDone);
-
-	}
-	
-	/****************************************************************************
-	 * 
-	 ****************************************************************************/
-	private void addCSVRecordsRequest(StringBuilder csv, GatlytronRecordStats record) {
-		
-		if(record.isUserRecord()) {
-			logger.warn("Unexpected type of Carbon record. Expected type 'request' but got type 'user'.");
-			return;
-		}
-		
-		//-------------------------------
-		// Initialize Values
-		String category = categoryPrefix+record.getSimulation();
-		String entityName = record.getRequest();
+		String entityName = record.getMetricName();
 		
 		//-------------------------------
 		// Escape Quotes
@@ -261,11 +204,11 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 			recordALL += SEPARATOR + ( (valueALL != null) ? valueALL : "");
 		}
 		
-		if( Gatlytron.isKeepEmptyRecords() || record.hasRequestData()) {
+		if( Gatlytron.isKeepEmptyRecords() || record.hasData()) {
 			csv.append("\r\n"+recordALL);
 			
-			if(Gatlytron.isKeepEmptyRecords() || record.hasRequestDataOK()) { csv.append("\r\n"+recordOK); }
-			if(Gatlytron.isKeepEmptyRecords() || record.hasRequestDataKO()) { csv.append("\r\n"+recordKO); }
+			if(Gatlytron.isKeepEmptyRecords() || record.hasDataOK()) { csv.append("\r\n"+recordOK); }
+			if(Gatlytron.isKeepEmptyRecords() || record.hasDataKO()) { csv.append("\r\n"+recordKO); }
 		}
 		
 	}

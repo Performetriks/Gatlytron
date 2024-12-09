@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
 
 /***************************************************************************
  * This record holds one record of statistical data.
@@ -25,10 +26,11 @@ public class GatlytronRecordStats {
 	private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
 	
 	private long time;
-	private String simulation = null;
-	private String scenario = null;
-	private String metricName = null;
-	private String user_group = null;
+	private GatlytronRecordType type;
+	private String simulation;
+	private String scenario;
+	private String metricName;
+	private String code;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
 	// list of metric names
@@ -45,12 +47,8 @@ public class GatlytronRecordStats {
 	};
 	
 	// value names consist of type + "_" + metric
-	public static final String[] valueNames = new String[] {
-		  "users_active"
-		, "users_waiting"
-		, "users_done"
-			
-		, "ok_count"
+	public static final String[] valueNames = new String[] {		
+		  "ok_count"
 		, "ok_min"
 		, "ok_max"
 		, "ok_mean"
@@ -81,16 +79,17 @@ public class GatlytronRecordStats {
 //		, "all_p99"
 //	};
 	
-	private static String csvHeaderTemplate = "time,simulation,scenario,request,user_group";
+	private static String csvHeaderTemplate = "time,type,simulation,scenario,metric,code";
 	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
 			+ "		  time BIGINT,\r\n"
+			+ "		  type VARCHAR(16),\r\n"
 			+ "		  simulation VARCHAR(4096),\r\n"
 			+ "		  scenario VARCHAR(4096),\r\n"
-			+ "		  request VARCHAR(4096),\r\n"
-			+ "		  user_group VARCHAR(4096)"
+			+ "		  metric VARCHAR(4096),\r\n"
+			+ "		  code VARCHAR(16)"
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,simulation,scenario,request,user_group";
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,type,simulation,scenario,metric,code";
 
 	static {
 		
@@ -99,7 +98,7 @@ public class GatlytronRecordStats {
 		for(String name : valueNames) {
 			csvHeaderTemplate += ","+name;
 		}
-		csvHeaderTemplate += "\r\n";
+		//csvHeaderTemplate += "\r\n";
 		
 		//-----------------------------------------
 		// SQL Create Table Template
@@ -110,7 +109,7 @@ public class GatlytronRecordStats {
 
 		//-----------------------------------------
 		// SQL Insert Into Template
-		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?";
+		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?, ?";
 		for(String name : valueNames) {
 			sqlInsertIntoTemplate += ","+name;
 			sqlInsertValues += ", ?";
@@ -125,14 +124,13 @@ public class GatlytronRecordStats {
 	/***********************************************************************
 	 * Creates a record containing request statistics.
 	 * 
+	 * @param statsRecordList the list to which the stats record should be added too.
+	 * @param record one of the records of the 
 	 ***********************************************************************/
 	public GatlytronRecordStats(
-							  LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> existingRecords
-							, String status
+							  LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> statsRecordList
+							, GatlytronRecordRaw record
 						    , long timeMillis
-							, String simulation
-							, String scenario
-							, String metricName
 							, BigDecimal count 
 							, BigDecimal mean 
 							, BigDecimal min 		
@@ -147,23 +145,25 @@ public class GatlytronRecordStats {
 		//-----------------------------------
 		// Parse Message
 		this.time = timeMillis;
-		this.simulation = simulation;
-		this.scenario = scenario;
-		this.metricName = metricName;
+		this.type = record.getType();
+		this.simulation = record.getSimulation();
+		this.scenario = record.getScenario();
+		this.metricName = record.getMetricName();
+		this.code = record.getResponseCode();
 
 		
 		//-----------------------------------
 		// Get Target Record
-		GatlytronRecordStats targetForData = existingRecords.get(this);
+		GatlytronRecordStats targetForData = statsRecordList.get(this);
 		
 		if(targetForData == null) {
 			targetForData = this;
-			existingRecords.put(this, this);
+			statsRecordList.put(this, this);
 		}
 		
 		//-----------------------------------
 		// Add Values
-		String statusLower = status.trim().toLowerCase();  
+		String statusLower = record.getStatus().toLowerCase();  
 		
 		targetForData.addValue(statusLower, "count", count.toPlainString());
 		targetForData.addValue(statusLower, "min", min.toPlainString());
@@ -209,10 +209,11 @@ public class GatlytronRecordStats {
 	public String toCSV(String separator) {
 		
 		String csv = time 
+					+ separator + type.threeLetters()
 					+ separator + simulation.replace(separator, "_") 
 					+ separator + scenario.replace(separator, "_")  
 					+ separator + metricName.replace(separator, "_")  
-					+ separator + user_group
+					+ separator + code.replace(separator, "_")  
 					;
 				
 		for(String name : valueNames) {
@@ -241,10 +242,11 @@ public class GatlytronRecordStats {
 		JsonObject object = new JsonObject();
 		
 		object.addProperty("time", time);
+		object.addProperty("type", type.threeLetters());
 		object.addProperty("simulation", simulation);
 		object.addProperty("scenario", scenario);
-		object.addProperty("request", metricName);
-		object.addProperty("user_group", user_group);
+		object.addProperty("metric", metricName);
+		object.addProperty("code", code);
 		
 		for(String name : valueNames) {
 			object.addProperty(name, this.getValue(name));
@@ -273,10 +275,11 @@ public class GatlytronRecordStats {
 		ArrayList<Object> valueList = new ArrayList<>();
 		
 		valueList.add(time);
+		valueList.add(type.threeLetters());
 		valueList.add(simulation);
 		valueList.add(scenario);
 		valueList.add(metricName);
-		valueList.add(user_group);
+		valueList.add(code);
 		
 		for(String name : valueNames) {
 			valueList.add(this.getValue(name));
@@ -292,7 +295,7 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	@Override
 	public int hashCode() {
-		return (time + simulation + metricName + user_group).hashCode();
+		return (time + type.toString() + simulation + metricName).hashCode();
 	}
 	
 	/***********************************************************************
@@ -308,6 +311,13 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	public long getTime() {
 		return time;
+	}
+	
+	/***********************************************************************
+	 * Returns the time of this record.
+	 ***********************************************************************/
+	public GatlytronRecordType getType() {
+		return type;
 	}
 	
 	/***********************************************************************
@@ -327,16 +337,10 @@ public class GatlytronRecordStats {
 	/***********************************************************************
 	 * Returns the name of the request, or null if this is a user record.
 	 ***********************************************************************/
-	public String getRequest() {
+	public String getMetricName() {
 		return metricName;
 	}
 	
-	/***********************************************************************
-	 * Returns the name of the user group, or null if this is a user record.
-	 ***********************************************************************/
-	public String getUserGroup() {
-		return user_group;
-	}
 	
 	/***********************************************************************
 	 * 
@@ -360,53 +364,36 @@ public class GatlytronRecordStats {
 	/***********************************************************************
 	 * Checks if there is any data in this record.
 	 ***********************************************************************/
-	public boolean hasRequestData() {
-		return this.hasRequestData("ok") || this.hasRequestData("ko") ;
+	public boolean hasData() {
+		return this.hasData("ok") || this.hasData("ko") ;
 	}
 	
 	/***********************************************************************
 	 * Checks if there is 'ok' data in this record.
 	 ***********************************************************************/
-	public boolean hasRequestDataOK() {
-		return this.hasRequestData("ok");
+	public boolean hasDataOK() {
+		return this.hasData("ok");
 	}
 	
 	/***********************************************************************
 	 * Checks if there is 'ok' data in this record.
 	 ***********************************************************************/
-	public boolean hasRequestDataKO() {
-		return this.hasRequestData("ko");
+	public boolean hasDataKO() {
+		return this.hasData("ko");
 	}
 			
 	/***********************************************************************
 	 * Checks if the data is empty.
-	 * @param type either 'ok', 'ko' or 'all'. If null checks 'all'
+	 * @param status either 'ok', 'ko' or 'all'. If null checks 'all'
 	 ***********************************************************************/
-	private boolean hasRequestData(String type) {
+	private boolean hasData(String status) {
 
-		if(type == null) { type = "all"; }
+		if(status == null) { return false; }
 		
-		BigDecimal value = this.getValue(type+"_count");
+		BigDecimal value = this.getValue(status+"_count");
 		
 		return  (value != null && value.compareTo(BigDecimal.ZERO) != 0) ;
 
 	}
-	
-	/***********************************************************************
-	 * Returns true if this is a request record.
-	 ***********************************************************************/
-	public boolean isRequestRecord() {
-		return  (metricName != null);
-	}
-	
-	/***********************************************************************
-	 * Returns true if this is a user record.
-	 ***********************************************************************/
-	public boolean isUserRecord() {
-		return  (user_group != null);
-	}
-	
-	
-	
-	
+		
 }

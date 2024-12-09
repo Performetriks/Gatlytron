@@ -32,7 +32,7 @@ public class GatlytronReporterJson implements GatlytronReporter {
 	private String filepath;
 
 	private boolean makeArray = false;
-	private String arrayPrefix = "";
+	private String arrayComma = "";
 	
 	BufferedWriter writer = null;
 	
@@ -46,7 +46,7 @@ public class GatlytronReporterJson implements GatlytronReporter {
 		
 		this.makeArray = makeArray;
 		if(makeArray) {
-			arrayPrefix = ", ";
+			arrayComma = ",";
 		}
 		
 		this.filepath = filepath;
@@ -74,7 +74,7 @@ public class GatlytronReporterJson implements GatlytronReporter {
 		try {
 
 			for(GatlytronRecordStats record : records ) {
-				writer.write(record.toJsonString() + "\r\n" + arrayPrefix);
+				writer.write(record.toJsonString() +  arrayComma + "\r\n");
 			}
 
 		} catch (IOException e) {

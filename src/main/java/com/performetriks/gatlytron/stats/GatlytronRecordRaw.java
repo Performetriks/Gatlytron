@@ -15,6 +15,7 @@ import java.util.List;
  ***************************************************************************/
 public class GatlytronRecordRaw {
 	
+	private String simulation = "unknownSimulation";
 	private String scenario = "unnamedScenario";
 	
 	private List<String> groups = new ArrayList<>();
@@ -52,6 +53,7 @@ public class GatlytronRecordRaw {
 	 ******************************************************************/
 	public GatlytronRecordRaw(
 			  GatlytronRecordType type
+			, String simulation
 			, String scenario
 			, List<String> groups
 			, String metricName
@@ -68,6 +70,7 @@ public class GatlytronRecordRaw {
 		if(type != null ) {		this.type = type; }
 		if(groups != null ) {	this.groups = groups; }
 		
+		if(simulation != null && !simulation.isBlank() ) {			this.simulation = simulation; }
 		if(scenario != null && !scenario.isBlank() ) {			this.scenario = scenario; }
 		if(metricName != null && !metricName.isBlank() ) {	this.metricName = metricName; }
 		if(status != null && !status.isBlank() ) {				this.status = status; }
@@ -79,8 +82,8 @@ public class GatlytronRecordRaw {
 		this.metricValue = metricValue; 
 		
 		//-----------------------
-		// Create Fullname
-		this.statsIdentifier += type;
+		// Create Stats Group identifier
+		this.statsIdentifier += type.toString();
 		this.statsIdentifier += scenario;
 		if( !this.groups.isEmpty() ) {
 			this.statsIdentifier += "/" + getGroupsAsString("/", "");
@@ -99,6 +102,7 @@ public class GatlytronRecordRaw {
 	public String getStatsIdentifier() {
 		return statsIdentifier;
 	}
+	
 	/******************************************************************
 	 * 
 	 ******************************************************************/
@@ -138,6 +142,13 @@ public class GatlytronRecordRaw {
 		return logString;
 	}
 
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public String getSimulation() {
+		return simulation;
+	}
+	
 	/******************************************************************
 	 * 
 	 ******************************************************************/

@@ -148,28 +148,21 @@ public class GatlytronStatsEngine {
 			// Create StatsRecord
 			GatlytronRecordRaw firstRecord = records.get(0);
 			
-			if(firstRecord.getType().equals(GatlytronRecordType.REQUEST) ) {
+			new GatlytronRecordStats(
+				  statsRecords
+			    , firstRecord
+			    , System.currentTimeMillis()
+				, count 
+				, avg 
+				, min 		
+				, max 			
+				, stdev 	
+				, p50 		
+				, p75 		
+				, p95 		
+				, p99 	
+			);
 
-				new GatlytronRecordStats(
-					  statsRecords
-					, firstRecord.getStatus()
-				    , System.currentTimeMillis()
-					, Gatlytron.getSimulationName()
-					, firstRecord.getScenario()
-					, firstRecord.getMetricPath()
-					, count 
-					, avg 
-					, min 		
-					, max 			
-					, stdev 	
-					, p50 		
-					, p75 		
-					, p95 		
-					, p99 	
-				);
-
-			}
-			
 		}
 		
 		//-------------------------------
@@ -186,15 +179,13 @@ public class GatlytronStatsEngine {
 			LinkedHashMap<GatlytronRecordStats, GatlytronRecordStats> statsRecords
 			){
 		
-		System.out.println("%%%%%%%% statsRecords.size(): "+statsRecords.size());
 		//-------------------------
 		// Filter Records
 		ArrayList<GatlytronRecordStats> finalRecords = new ArrayList<>();
 		for (GatlytronRecordStats record : statsRecords.values()){
 			
 			if( Gatlytron.isKeepEmptyRecords()
-			 || record.hasRequestData() 
-			 || record.isUserRecord() 
+			 || record.hasData() 
 			 ){
 				finalRecords.add(record);
 			}
@@ -205,8 +196,14 @@ public class GatlytronStatsEngine {
 		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
 			ArrayList<GatlytronRecordStats> clone = new ArrayList<>();
 			clone.addAll(finalRecords);
-			logger.debug("Report data to: "+reporter.getClass().getName());
-		    reporter.reportRecords(clone);
+
+			// wrap with try catch to not stop reporting to all reporters
+			try {
+				logger.debug("Report data to: "+reporter.getClass().getName());
+				reporter.reportRecords(clone);
+			}catch(Exception e) {
+				logger.error("Exception while reporting data.", e);
+			}
 		}
 
 	}

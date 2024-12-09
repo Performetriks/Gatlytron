@@ -40,7 +40,7 @@ public class GatlytronReporterCSV implements GatlytronReporter {
 		this.separator = separator;
 		try {
 			path = Path.of(filepath);
-			String header = GatlytronRecordStats.getCSVHeader(separator);
+			String header = GatlytronRecordStats.getCSVHeader(separator)+"\r\n";
 			Files.deleteIfExists(path);
 			
 			Files.write(path, header.getBytes() 

@@ -176,7 +176,7 @@ public class InjectedDataReceiver {
 				, startTimestamp
 				, endTimestamp
 				, status.name()
-				, ( ( responseCode.isDefined() ) ? responseCode.toString() : "000" )
+				, ( ( responseCode.isDefined() ) ? responseCode.get().toString() : "000" )
 				, message.toString()
 				, duration
 				);	
@@ -203,6 +203,7 @@ public class InjectedDataReceiver {
 		// Create Record
 		GatlytronRecordRaw record = new GatlytronRecordRaw(
 				  type
+				, Gatlytron.getSimulationName()
 				, scenario
 				, groups
 				, requestName

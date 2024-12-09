@@ -30,11 +30,11 @@ public class GatlytronReporterSysoutCSV implements GatlytronReporter {
 	@Override
 	public void reportRecords(ArrayList<GatlytronRecordStats> records) {
 		
-		System.out.println( GatlytronRecordStats.getCSVHeader(separator) );
+		System.out.println("\r\n" + GatlytronRecordStats.getCSVHeader(separator) );
 		for(GatlytronRecordStats record : records ) {
 			System.out.println( record.toCSV(separator) );
 		}
-
+		System.out.println(" ");
 	}
 	
 	/****************************************************************************
