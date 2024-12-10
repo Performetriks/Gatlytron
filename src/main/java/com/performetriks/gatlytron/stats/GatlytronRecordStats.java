@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.JsonObject;
 import com.performetriks.gatlytron.database.DBInterface;
 import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
@@ -23,7 +20,7 @@ import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
  ***************************************************************************/
 public class GatlytronRecordStats {
 	
-	private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
+	//private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
 	
 	private long time;
 	private GatlytronRecordType type;
@@ -69,16 +66,7 @@ public class GatlytronRecordStats {
 		, "ko_p95"
 		, "ko_p99"
 	};		
-//		, "all_count"
-//		, "all_min"
-//		, "all_max"
-//		, "all_mean"
-//		, "all_stdev"
-//		, "all_p50"
-//		, "all_p75"
-//		, "all_p95"
-//		, "all_p99"
-//	};
+
 	
 	private static String csvHeaderTemplate = "time,type,simulation,scenario,metric,code";
 	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("

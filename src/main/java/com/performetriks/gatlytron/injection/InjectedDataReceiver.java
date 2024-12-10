@@ -9,9 +9,7 @@ import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
 import com.performetriks.gatlytron.stats.GatlytronStatsEngine;
 
 import io.gatling.commons.stats.Status;
-import scala.Int;
 import scala.Option;
-import scala.Some;
 import scala.collection.JavaConverters;
 import scala.collection.immutable.List;
 
@@ -112,8 +110,8 @@ public class InjectedDataReceiver {
 			, long startTimestamp
 			, long endTimestamp
 			, Status status
-			, Option responseCode
-			, Option message
+			, Option<?> responseCode
+			, Option<?> message
 			){
 		
 		long duration = -1;

@@ -4,9 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -29,8 +27,6 @@ public class GatlytronReporterJson implements GatlytronReporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(GatlytronReporterJson.class);
 	
-	private String filepath;
-
 	private boolean makeArray = false;
 	private String arrayComma = "";
 	
@@ -49,7 +45,6 @@ public class GatlytronReporterJson implements GatlytronReporter {
 			arrayComma = ",";
 		}
 		
-		this.filepath = filepath;
 		try {
 			Path path = Path.of(filepath);
 			Files.deleteIfExists(path);

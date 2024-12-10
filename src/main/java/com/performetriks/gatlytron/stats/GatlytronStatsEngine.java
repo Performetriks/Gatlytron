@@ -78,6 +78,8 @@ public class GatlytronStatsEngine {
 		
 		isStopped = true;
 		reporterThread.interrupt();
+		
+		aggregateAndReport();
 	}
 	
 	/***************************************************************************
@@ -98,10 +100,15 @@ public class GatlytronStatsEngine {
 	}
 
 	/***************************************************************************
+	 * Aggregates the raw records into statistics and sends the statistical
+	 * records to the reporters.
 	 * 
 	 ***************************************************************************/
 	private static void aggregateAndReport() {
 
+		
+		if(groupedRecords.isEmpty()) { return; }
+		
 		//----------------------------------------
 		// Create User Records
 		InjectedDataReceiver.createUserRecords(); 
@@ -140,6 +147,7 @@ public class GatlytronStatsEngine {
 			// skip if group is empty
 			if(values.isEmpty()) { continue; }
 			
+			// sort, needed for calculating the stats
 			values.sort(null);
 			
 			//---------------------------
@@ -243,24 +251,7 @@ public class GatlytronStatsEngine {
 		
 		
 	}
-	
-	/***************************************************************************
-	 * Send the test settings to Database Reporters.
-	 * 
-	 ***************************************************************************/
-//	private static void sendTestSettingsToDBReporter() {
-//		
-//		//-------------------------
-//		// Send Clone of list to each Reporter
-//		for (GatlytronReporter reporter : Gatlytron.getReporterList()){
-//			if(reporter instanceof GatlytronReporterDatabase) {
-//				logger.debug("Send TestSettings Data to: "+reporter.getClass().getName());
-//				((GatlytronReporterDatabase)reporter).reportTestSettings(firstRecord.getSimulation());
-//			}
-//		}
-//		
-//	}
-	
+		
 	
 	/***********************************************************************************************
 	 * 

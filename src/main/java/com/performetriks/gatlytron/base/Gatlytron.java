@@ -17,6 +17,7 @@ import io.gatling.core.config.GatlingConfiguration;
 import scala.concurrent.duration.FiniteDuration;
 
 /***************************************************************************
+ * Main Gatlytron class used for configuration and controlling the framework.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License
@@ -65,7 +66,7 @@ public class Gatlytron {
 	}
 	
 	/******************************************************************
-	 * Returns the list of added reporters.
+	 * Returns the list of the reporters.
 	 * 
 	 ******************************************************************/
 	@SuppressWarnings("unchecked")
@@ -115,14 +116,15 @@ public class Gatlytron {
 	}
 	
 	/******************************************************************
-	 * 
+	 * Enable or disable writing raw data to sysout.
 	 ******************************************************************/
 	public static void setRawDataToSysout(boolean rawDataToSysout) {
 		Gatlytron.rawDataToSysout = rawDataToSysout;
 	}
 	
 	/******************************************************************
-	 * 
+	 * Set the log path for raw data.
+	 * Will also activate the logging of raw data.
 	 ******************************************************************/
 	public static void setRawDataLogPath(String rawdataLogPath) {
 		Gatlytron.rawdataLogPath = rawdataLogPath;
@@ -139,8 +141,6 @@ public class Gatlytron {
 	 ******************************************************************/
 	public static String getRawDataLogPath() {
 		return Gatlytron.rawdataLogPath;
-		
-		
 	}
 	
 	/******************************************************************
@@ -207,7 +207,9 @@ public class Gatlytron {
 	}
 
 	/******************************************************************
-	 * 
+	 * Toggles certain debug information.
+	 * You can use this to also toggle your own debug logs by
+	 * retrieving this values using the isDebug()-method.
 	 ******************************************************************/
 	public static void setDebug(boolean debug) {
 		Gatlytron.debug = debug;
@@ -221,7 +223,7 @@ public class Gatlytron {
 	}
 	
 	/******************************************************************
-	 * Terminates the reporters.
+	 * Terminates Gatlytron.
 	 * 
 	 ******************************************************************/
 	public static void terminate() {
@@ -229,7 +231,11 @@ public class Gatlytron {
 
 		//--------------------------------
 		// Stop Stats Engine
-		GatlytronStatsEngine.stop();
+		try {
+			GatlytronStatsEngine.stop();
+		} catch (Exception e) {
+			logger.error("Error while stopping GatlytronStatsEngine.", e);
+		}
 		
 		//--------------------------------
 		// Close Raw Log Writer

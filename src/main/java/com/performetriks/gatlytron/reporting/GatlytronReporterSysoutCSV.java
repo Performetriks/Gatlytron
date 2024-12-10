@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.performetriks.gatlytron.stats.GatlytronRecordStats;
 
 /***************************************************************************
- * This reporter prints the records as JSON data to sysout.
+ * This reporter prints the records as CSV data to sysout.
  * Useful for debugging.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland

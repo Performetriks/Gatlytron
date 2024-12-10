@@ -19,30 +19,27 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 
 	private DBInterface db;
 	private GatlytronDBInterface gtronDB;
-	private String tableName;
 	
 	/****************************************************************************
 	 * 
 	 * @param driverName the name of the JDBC driver class
 	 * @param jdbcURL the url used to connect to the jdbc database
-	 * @param tableName the name that should be used for the table (will be created)
+	 * @param tableNamePrefix the name prefix that should be used for the tables (will be created)
 	 * @param username the username for accessing the database
 	 * @param password the password for accessing the database
 	 ****************************************************************************/
 	public GatlytronReporterDatabaseJDBC(
 			  String driverName
 			, String jdbcURL
-			, String tableName
+			, String tableNamePrefix
 			, String username
 			, String password) {
-		
-		this.tableName = tableName;
-		
+				
 		String uniqueName = jdbcURL;
 		
 		db = DBInterface.createDBInterface(uniqueName, driverName, jdbcURL, username, password);
 		
-		gtronDB = this.getGatlytronDB(db, tableName);
+		gtronDB = this.getGatlytronDB(db, tableNamePrefix);
 
 		gtronDB.createTables();
 	}

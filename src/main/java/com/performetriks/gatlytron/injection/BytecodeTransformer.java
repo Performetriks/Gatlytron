@@ -5,7 +5,6 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 
-import io.gatling.core.config.GatlingConfiguration;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -24,6 +23,7 @@ public class BytecodeTransformer implements ClassFileTransformer {
 	/*******************************************************************************
 	 * 
 	 *******************************************************************************/
+	@SuppressWarnings("rawtypes")
 	public byte[] transform(ClassLoader loader, String className,
 			Class classBeingRedefined, ProtectionDomain protectionDomain,
 			byte[] classfileBuffer) throws IllegalClassFormatException {

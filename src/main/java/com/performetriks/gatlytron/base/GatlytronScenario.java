@@ -17,6 +17,7 @@ import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
 
 /***************************************************************************
+ * Extend this class to make your scenario a GaltytronScenario.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License

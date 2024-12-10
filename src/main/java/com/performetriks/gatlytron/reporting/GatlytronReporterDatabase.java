@@ -1,7 +1,7 @@
 package com.performetriks.gatlytron.reporting;
 
 /***************************************************************************
- * Interface for reporting data received through Graphite protocol.
+ * Interface for reporting data to a database.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License

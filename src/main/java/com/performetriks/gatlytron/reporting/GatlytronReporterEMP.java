@@ -15,14 +15,14 @@ import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.stats.GatlytronRecordStats;
 
 /***************************************************************************
- * This reporter send the received records and sends them to an instance of
+ * This reporter takes the received records and sends them to an instance of
  * the open source tool Engineered Monitoring Platform(EMP), which you can find
  * <a href="https://github.com/xresch/EngineeredMonitoringPlatform">here</a>.
  * 
  * Data is pushed to the EMP API Endpoints 
  * 		EAVStats.pushStats and 
  * 		EAVStats.pushStatsCSV 
- * and the token used for the connection needs permission to use that endpoint.
+ * and the token used for the connection needs permission to use these endpoins.
  * 
  * Copyright Owner: Performetriks GmbH, Switzerland
  * License: MIT License
@@ -58,6 +58,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 	private HttpClient client = HttpClient.newBuilder()
 									.connectTimeout(Duration.ofSeconds(15))
 									.build();
+	
 	/****************************************************************************
 	 * 
 	 * 
@@ -153,8 +154,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 				.build();
 		
 		try {
-			HttpResponse<String> response = 
-					client.send( request, HttpResponse.BodyHandlers.ofString() );
+			client.send( request, HttpResponse.BodyHandlers.ofString() );
 			
 		} catch (Exception e) {
 			logger.error("EMP: An Error occured while calling the API.", e);

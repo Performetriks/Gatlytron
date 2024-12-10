@@ -37,13 +37,11 @@ public class DBInterface {
 
 	private BasicDataSource pooledSource;
 	
-	private String InterfaceName = "";
 
 	private static HashMap<String, BasicDataSource> managedConnectionPools = new HashMap<>();
 	
-	public DBInterface(String interfaceName, BasicDataSource pooledSource) {
+	public DBInterface(BasicDataSource pooledSource) {
 		this.pooledSource = pooledSource;
-		this.InterfaceName = interfaceName;
 	}
 	
 	/********************************************************************************************
@@ -762,6 +760,7 @@ public class DBInterface {
 	 * @return DBInterface
 	 * 
 	 ************************************************************************/
+	@SuppressWarnings("deprecation")
 	public static DBInterface createDBInterface(String uniquepoolName, String driverName, String url, String username, String password, String validationQuery) {
 		
 		BasicDataSource datasource;
@@ -803,7 +802,7 @@ public class DBInterface {
 			return null;
 		}
 		
-		DBInterface db = new DBInterface(uniquepoolName, datasource);
+		DBInterface db = new DBInterface(datasource);
 
 		logger.info("Created DBInteface: "+ url);
 		return db;
@@ -812,6 +811,7 @@ public class DBInterface {
 	/********************************************************************************************
 	 *
 	 ********************************************************************************************/
+	@SuppressWarnings("deprecation")
 	public static void setDefaultConnectionPoolSettings(BasicDataSource pooledSource) {
 		pooledSource.setMaxConnLifetimeMillis(60*60*1000);
 		pooledSource.setTimeBetweenEvictionRunsMillis(5*60*1000);
@@ -860,6 +860,7 @@ public class DBInterface {
 	 * 
 	 * @throws SQLException 
 	 ********************************************************************************************/
+	@SuppressWarnings("deprecation")
 	public static JsonArray getConnectionPoolStatsAsJSON() {	
 		
 		JsonArray result = new JsonArray();

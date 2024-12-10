@@ -48,6 +48,7 @@ public class GatlytronRecordRaw {
 			return threeLetters;
 		}
 	}
+	
 	/******************************************************************
 	 * 
 	 ******************************************************************/
@@ -94,6 +95,7 @@ public class GatlytronRecordRaw {
 	
 	
 	/******************************************************************
+	 * Returns the string used for grouping the statistics.
 	 * 
 	 ******************************************************************/
 	public String getStatsIdentifier() {
@@ -101,6 +103,7 @@ public class GatlytronRecordRaw {
 	}
 	
 	/******************************************************************
+	 * Returns the groups separated by the given separator.
 	 * 
 	 ******************************************************************/
 	public String getGroupsAsString(String separator, String fallbackForNoGrouping) {
@@ -231,15 +234,5 @@ public class GatlytronRecordRaw {
 	public BigDecimal getMetricValue() {
 		return metricValue;
 	}
-	
-	/******************************************************************
-	 * 
-	 ******************************************************************/
-	public String getLogString() {
-		return logString;
-	}
-	
-	
-	
-	
+		
 }
