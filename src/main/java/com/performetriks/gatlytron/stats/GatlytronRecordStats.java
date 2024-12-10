@@ -333,7 +333,7 @@ public class GatlytronRecordStats {
 	 * Returns the name of the gatling simulation.
 	 ***********************************************************************/
 	public String getScenario() {
-		return simulation;
+		return scenario;
 	}
 	
 	/***********************************************************************

@@ -49,8 +49,8 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						;
 	}
 	
-	private static final String ATTRIBUTES_OK = "\"{status: \\\"ok\\\", type: \\\"$typePlaceholder$\\\"}\""; 
-	private static final String ATTRIBUTES_KO = "\"{status: \\\"ko\\\", type: \\\"$typePlaceholder$\\\"}\""; ; 
+	private static final String ATTRIBUTES_OK = "\"{status: \\\"ok\\\", type: \\\"$typePlaceholder$\\\", scenario: \\\"$scenarioPlaceholder$\\\"}\""; 
+	private static final String ATTRIBUTES_KO = "\"{status: \\\"ko\\\", type: \\\"$typePlaceholder$\\\", scenario: \\\"$scenarioPlaceholder$\\\"}\""; ; 
 	
 	private String empURL;
 	private String apiToken;
@@ -171,6 +171,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		String category = categoryPrefix+record.getSimulation();
 		String entityName = record.getMetricName();
 		String type = record.getType().threeLetters();
+		String scenario = record.getScenario().replace("\"", "\\\"");
 		
 		//-------------------------------
 		// Escape Quotes
@@ -185,8 +186,15 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						+ "\""+entityName+"\""
 						+ SEPARATOR;
 		
-		String recordOK  = commonInfo + ATTRIBUTES_OK.replace("$typePlaceholder$",  type); 
-		String recordKO  = commonInfo + ATTRIBUTES_KO.replace("$typePlaceholder$", type); 
+		String recordOK  = commonInfo + ATTRIBUTES_OK
+											.replace("$typePlaceholder$",  type)
+											.replace("$scenarioPlaceholder$",  scenario)
+											; 
+		
+		String recordKO  = commonInfo + ATTRIBUTES_KO
+											.replace("$typePlaceholder$",  type)
+											.replace("$scenarioPlaceholder$",  scenario)
+											; 
 		
 		//-------------------------------
 		// Common information
