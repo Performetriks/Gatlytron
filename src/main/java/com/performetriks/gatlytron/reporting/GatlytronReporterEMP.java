@@ -49,9 +49,14 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						;
 	}
 	
-	private static final String ATTRIBUTES_OK = "\"{status: \\\"ok\\\", type: \\\"$typePlaceholder$\\\", scenario: \\\"$scenarioPlaceholder$\\\"}\""; 
-	private static final String ATTRIBUTES_KO = "\"{status: \\\"ko\\\", type: \\\"$typePlaceholder$\\\", scenario: \\\"$scenarioPlaceholder$\\\"}\""; ; 
-	
+	private static final String ATTRIBUTES = "\"{"
+									+ "  status: \\\"$statusPlaceholder$\\\""
+									+ ", code: \\\"$codePlaceholder$\\\""
+									+ ", type: \\\"$typePlaceholder$\\\""
+									+ ", groups: \\\"$groupsPlaceholder$\\\""
+									+ ", scenario: \\\"$scenarioPlaceholder$\\\""
+									+ "}\""; 
+
 	private String empURL;
 	private String apiToken;
 	private String categoryPrefix = "GTRON:";
@@ -170,8 +175,7 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 		// Initialize Values
 		String category = categoryPrefix+record.getSimulation();
 		String entityName = record.getMetricName();
-		String type = record.getType().threeLetters();
-		String scenario = record.getScenario().replace("\"", "\\\"");
+
 		
 		//-------------------------------
 		// Escape Quotes
@@ -186,15 +190,16 @@ public class GatlytronReporterEMP implements GatlytronReporter {
 						+ "\""+entityName+"\""
 						+ SEPARATOR;
 		
-		String recordOK  = commonInfo + ATTRIBUTES_OK
-											.replace("$typePlaceholder$",  type)
-											.replace("$scenarioPlaceholder$",  scenario)
-											; 
 		
-		String recordKO  = commonInfo + ATTRIBUTES_KO
-											.replace("$typePlaceholder$",  type)
-											.replace("$scenarioPlaceholder$",  scenario)
-											; 
+		String attrPrepared = ATTRIBUTES
+							.replace("$codePlaceholder$",  record.getCode() )
+							.replace("$typePlaceholder$",  record.getType().threeLetters() )
+							.replace("$groupsPlaceholder$",  record.getGroupsPath() )
+							.replace("$scenarioPlaceholder$",  record.getScenario().replace("\"", "\\\"") )
+							;
+		
+		String recordOK  = commonInfo + attrPrepared.replace("$statusPlaceholder$",  "ok"); 
+		String recordKO  = commonInfo + attrPrepared.replace("$statusPlaceholder$",  "ko"); 
 		
 		//-------------------------------
 		// Common information

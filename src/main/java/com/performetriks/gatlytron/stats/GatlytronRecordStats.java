@@ -27,6 +27,7 @@ public class GatlytronRecordStats {
 	private String simulation;
 	private String scenario;
 	private String metricName;
+	private String groupsPath;
 	private String code;
 	private String statsIdentifier;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
@@ -68,17 +69,18 @@ public class GatlytronRecordStats {
 	};		
 
 	
-	private static String csvHeaderTemplate = "time,type,simulation,scenario,metric,code";
+	private static String csvHeaderTemplate = "time,type,simulation,scenario,groups,metric,code";
 	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
 			+ "		  time BIGINT,\r\n"
 			+ "		  type VARCHAR(16),\r\n"
 			+ "		  simulation VARCHAR(4096),\r\n"
 			+ "		  scenario VARCHAR(4096),\r\n"
+			+ "		  groups VARCHAR(4096),\r\n"
 			+ "		  metric VARCHAR(4096),\r\n"
 			+ "		  code VARCHAR(16)"
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,type,simulation,scenario,metric,code";
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,type,simulation,scenario,groups,metric,code";
 
 	static {
 		
@@ -98,7 +100,7 @@ public class GatlytronRecordStats {
 
 		//-----------------------------------------
 		// SQL Insert Into Template
-		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?, ?";
+		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?, ?, ?";
 		for(String name : valueNames) {
 			sqlInsertIntoTemplate += ","+name;
 			sqlInsertValues += ", ?";
@@ -138,10 +140,10 @@ public class GatlytronRecordStats {
 		this.simulation = record.getSimulation();
 		this.scenario = record.getScenario();
 		this.metricName = record.getMetricName();
+		this.groupsPath = record.getGroupsAsString(" / ", "");
 		this.code = record.getResponseCode();
 		this.statsIdentifier = record.getStatsIdentifier();
 
-		
 		//-----------------------------------
 		// Get Target Record
 		GatlytronRecordStats targetForData = statsRecordList.get(this);
@@ -202,6 +204,7 @@ public class GatlytronRecordStats {
 					+ separator + type.threeLetters()
 					+ separator + simulation.replace(separator, "_") 
 					+ separator + scenario.replace(separator, "_")  
+					+ separator + groupsPath.replace(separator, "_")  
 					+ separator + metricName.replace(separator, "_")  
 					+ separator + code.replace(separator, "_")  
 					;
@@ -235,6 +238,7 @@ public class GatlytronRecordStats {
 		object.addProperty("type", type.threeLetters());
 		object.addProperty("simulation", simulation);
 		object.addProperty("scenario", scenario);
+		object.addProperty("groups", groupsPath);
 		object.addProperty("metric", metricName);
 		object.addProperty("code", code);
 		
@@ -268,6 +272,7 @@ public class GatlytronRecordStats {
 		valueList.add(type.threeLetters());
 		valueList.add(simulation);
 		valueList.add(scenario);
+		valueList.add(groupsPath);
 		valueList.add(metricName);
 		valueList.add(code);
 		
@@ -308,6 +313,20 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	public GatlytronRecordType getType() {
 		return type;
+	}
+	
+	/***********************************************************************
+	 * Returns the code of the record.
+	 ***********************************************************************/
+	public String getCode() {
+		return code;
+	}
+	
+	/***********************************************************************
+	 * Returns the groups path of the record.
+	 ***********************************************************************/
+	public String getGroupsPath() {
+		return groupsPath;
 	}
 	
 	/***********************************************************************
