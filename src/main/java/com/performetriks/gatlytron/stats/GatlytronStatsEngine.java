@@ -157,8 +157,9 @@ public class GatlytronStatsEngine {
 			BigDecimal min 		= values.get(0);
 			BigDecimal max 		= values.get( values.size()-1 );
 			BigDecimal stdev 	= bigStdev(values, avg, false);
+			BigDecimal p25 		= bigPercentile(25, values);
 			BigDecimal p50 		= bigPercentile(50, values);
-			BigDecimal p75 		= bigPercentile(50, values);
+			BigDecimal p75 		= bigPercentile(75, values);
 			BigDecimal p95 		= bigPercentile(95, values);
 			BigDecimal p99 		= bigPercentile(99, values);
 			
@@ -175,6 +176,7 @@ public class GatlytronStatsEngine {
 				, min 		
 				, max 			
 				, stdev 	
+				, p25 		
 				, p50 		
 				, p75 		
 				, p95 		

@@ -43,6 +43,14 @@ public class GatlytronReporterDatabasePostGres implements GatlytronReporterDatab
 		
 		gtronDB = new GatlytronDBInterface(db, tableNamePrefix);
 		gtronDB.createTables();
+		
+		//----------------------------
+		// Add P25 Column
+		String addOkP25Column = "ALTER TABLE "+gtronDB.tablenameStats+" ADD IF NOT EXISTS ok_p25 DECIMAL(32,3);";
+		db.preparedExecute(addOkP25Column);
+		
+		String addKoP25Column = "ALTER TABLE "+gtronDB.tablenameStats+" ADD IF NOT EXISTS ko_p25 DECIMAL(32,3);";
+		db.preparedExecute(addKoP25Column);
 	}			
 
 	/****************************************************************************

@@ -39,6 +39,7 @@ public class GatlytronRecordStats {
 		, "max"
 		, "mean"
 		, "stdev"
+		, "p25"
 		, "p50"
 		, "p75"
 		, "p95"
@@ -52,6 +53,7 @@ public class GatlytronRecordStats {
 		, "ok_max"
 		, "ok_mean"
 		, "ok_stdev"
+		, "ok_p25"
 		, "ok_p50"
 		, "ok_p75"
 		, "ok_p95"
@@ -62,6 +64,7 @@ public class GatlytronRecordStats {
 		, "ko_max"
 		, "ko_mean"
 		, "ko_stdev"
+		, "ko_p25"
 		, "ko_p50"
 		, "ko_p75"
 		, "ko_p95"
@@ -127,6 +130,7 @@ public class GatlytronRecordStats {
 							, BigDecimal min 		
 							, BigDecimal max 			
 							, BigDecimal stdev 	
+							, BigDecimal p25 		
 							, BigDecimal p50 		
 							, BigDecimal p75 		
 							, BigDecimal p95 		
@@ -162,6 +166,7 @@ public class GatlytronRecordStats {
 		targetForData.addValue(statusLower, "max", max.toPlainString());
 		targetForData.addValue(statusLower, "mean", mean.toPlainString());
 		targetForData.addValue(statusLower, "stdev", stdev.toPlainString());
+		targetForData.addValue(statusLower, "p25", p25.toPlainString());
 		targetForData.addValue(statusLower, "p50", p50.toPlainString());
 		targetForData.addValue(statusLower, "p75", p75.toPlainString());
 		targetForData.addValue(statusLower, "p95", p95.toPlainString());
