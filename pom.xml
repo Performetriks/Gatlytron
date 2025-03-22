@@ -7,12 +7,12 @@
 
 	<groupId>com.performetriks</groupId>
 	<artifactId>gatlytron</artifactId>
-	<version>2.1.0</version>
+	<version>2.2.0</version>
 
 	<packaging>jar</packaging>
 	
 	<name>Gatlytron</name>
-	<description>Gatlytron is a little framework that assists you in creatname>Gatlyting tests and provides some additional features like reporting.</description>
+	<description>Gatlytron is a little framework that assists you in creating Gatling tests and provides some additional features like reporting.</description>
 	<url>https://github.com/Performetriks/Gatlytron</url>
 
 	<!-- ================= PROPERTIES ================== -->
