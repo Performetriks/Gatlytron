@@ -102,6 +102,37 @@ public class GatlytronScenario {
 		
 	}
 
+	/***************************************************************************
+	 * This method creates a standard load pattern:
+	 * <ul>
+	 * <li>Ramping up users at the start of the test</li>
+	 * <li>Keeping users at a constant level</li>
+	 * <li>Adds pacing to the use cases.</li>
+	 * </ul>
+	 *
+	 * This method will calculate the pacing and ramp up interval based on the input
+	 * values. The users and execHours will be scaled by the percentage.
+	 * 
+	 * <pre>
+	 * <code>
+	 * int pacingSeconds = 3600 / (execsHour / users);
+	 * int rampUpInterval = pacingSeconds / users * rampUp;
+	 * </code>
+	 * </pre>
+	 *
+	 * @param percent   percentage (0-100, or more) that will be used to scale the number of 
+	 * 					users and execsHour
+	 * @param users     number of users to run constantly for this scenario
+	 * @param execsHour targeted number of executions per hour
+	 * @param offset    in seconds from the test start
+	 * @param rampUp    number of users to increase per ramp up
+	 ***************************************************************************/
+	public PopulationBuilder buildStandardLoad(int percent, int users, int execsHour, long offset, int rampUp) {
+		users = (int)Math.ceil( users * (percent / 100.0f) );
+		execsHour = (int)Math.ceil( execsHour * (percent / 100.0f) );
+		
+		return buildStandardLoad(users, execsHour, offset, rampUp);
+	}
 	
 	/***************************************************************************
 	 * This method creates a standard load pattern:
