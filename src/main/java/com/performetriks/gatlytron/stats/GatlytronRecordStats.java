@@ -24,10 +24,12 @@ public class GatlytronRecordStats {
 	
 	private long time;
 	private GatlytronRecordType type;
-	private String simulation;
-	private String scenario;
-	private String metricName;
-	private String groupsPath;
+	private String simulation;		// the name of the simulation
+	private String scenario;		// the name of the scenario
+	private String metricName;		// the name of the metric, one of the items in the lost metricNames
+	private String groupsPath;		// 
+	private String metricPath;
+	private String metricPathFull;
 	private String code;
 	private String statsIdentifier;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
@@ -145,6 +147,8 @@ public class GatlytronRecordStats {
 		this.scenario = record.getScenario();
 		this.metricName = record.getMetricName();
 		this.groupsPath = record.getGroupsAsString(" / ", "");
+		this.metricPath = record.getMetricPath();
+		this.metricPathFull = record.getMetricPathFull();
 		this.code = record.getResponseCode();
 		this.statsIdentifier = record.getStatsIdentifier();
 
@@ -314,7 +318,7 @@ public class GatlytronRecordStats {
 	}
 	
 	/***********************************************************************
-	 * Returns the time of this record.
+	 * Returns the type of this record.
 	 ***********************************************************************/
 	public GatlytronRecordType getType() {
 		return type;
@@ -355,9 +359,27 @@ public class GatlytronRecordStats {
 		return metricName;
 	}
 	
+	/******************************************************************
+	 * Returns the metric path of the metric including groups:
+	 *   {group}.{metricName}
+	 ******************************************************************/
+	public String getMetricPath() {
+		return metricPath;
+	}
+	
+	/******************************************************************
+	 * Returns the full path of the metric including simulation, scenario
+	 * and groups:
+	 *   {simulation}.{scenario}.{group}.{metricName}
+	 ******************************************************************/
+	public String getMetricPathFull() {
+		return metricPathFull;
+	}
+	
 	
 	/***********************************************************************
 	 * 
+	 * @param name of a value, e.g. "ko_count" or "ok_max"
 	 * @return the value for the given name
 	 ***********************************************************************/
 	public BigDecimal getValue(String name) {

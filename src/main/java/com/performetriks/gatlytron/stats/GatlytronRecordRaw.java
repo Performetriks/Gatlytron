@@ -172,6 +172,31 @@ public class GatlytronRecordRaw {
 
 	/******************************************************************
 	 * Returns the full path of the metric including groups:
+	 *   {simulation}.{scenario}.{group}.{metricName}
+	 ******************************************************************/
+	public String getMetricPathFull() {
+		
+		if(groups.isEmpty()) {
+			return  simulation.replaceAll(" ", "_")
+					+ "."
+					+ scenario.replaceAll(" ", "_")
+					+ "."
+					+ metricName.replaceAll(" ", "_")
+					;
+		}
+		
+		return simulation.replaceAll(" ", "_")
+				+ "."
+				+ scenario.replaceAll(" ", "_")
+				+ "."
+				+ getGroupsAsString(".", "noGroup").replaceAll(" ", "_")
+				+ "." 
+				+ metricName.replaceAll(" ", "_");
+		
+	}
+	
+	/******************************************************************
+	 * Returns the metric path of the metric including groups:
 	 *   {group}.{metricName}
 	 ******************************************************************/
 	public String getMetricPath() {
