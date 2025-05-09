@@ -78,7 +78,7 @@ public class GatlytronReporterOTel implements GatlytronReporter {
     public void reportRecords(ArrayList<GatlytronRecordStats> records) {
         
         for (GatlytronRecordStats record : records) {
-        	String metricName = record.getMetricName().replaceAll("[^A-Za-z_./\\-]", "_");
+        	String metricName = record.getMetricName().replaceAll("[^A-Za-z0-9_./\\-]", "_");
         	
         	if( ! metricName.matches("^[A-Za-z].*")){
         		metricName = "x"+metricName;
