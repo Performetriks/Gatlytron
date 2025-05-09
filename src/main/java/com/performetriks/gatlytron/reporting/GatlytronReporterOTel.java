@@ -49,6 +49,7 @@ public class GatlytronReporterOTel implements GatlytronReporter {
         reader = 
         		PeriodicMetricReader
 					.builder(metricExporter)
+					// will be force flushed
 					//.setInterval(Duration.ofSeconds(reportingIntervalSeconds))
 					.build();
         
