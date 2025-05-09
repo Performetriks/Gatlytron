@@ -49,7 +49,7 @@ public class GatlytronReporterOTel implements GatlytronReporter {
         reader = 
         		PeriodicMetricReader
 					.builder(metricExporter)
-					.setInterval(Duration.ofSeconds(reportingIntervalSeconds))
+					//.setInterval(Duration.ofSeconds(reportingIntervalSeconds))
 					.build();
         
         this.meterProvider = 
@@ -77,7 +77,11 @@ public class GatlytronReporterOTel implements GatlytronReporter {
     public void reportRecords(ArrayList<GatlytronRecordStats> records) {
         
         for (GatlytronRecordStats record : records) {
-        	String metricName = record.getMetricName().replace(" ", "_");
+        	String metricName = record.getMetricName().replaceAll("[^A-Za-z_./\\-]", "_");
+        	
+        	if( ! metricName.matches("^[A-Za-z].*")){
+        		metricName = "x"+metricName;
+        	}
         	
         	if( ! metricsHolderMap.containsKey(metricName) ) {
         		metricsHolderMap.put(metricName, new OTelMetricsHolder(meter, metricName) );
