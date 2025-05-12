@@ -80,10 +80,8 @@ public class GatlytronReporterOTel implements GatlytronReporter {
         for (GatlytronRecordStats record : records) {
         	String metricName = record.getMetricName().replaceAll("[^A-Za-z0-9_./\\-]", "_");
         	
-        	if( ! metricName.matches("^[A-Za-z].*")){
-        		metricName = "x"+metricName;
-        	}
-        	
+        	metricName = "gtron_"+metricName;
+
         	if( ! metricsHolderMap.containsKey(metricName) ) {
         		metricsHolderMap.put(metricName, new OTelMetricsHolder(meter, metricName) );
         	}
