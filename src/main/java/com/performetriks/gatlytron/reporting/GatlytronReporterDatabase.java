@@ -9,7 +9,7 @@ package com.performetriks.gatlytron.reporting;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public interface GatlytronReporterDatabase extends GatlytronReporter {
+public abstract class GatlytronReporterDatabase implements GatlytronReporter {
 
 	public abstract void reportTestSettings(String simulationName);
 	

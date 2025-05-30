@@ -15,7 +15,7 @@ import com.performetriks.gatlytron.stats.GatlytronRecordStats;
  * @author Reto Scheiwiller
  * 
  ***************************************************************************/
-public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporterDatabase {
+public abstract class GatlytronReporterDatabaseJDBC extends GatlytronReporterDatabase {
 
 	private DBInterface db;
 	private GatlytronDBInterface gtronDB;
@@ -43,13 +43,6 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 
 		gtronDB.createTables();
 		
-		//----------------------------
-		// Add P25 Column
-		String addOkP25Column = "ALTER TABLE "+gtronDB.tablenameStats+" ADD IF NOT EXISTS ok_p25 DECIMAL(32,3);";
-		db.preparedExecute(addOkP25Column);
-		
-		String addKoP25Column = "ALTER TABLE "+gtronDB.tablenameStats+" ADD IF NOT EXISTS ko_p25 DECIMAL(32,3);";
-		db.preparedExecute(addKoP25Column);
 	}
 	
 	/****************************************************************************
@@ -82,7 +75,7 @@ public abstract class GatlytronReporterDatabaseJDBC implements GatlytronReporter
 	 ****************************************************************************/
 	@Override
 	public void terminate() {
-		
+		gtronDB.reportTestSettingsEndTime();
 	}
 
 }

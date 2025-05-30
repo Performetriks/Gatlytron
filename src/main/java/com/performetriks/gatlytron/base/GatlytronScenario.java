@@ -44,6 +44,7 @@ public class GatlytronScenario {
 	
 	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
 			+ "		    time BIGINT \r\n"
+			+ "		  , endtime BIGINT \r\n"
 			+ "		  , execID VARCHAR(4096) \r\n"
 			+ "		  , simulation VARCHAR(4096) \r\n"
 			+ "		  , scenario VARCHAR(4096) \r\n"
@@ -56,7 +57,7 @@ public class GatlytronScenario {
 			+ ")"
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} VALUES (?,?,?,?,?,?,?,?,?,?)";
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 	
 	/***************************************************************************
@@ -88,6 +89,7 @@ public class GatlytronScenario {
 		ArrayList<Object> valueList = new ArrayList<>();
 		
 		valueList.add(Gatlytron.STARTTIME_MILLIS);
+		valueList.add(null); //report nothing for endtime
 		valueList.add(Gatlytron.EXECUTION_ID);
 		valueList.add(simulationName);
 		valueList.add(scenarioName);
