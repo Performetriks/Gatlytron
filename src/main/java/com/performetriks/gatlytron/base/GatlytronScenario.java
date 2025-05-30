@@ -57,7 +57,11 @@ public class GatlytronScenario {
 			+ ")"
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+	private static String sqlInsertIntoTemplate = 
+						  "INSERT INTO {tablename} "
+						+ " (time, endtime, execID, simulation, scenario, users, execsHour, startOffset, rampUp, rampUpInterval, pacingSeconds) "
+						+ " VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+						;
 
 	
 	/***************************************************************************
