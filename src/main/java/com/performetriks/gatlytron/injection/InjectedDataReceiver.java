@@ -1,6 +1,7 @@
 package com.performetriks.gatlytron.injection;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import com.performetriks.gatlytron.base.Gatlytron;
@@ -197,8 +198,58 @@ public class InjectedDataReceiver {
 				);	
 		}
 	}
+	
 	/***************************************************************************
+	 * Shorthand function that creates a record that will be 
+	 * included in the reported values.
 	 * 
+	 * @param type the record type
+	 * @param scenario the name of the scenario
+	 * @param metricName the name of the metric
+	 * @param startTimestamp the start time in epoch milliseconds
+	 * @param endTimestamp  the end time in epoch milliseconds
+	 * @param status the status, either "KO", "OK" or "ALL"
+	 * @param responseCode a response code, e.g. HTTP Status Code
+	 * @param metricValue 
+	 ***************************************************************************/
+	public static void createRecord(
+			  String scenario
+			, String metricName
+			, long startTimestamp
+			, long endTimestamp
+			, String status
+			, String responseCode
+			, long metricValue
+			){
+		
+		createRecord(
+				  GatlytronRecordType.REQUEST
+				, scenario
+				, null
+				, metricName
+				, startTimestamp
+				, endTimestamp
+				, status
+				, responseCode
+				, "NONE"
+				, metricValue
+			);
+	}
+	
+	
+	/***************************************************************************
+	 * Creates a record that will be included in the reported values.
+	 * 
+	 * @param type the record type
+	 * @param scenario the name of the scenario
+	 * @param groups the groups as a list of strings
+	 * @param metricName the name of the metric
+	 * @param startTimestamp the start time in epoch milliseconds
+	 * @param endTimestamp  the end time in epoch milliseconds
+	 * @param status the status, either "KO", "OK" or "ALL"
+	 * @param responseCode a response code, e.g. HTTP Status Code
+	 * @param message custom message
+	 * @param metricValue 
 	 ***************************************************************************/
 	public static void createRecord(
 			  GatlytronRecordType type
