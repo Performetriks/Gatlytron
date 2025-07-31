@@ -269,6 +269,64 @@ public class GatlytronScenario {
 
 		return SCENARIO.injectOpen(atOnceUsers(1));
 	}
+	
+	/***************************************************************************
+	 * Repeats the Scenario for the specified amount of times
+	 * in sequence with a single user.
+	 * 
+	 *  @param times number of times to repeat the scenario
+	 ***************************************************************************/
+	public PopulationBuilder buildRepeat(int times) {
+
+		if (scenarioSteps == null) {
+			throw new IllegalStateException("Scenario Steps cannot be null.");
+		}
+
+		// -----------------------------------------------
+		// Add all feeders
+		// -----------------------------------------------
+		ScenarioBuilder SCENARIO = scenario(scenarioName);
+		
+		for (FeederBuilder<?> builder : feederBuilderList) {
+			// feed before the scenario steps are executed
+			SCENARIO = SCENARIO.feed(builder);
+			// feed after each repetition of the scenario
+			scenarioSteps = scenarioSteps.feed(builder);
+		}
+
+		// -----------------------------------------------
+		// Endless Loop until end of test
+		// -----------------------------------------------
+		SCENARIO = SCENARIO.repeat(times).on(scenarioSteps);
+
+		// -----------------------------------------------
+		// Add debugging data if enabled
+		// -----------------------------------------------
+		GatlytronScenario.addDebug(SCENARIO, debug);
+
+		return SCENARIO.injectOpen(atOnceUsers(1));
+	}
+	
+	/***************************************************************************
+	 * Repeats the specified Scenario for the highest amount of records of any
+	 * of the data feeders added to the scenario.
+	 * Runs all the repetitions in sequence with a single user.
+	 * 
+	 *  @param times number of times to repeat the scenario
+	 ***************************************************************************/
+	public PopulationBuilder buildDatacheck() {
+
+		int maxRecords = 0;
+		for (FeederBuilder<?> builder : feederBuilderList) {
+			int count = builder.recordsCount();
+			if(count > maxRecords) {
+				maxRecords = count;
+			}
+		}
+
+		return buildRepeat(maxRecords);
+		
+	}
 
 	/***************************************************************************
 	 * Adds a debug step to the scenario if debugEnabled is set to true.
