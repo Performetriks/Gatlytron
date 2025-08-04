@@ -1,9 +1,10 @@
 package com.performetriks.gatlytron.base;
 
-import io.gatling.javaapi.core.ChainBuilder;
-import io.gatling.javaapi.core.PopulationBuilder;
-import io.gatling.javaapi.core.ScenarioBuilder;
-import io.gatling.javaapi.core.FeederBuilder;
+import static io.gatling.javaapi.core.CoreDsl.atOnceUsers;
+import static io.gatling.javaapi.core.CoreDsl.constantConcurrentUsers;
+import static io.gatling.javaapi.core.CoreDsl.feed;
+import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -13,8 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import com.performetriks.gatlytron.database.DBInterface;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.core.CoreDsl.rampConcurrentUsers;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.ClosedInjectionStep;
+import io.gatling.javaapi.core.FeederBuilder;
+import io.gatling.javaapi.core.PopulationBuilder;
+import io.gatling.javaapi.core.ScenarioBuilder;
 
 /***************************************************************************
  * Extend this class to make your scenario a GaltytronScenario.
@@ -134,6 +138,7 @@ public class GatlytronScenario {
 		
 	}
 
+	
 	/***************************************************************************
 	 * This method creates a standard load pattern:
 	 * <ul>
@@ -159,11 +164,41 @@ public class GatlytronScenario {
 	 * @param offset    in seconds from the test start
 	 * @param rampUp    number of users to increase per ramp up
 	 ***************************************************************************/
-	public PopulationBuilder buildStandardLoad(int percent, int users, int execsHour, long offset, int rampUp) {
+	public PopulationBuilder buildStandardLoad(int percent, int users, int execsHour, long offset, int rampUp) {		
+		return buildStandardLoad(percent, users, execsHour, offset, rampUp, null);
+	}
+	/***************************************************************************
+	 * This method creates a standard load pattern:
+	 * <ul>
+	 * <li>Ramping up users at the start of the test</li>
+	 * <li>Keeping users at a constant level</li>
+	 * <li>Adds pacing to the use cases.</li>
+	 * </ul>
+	 *
+	 * This method will calculate the pacing and ramp up interval based on the input
+	 * values. The users and execHours will be scaled by the percentage.
+	 * 
+	 * <pre>
+	 * <code>
+	 * int pacingSeconds = 3600 / (execsHour / users);
+	 * int rampUpInterval = pacingSeconds / users * rampUp;
+	 * </code>
+	 * </pre>
+	 *
+	 * @param percent   percentage (0-100, or more) that will be used to scale 
+	 * 					the number of users and execsHour
+	 * @param users     number of users to run constantly for this scenario
+	 * @param execsHour targeted number of executions per hour
+	 * @param offset    in seconds from the test start
+	 * @param rampUp    number of users to increase per ramp up
+	 * @param duration  the time the scenario should run with a constant amount 
+	 * 					of users, forever if null
+	 ***************************************************************************/
+	public PopulationBuilder buildStandardLoad(int percent, int users, int execsHour, long offset, int rampUp, Duration duration) {
 		users = (int)Math.ceil( users * (percent / 100.0f) );
 		execsHour = (int)Math.ceil( execsHour * (percent / 100.0f) );
 		
-		return buildStandardLoad(users, execsHour, offset, rampUp);
+		return buildStandardLoad(users, execsHour, offset, rampUp, duration);
 	}
 	
 	/***************************************************************************
@@ -200,6 +235,44 @@ public class GatlytronScenario {
 	 * 
 	 ***************************************************************************/
 	public PopulationBuilder buildStandardLoad(int users, int execsHour, long offset, int rampUp) {
+		return buildStandardLoad(users, execsHour, offset, rampUp, null);
+	}
+	
+	/***************************************************************************
+	 * The scenario will be set to run forever, therefore make sure to
+	 * set maxDuration in your simulation:
+	 * 
+	 * <pre>
+	 * <code>
+	 * setUp(...).maxDuration(Duration.ofMinutes(15))
+	 * </code>
+	 * </pre>
+	 * 
+	 * This method creates a standard load pattern:
+	 * <ul>
+	 * <li>Ramping up users at the start of the test</li>
+	 * <li>Keeping users at a constant level</li>
+	 * <li>Adds pacing to the use cases.</li>
+	 * </ul>
+	 *
+	 * This method will calculate the pacing and ramp up interval based on the input
+	 * values. 
+	 * 
+	 * <pre>
+	 * <code>
+	 * int pacingSeconds = 3600 / (execsHour / users);
+	 * int rampUpInterval = pacingSeconds / users * rampUp;
+	 * </code>
+	 * </pre>
+	 *
+	 * @param users     number of users to run constantly for this scenario
+	 * @param execsHour targeted number of executions per hour
+	 * @param offset    in seconds from the test start
+	 * @param rampUp    number of users to increase per ramp up
+	 * @param duration  the time the scenario should run with a constant amount of users, forever if null
+	 * 
+	 ***************************************************************************/
+	public PopulationBuilder buildStandardLoad(int users, int execsHour, long offset, int rampUp, Duration duration) {
 
 		if (scenarioSteps == null) {
 			throw new IllegalStateException("Scenario Steps cannot be null.");
@@ -215,8 +288,11 @@ public class GatlytronScenario {
 		// -----------------------------------------------
 		// Calculate Load Parameters
 		// -----------------------------------------------
-		int pacingSeconds = 3600 / (execsHour / users);
+		int pacingSeconds = (int)Math.ceil( 3600 / ( 1f * execsHour / users) );
 		int rampUpInterval = (int)Math.ceil( (1f * pacingSeconds / users) * rampUp );
+		
+		this.rampUpInterval = rampUpInterval;
+		this.pacingSeconds = pacingSeconds;
 		
 		// -----------------------------------------------
 		// Log Warnings
@@ -230,7 +306,7 @@ public class GatlytronScenario {
 		}
 		
 		if(pacingSeconds < 10) {
-			logger.warn("==> Pacing is below 10 seconds, make sure your scenario duration can fit into that time.");
+			logger.warn("==> Pacing is below 10 seconds, make sure  one iteration of your scenario can execute in that time.");
 		}
 		
 		if(pacingSeconds == 0) {
@@ -251,25 +327,46 @@ public class GatlytronScenario {
 		logger.info("Pacing(s): " + pacingSeconds);
 		logger.info(sides.repeat(2) + "=".repeat( title.length()) ); // cosmetics, just because because we can!
 		
-		this.rampUpInterval = rampUpInterval;
-		this.pacingSeconds = pacingSeconds;
-		
-		ScenarioBuilder SCENARIO = buildScenario(pacingSeconds);
+		// -----------------------------------------------
+		// Build Scenario
+		// -----------------------------------------------
 
-		return SCENARIO.injectClosed(
-					  constantConcurrentUsers(0)
-						.during(Duration.ofSeconds(offset))
-					, rampConcurrentUsers(rampUp)
-						.to(users)
-						.during(pacingSeconds)
+		ArrayList<ClosedInjectionStep> steps = new ArrayList<>();
+		
+		// Start Offset
+		steps.add(constantConcurrentUsers(0)
+				.during(Duration.ofSeconds(offset))
+			);
+		
+		// Ramp Up
+		steps.add(
+			rampConcurrentUsers(rampUp)
+				.to(users)
+				.during(pacingSeconds)
+		);
+		
+		if(duration != null) {
+			// Keep Constant Amount of Users
+			Duration pacingDuration = Duration.ofSeconds(pacingSeconds);
+			Duration constantDuration = duration.minus(pacingDuration);
+			
+			steps.add(constantConcurrentUsers(users)
+					.during(constantDuration)
 				);
+		}
+		
+		ScenarioBuilder SCENARIO = buildScenario(pacingSeconds, duration);
+
+		return SCENARIO.injectClosed( 
+				steps.toArray(new ClosedInjectionStep[] {}) 
+			);
 	}
 
 	/***************************************************************************
 	 * Builds a scenario using the feeders and scenario Steps. Also adds a debug
 	 * output that will be triggered if debug is set to true.
 	 * 
-	 * The scenario will be set to run forever, therefore make sure to
+	 * The scenario will be set to run forever(9999 days), therefore make sure to
 	 * set maxDuration in your simulation:
 	 * 
 	 * <pre>
@@ -279,7 +376,29 @@ public class GatlytronScenario {
 	 * </pre>
 	 ***************************************************************************/
 	public ScenarioBuilder buildScenario(int pacingSeconds) {
+		return buildScenario(pacingSeconds, null);
+	}
+	/***************************************************************************
+	 * Builds a scenario using the feeders and scenario Steps. Also adds a debug
+	 * output that will be triggered if debug is set to true.
+	 * 
+	 * The scenario will be set to run forever if duration is null, in that case
+	 * make sure to set maxDuration in your simulation:
+	 * 
+	 * <pre>
+	 * <code>
+	 * setUp(...).maxDuration(Duration.ofMinutes(15))
+	 * </code>
+	 * </pre>
+	 * 
+	 * @param pacingSeconds the pacing for the scenario
+	 * @param duration the execution duration for the scenario, if null, use 9999 days(~forever).
+	 ***************************************************************************/
+	public ScenarioBuilder buildScenario(int pacingSeconds, Duration duration) {
 		
+		if(duration == null) {
+			duration = Duration.ofDays(9999);
+		}
 		// -----------------------------------------------
 		// Add all feeders
 		// -----------------------------------------------
@@ -294,7 +413,7 @@ public class GatlytronScenario {
 		// Endless Loop until end of test
 		// -----------------------------------------------
 		ScenarioBuilder SCENARIO = scenario(scenarioName);
-		SCENARIO = SCENARIO.forever().on(scenarioSteps.pace(pacingSeconds));
+		SCENARIO = SCENARIO.during(duration).on(scenarioSteps.pace(pacingSeconds));
 
 		// -----------------------------------------------
 		// Add debugging data if enabled
