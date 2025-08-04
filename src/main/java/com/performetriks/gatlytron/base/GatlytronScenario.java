@@ -34,6 +34,7 @@ public class GatlytronScenario {
 	private ArrayList<FeederBuilder<?>> feederBuilderList = new ArrayList<>();
 	private ChainBuilder scenarioSteps;
 	private boolean debug = Gatlytron.isDebug();
+	private boolean feedersPrepended = false;
 
 	private int users = -1;
 	private int execsHour = -1;
@@ -107,6 +108,31 @@ public class GatlytronScenario {
 		return db.preparedExecute(insertSQL, valueList.toArray());
 		
 	}
+	
+	/***********************************************************************
+	 * Checks if scenario steps are defined, then prepends the feeders 
+	 * to the scenarioSteps
+	 ***********************************************************************/
+	private void prependFeedersToScenarioSteps() {
+		
+		if (scenarioSteps == null) {
+			throw new IllegalStateException("Scenario Steps cannot be null, please add them to the scenario using the function scenarioSteps().");
+		}
+		
+		if(!feedersPrepended 
+		&& feederBuilderList.size() > 0) {
+			ChainBuilder chainedFeeders = feed(feederBuilderList.get(0) );
+			
+			for (int i = 1; i < feederBuilderList.size(); i++) {
+				chainedFeeders = feed( feederBuilderList.get(i));
+			}
+			
+			scenarioSteps = chainedFeeders.exec(scenarioSteps);
+			feedersPrepended = true;
+		}
+		
+		
+	}
 
 	/***************************************************************************
 	 * This method creates a standard load pattern:
@@ -141,6 +167,15 @@ public class GatlytronScenario {
 	}
 	
 	/***************************************************************************
+	 * The scenario will be set to run forever, therefore make sure to
+	 * set maxDuration in your simulation:
+	 * 
+	 * <pre>
+	 * <code>
+	 * setUp(...).maxDuration(Duration.ofMinutes(15))
+	 * </code>
+	 * </pre>
+	 * 
 	 * This method creates a standard load pattern:
 	 * <ul>
 	 * <li>Ramping up users at the start of the test</li>
@@ -149,7 +184,7 @@ public class GatlytronScenario {
 	 * </ul>
 	 *
 	 * This method will calculate the pacing and ramp up interval based on the input
-	 * values.
+	 * values. 
 	 * 
 	 * <pre>
 	 * <code>
@@ -162,6 +197,7 @@ public class GatlytronScenario {
 	 * @param execsHour targeted number of executions per hour
 	 * @param offset    in seconds from the test start
 	 * @param rampUp    number of users to increase per ramp up
+	 * 
 	 ***************************************************************************/
 	public PopulationBuilder buildStandardLoad(int users, int execsHour, long offset, int rampUp) {
 
@@ -172,6 +208,8 @@ public class GatlytronScenario {
 		this.users = users;
 		this.execsHour = execsHour;
 		this.offset = offset;
+		
+		if(rampUp > users) { rampUp = users; } // prevent issues with ramp up
 		this.rampUp = rampUp;
 		
 		// -----------------------------------------------
@@ -179,12 +217,31 @@ public class GatlytronScenario {
 		// -----------------------------------------------
 		int pacingSeconds = 3600 / (execsHour / users);
 		int rampUpInterval = (int)Math.ceil( (1f * pacingSeconds / users) * rampUp );
-
+		
+		// -----------------------------------------------
+		// Log Warnings
+		// -----------------------------------------------
+		String sides = "=".repeat(16);
+		String title = " Load Config: "+scenarioName+" ";
+		logger.info(sides + title + sides);
+		
+		if(rampUpInterval == 0) {
+			logger.warn("==> Ramp up interval is 0, all users will be started at the same time.");
+		}
+		
+		if(pacingSeconds < 10) {
+			logger.warn("==> Pacing is below 10 seconds, make sure your scenario duration can fit into that time.");
+		}
+		
+		if(pacingSeconds == 0) {
+			pacingSeconds = 1; // needed or else ramp up might not load any users
+			logger.warn("==> Calculated Pacing was 0 seconds, set to 1 second.");
+		}
 		
 		// -----------------------------------------------
 		// Log infos
 		// -----------------------------------------------
-		logger.info("============== Load Parameters ==============");
+
 		logger.info("Scenario: " + scenarioName);
 		logger.info("Target Users: " + users);
 		logger.info("Executions/Hour: " + execsHour);
@@ -192,44 +249,51 @@ public class GatlytronScenario {
 		logger.info("RampUp Users: " + rampUp);
 		logger.info("RampUp Interval(s): " + rampUpInterval);
 		logger.info("Pacing(s): " + pacingSeconds);
-		logger.info("============================================");
-		
-		// -----------------------------------------------
-		// Log Warnings
-		// -----------------------------------------------
-		if(rampUpInterval == 0) {
-			logger.warn("===> Ramp up interval is 0, all users will be started at the same time.");
-		}
-		
-		if(pacingSeconds < 10) {
-			logger.warn("===> Pacing is below 10 seconds, make sure your scenario duration can fit into that time.");
-		}
+		logger.info(sides.repeat(2) + "=".repeat( title.length()) ); // cosmetics, just because because we can!
 		
 		this.rampUpInterval = rampUpInterval;
 		this.pacingSeconds = pacingSeconds;
 		
 		ScenarioBuilder SCENARIO = buildScenario(pacingSeconds);
 
-		return SCENARIO.injectClosed(constantConcurrentUsers(0).during(Duration.ofSeconds(offset)),
-				rampConcurrentUsers(rampUp).to(users).during(pacingSeconds));
+		return SCENARIO.injectClosed(
+					  constantConcurrentUsers(0)
+						.during(Duration.ofSeconds(offset))
+					, rampConcurrentUsers(rampUp)
+						.to(users)
+						.during(pacingSeconds)
+				);
 	}
 
 	/***************************************************************************
 	 * Builds a scenario using the feeders and scenario Steps. Also adds a debug
 	 * output that will be triggered if debug is set to true.
+	 * 
+	 * The scenario will be set to run forever, therefore make sure to
+	 * set maxDuration in your simulation:
+	 * 
+	 * <pre>
+	 * <code>
+	 * setUp(...).maxDuration(Duration.ofMinutes(15))
+	 * </code>
+	 * </pre>
 	 ***************************************************************************/
 	public ScenarioBuilder buildScenario(int pacingSeconds) {
+		
 		// -----------------------------------------------
 		// Add all feeders
 		// -----------------------------------------------
-		ScenarioBuilder SCENARIO = scenario(scenarioName);
-		for (FeederBuilder<?> builder : feederBuilderList) {
-			SCENARIO = SCENARIO.feed(builder);
-		}
+		prependFeedersToScenarioSteps();
+		
+		//
+		//for (FeederBuilder<?> builder : feederBuilderList) {
+		//	SCENARIO = SCENARIO.feed(builder);
+		//}
 
 		// -----------------------------------------------
 		// Endless Loop until end of test
 		// -----------------------------------------------
+		ScenarioBuilder SCENARIO = scenario(scenarioName);
 		SCENARIO = SCENARIO.forever().on(scenarioSteps.pace(pacingSeconds));
 
 		// -----------------------------------------------
@@ -241,25 +305,19 @@ public class GatlytronScenario {
 	}
 
 	/***************************************************************************
-	 *
+	 * Runs the scenario once, 
 	 ***************************************************************************/
 	public PopulationBuilder buildRunOnce() {
-
-		if (scenarioSteps == null) {
-			throw new IllegalStateException("Scenario Steps cannot be null.");
-		}
 
 		// -----------------------------------------------
 		// Add all feeders
 		// -----------------------------------------------
-		ScenarioBuilder SCENARIO = scenario(scenarioName);
-		for (FeederBuilder<?> builder : feederBuilderList) {
-			SCENARIO = SCENARIO.feed(builder);
-		}
+		prependFeedersToScenarioSteps();
 
 		// -----------------------------------------------
 		// Endless Loop until end of test
 		// -----------------------------------------------
+		ScenarioBuilder SCENARIO = scenario(scenarioName);
 		SCENARIO = SCENARIO.exec(scenarioSteps);
 
 		// -----------------------------------------------
@@ -285,18 +343,12 @@ public class GatlytronScenario {
 		// -----------------------------------------------
 		// Add all feeders
 		// -----------------------------------------------
-		ScenarioBuilder SCENARIO = scenario(scenarioName);
-		
-		for (FeederBuilder<?> builder : feederBuilderList) {
-			// feed before the scenario steps are executed
-			SCENARIO = SCENARIO.feed(builder);
-			// feed after each repetition of the scenario
-			scenarioSteps = scenarioSteps.feed(builder);
-		}
+		prependFeedersToScenarioSteps();
 
 		// -----------------------------------------------
 		// Endless Loop until end of test
 		// -----------------------------------------------
+		ScenarioBuilder SCENARIO = scenario(scenarioName);
 		SCENARIO = SCENARIO.repeat(times).on(scenarioSteps);
 
 		// -----------------------------------------------
@@ -312,7 +364,6 @@ public class GatlytronScenario {
 	 * of the data feeders added to the scenario.
 	 * Runs all the repetitions in sequence with a single user.
 	 * 
-	 *  @param times number of times to repeat the scenario
 	 ***************************************************************************/
 	public PopulationBuilder buildDatacheck() {
 
@@ -340,17 +391,21 @@ public class GatlytronScenario {
 				return session;
 			});
 		}
+		
 	}
 
 	/***************************************************************************
-	 *
+	 * Returns the name of the scenario.
+	 * 
 	 ***************************************************************************/
 	public String scenarioName() {
 		return scenarioName;
 	}
 
 	/***************************************************************************
-	 *
+	 * Set the name of the scenario.
+	 * 
+	 * @return the scenario instance for chaining
 	 ***************************************************************************/
 	public GatlytronScenario scenarioName(String scenarioName) {
 		this.scenarioName = scenarioName;
@@ -358,14 +413,18 @@ public class GatlytronScenario {
 	}
 
 	/***************************************************************************
-	 *
+	 * Returns the list of all the feeders added to this scenario.
+	 * 
 	 ***************************************************************************/
 	public ArrayList<FeederBuilder<?>> feederList() {
 		return feederBuilderList;
 	}
 
 	/***************************************************************************
-	 *
+	 * Add a feeder to this scenario.
+	 * 
+	 * @param feederBuilder a feeder that should be used in this scenario.
+	 * @return the scenario instance for chaining
 	 ***************************************************************************/
 	public GatlytronScenario feederBuilder(FeederBuilder<?> feederBuilder) {
 		this.feederBuilderList.add(feederBuilder);
@@ -373,14 +432,16 @@ public class GatlytronScenario {
 	}
 
 	/***************************************************************************
-	 *
+	 * Returns the steps that where added to this scenario.
 	 ***************************************************************************/
 	public ChainBuilder scenarioSteps() {
 		return scenarioSteps;
 	}
 
 	/***************************************************************************
-	 *
+	 * Sets or replaces the steps of this scenario.
+	 * 
+	 * @param scenarioSteps the steps for this scenario.
 	 ***************************************************************************/
 	public GatlytronScenario scenarioSteps(ChainBuilder scenarioSteps) {
 		this.scenarioSteps = scenarioSteps;
@@ -388,7 +449,10 @@ public class GatlytronScenario {
 	}
 
 	/***************************************************************************
-	 *
+	 * Return if debug is enabled for this scenario.
+	 * Default value is obtained from Gatlytron.isDebug();
+	 * 
+	 * @return boolean
 	 ***************************************************************************/
 	public boolean isDebug() {
 		return debug;
@@ -397,6 +461,8 @@ public class GatlytronScenario {
 	/***************************************************************************
 	 * Set if debug logs should be printed.
 	 * Default value is obtained from Gatlytron.isDebug();
+	 * 
+	 * @return the scenario instance for chaining
 	 ***************************************************************************/
 	public GatlytronScenario debug(boolean debug) {
 		this.debug = debug;
