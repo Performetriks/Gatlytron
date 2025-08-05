@@ -126,9 +126,9 @@ public class GatlytronScenario {
 		if(!feedersPrepended 
 		&& feederBuilderList.size() > 0) {
 			ChainBuilder chainedFeeders = feed(feederBuilderList.get(0) );
-			
+
 			for (int i = 1; i < feederBuilderList.size(); i++) {
-				chainedFeeders = feed( feederBuilderList.get(i));
+				chainedFeeders = chainedFeeders.feed(feederBuilderList.get(i));
 			}
 			
 			scenarioSteps = chainedFeeders.exec(scenarioSteps);
