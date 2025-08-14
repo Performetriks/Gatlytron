@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.performetriks.gatlytron.database.GatlytronAgeOutConfig;
 import com.performetriks.gatlytron.reporting.GatlytronReporter;
 import com.performetriks.gatlytron.stats.GatlytronStatsEngine;
 
@@ -36,6 +37,10 @@ public class Gatlytron {
 	private static boolean debug = false;
 	private static boolean keepEmptyRecords = false;
 	
+	private static boolean databaseAgeOut = false;
+	private static GatlytronAgeOutConfig databaseAgeOutConfig = new GatlytronAgeOutConfig(); // use defaults
+	
+	
 	private static boolean rawDataToSysout = false;
 	private static String rawdataLogPath = null;
 	private static BufferedWriter rawDataLogWriter = null;
@@ -43,6 +48,7 @@ public class Gatlytron {
 	public static final String EXECUTION_ID = UUID.randomUUID().toString();
 	public static final long STARTTIME_MILLIS = System.currentTimeMillis();
 	
+	private static int reportingIntervalSec = 15; 
 	
 	/******************************************************************
 	 * Starts Gatlytron and the reporting engine.
@@ -53,7 +59,7 @@ public class Gatlytron {
 	 * 
 	 ******************************************************************/
 	public static void start(int reportingInterval) {
-		
+		reportingIntervalSec = reportingInterval;
 		GatlytronStatsEngine.start(reportingInterval);
 	}
 	
@@ -205,7 +211,48 @@ public class Gatlytron {
 	public static void setSimulationName(String simulationName) {
 		Gatlytron.simulationName = simulationName;
 	}
+	
 
+	/******************************************************************
+	 * Enable age out of data that was reported to Databases.
+	 * Default is false.
+	 * 
+	 * @param doAgeOut 
+	 ******************************************************************/
+	public static void setAgeOut(boolean doAgeOut) {
+		Gatlytron.databaseAgeOut = doAgeOut;
+	}
+	
+	/******************************************************************
+	 * 
+	 ******************************************************************/
+	public static boolean isAgeOut() {
+		return databaseAgeOut;
+	}
+	
+	/******************************************************************
+	 * Sets the age out config.
+	 * Only takes effect if AgeOut has been enabled.
+	 * 
+	 * @param config 
+	 ******************************************************************/
+	public static void setAgeOutConfig(GatlytronAgeOutConfig config) {
+		Gatlytron.databaseAgeOutConfig = config;
+	}
+
+	
+	/******************************************************************
+	 * Sets the age out config.
+	 * Only takes effect if AgeOut has been enabled.
+	 * 
+	 * @param config
+	 * 
+	 * @return the AgeOutConfig 
+	 ******************************************************************/
+	public static GatlytronAgeOutConfig getAgeOutConfig() {
+		return Gatlytron.databaseAgeOutConfig;
+	}
+	
 	/******************************************************************
 	 * Toggles certain debug information.
 	 * You can use this to also toggle your own debug logs by
@@ -220,6 +267,13 @@ public class Gatlytron {
 	 ******************************************************************/
 	public static boolean isDebug() {
 		return debug;
+	}
+	
+	/******************************************************************
+	 * Returns the report interval in seconds.
+	 ******************************************************************/
+	public static int getReportInterval() {
+		return reportingIntervalSec;
 	}
 	
 	/******************************************************************

@@ -3,9 +3,11 @@ package com.performetriks.gatlytron.stats;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import com.google.gson.JsonObject;
+import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.database.DBInterface;
 import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
 
@@ -31,61 +33,165 @@ public class GatlytronRecordStats {
 	private String metricPath;
 	private String metricPathFull;
 	private String code;
+	private int granularity;
 	private String statsIdentifier;
 	private HashMap<String, BigDecimal> values = new HashMap<>();
 	
-	// list of metric names
-	public static final String[] metricNames = new String[] {
-		  "count"
-		, "min"
-		, "max"
-		, "mean"
-		, "stdev"
-		, "p25"
-		, "p50"
-		, "p75"
-		, "p95"
-		, "p99"
-	};
-	
-	// value names consist of type + "_" + metric
-	public static final String[] valueNames = new String[] {		
-		  "ok_count"
-		, "ok_min"
-		, "ok_max"
-		, "ok_mean"
-		, "ok_stdev"
-		, "ok_p25"
-		, "ok_p50"
-		, "ok_p75"
-		, "ok_p95"
-		, "ok_p99"
+	/***********************************************************************
+	 * Lists of the names of the metrics 
+	 ***********************************************************************/
+	public enum RecordField {
+		  time("DECIMAL(19, 0)") // ANSI SQL for Long value
+		, type("VARCHAR(16)")
+		, simulation("VARCHAR(4096)")
+		, scenario("VARCHAR(4096)")
+		, groups("VARCHAR(4096)")
+		, metric("VARCHAR(4096)")
+		, code("VARCHAR(16)")
+		, granularity("INTEGER")
+		;
+		
+		private RecordField(String dbColumnType){
+			this.dbColumnType = dbColumnType;
+		}
+		
+		private static ArrayList<String> names = new ArrayList<>();
+		static {
+			for(RecordField type : RecordField.values()) { 
+				names.add(type.name());
+			}
+		}
+
+		private String dbColumnType;		
+		public  String getDBColumnType(){ return dbColumnType; }
+		
+		public static boolean has(String value) { return names.contains(value); }
+		
+		public static ArrayList<String> getFieldNames() { 
+			ArrayList<String> valueNames =  new ArrayList<>();
 			
-		, "ko_count"
-		, "ko_min"
-		, "ko_max"
-		, "ko_mean"
-		, "ko_stdev"
-		, "ko_p25"
-		, "ko_p50"
-		, "ko_p75"
-		, "ko_p95"
-		, "ko_p99"
-	};		
+			for(String name : names) { valueNames.add(name); }
+			
+			return valueNames;
+		}
+	}
+	
 
 	
-	private static String csvHeaderTemplate = "time,type,simulation,scenario,groups,metric,code";
-	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} ("
-			+ "		  time BIGINT,\r\n"
-			+ "		  type VARCHAR(16),\r\n"
-			+ "		  simulation VARCHAR(4096),\r\n"
-			+ "		  scenario VARCHAR(4096),\r\n"
-			+ "		  groups VARCHAR(4096),\r\n"
-			+ "		  metric VARCHAR(4096),\r\n"
-			+ "		  code VARCHAR(16)"
+	/***********************************************************************
+	 * Lists of the names of the metrics 
+	 ***********************************************************************/
+	
+	// !#!#!#!#!#!#!# IMPORTANT !#!#!#!#!#!#!#
+	// If you change this in any way make sure to test the ageOut mechanism again.
+	// Easiest way to test: Generate data in the database and use a DB tool to adjust the time column. 
+	// !#!#!#!#!# END OF IMPORTANCE !#!#!#!#!#
+
+	public enum RecordMetric {
+		  count("SUM(\"count\")")
+		, min("MIN(\"min\")")
+		, max(" MAX(\"max\")")
+		, mean("AVG(\"mean\")")
+		, stdev("STDDEV(\"stdev\")")
+		, p25("PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value_column)") // (CALL AGGREGATE_PERC('p50', 0.50, ?, ?, ?, ?))
+		, p50("PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY value_column)")
+		, p75("PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value_column)")
+		, p95("PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY value_column)") 
+		, p99("PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY value_column)")
+		;
+		
+		private String sqlAggregation = "";
+		private RecordMetric(String sqlAggregationString){
+			this.sqlAggregation = sqlAggregationString;
+		}
+		
+		private static ArrayList<String> names = new ArrayList<>();
+		private static String sqlAggregationPart = "";
+		static {
+			for(RecordMetric type : RecordMetric.values()) { 
+				names.add(type.name()); 
+				sqlAggregationPart += ", "+type.sqlAggregation+" AS \""+type.name()+"\"";
+				
+			}
+		}
+
+		public static boolean has(String value) { return names.contains(value); }
+		
+		public static ArrayList<String> getNames() { 
+			ArrayList<String> copy =  new ArrayList<>();
+			copy.addAll(names); 
+			return copy;
+		}
+		
+		public static ArrayList<String> getValueNames() { 
+			ArrayList<String> valueNames =  new ArrayList<>();
+			
+			for(String name : names) { valueNames.add("ok_"+name); }
+			for(String name : names) { valueNames.add("ko_"+name); }
+			
+			return valueNames;
+		}
+		
+		public static String getSQLAggregationPart() { 
+			return sqlAggregationPart;
+		}
+		
+		
+	}
+	
+	// list of field names
+	public static final ArrayList<String> fieldNames = RecordField.getFieldNames();
+	public static final String fieldNamesJoined = "\""+String.join("\",\"", fieldNames.toArray(new String[0]))+"\"";
+	
+	// list of metric names e.g. min, mean, max ...
+	public static final ArrayList<String> metricNames = RecordMetric.getNames();
+	public static final String metricNamesJoined = "\""+String.join("\",\"", metricNames.toArray(new String[0]))+"\"";
+	
+	// value names consist of type + "_" + metric, e.g. ok_min, ok_mean, ok_max ... ko_min, ko_mean, ko_max ...
+	public static final  ArrayList<String> valueNames = RecordMetric.getValueNames();
+	public static final String valueNamesJoined = "\""+String.join("\",\"", valueNames.toArray(new String[0]))+"\"";
+	
+	
+	private static String sqlTableColumnDefinitions;
+	private static String sqlTableColumnNames;
+	static {
+		
+		sqlTableColumnDefinitions = "(";
+		sqlTableColumnNames = "(";
+		
+			//-----------------------------------------
+			// SQL Create Table Template
+			for(RecordField field : RecordField.values()) {
+				sqlTableColumnDefinitions += field.name()+" "+field.getDBColumnType() +",\r\n";
+				sqlTableColumnNames += field.name()+",\r\n";
+			}
+			
+			//-----------------------------------------
+			// SQL Create Table Template
+			for(String name : valueNames) {
+				sqlTableColumnDefinitions += name+" DECIMAL(32,3),\r\n";
+				sqlTableColumnNames += name+",\r\n";
+			}
+			
+			// remove last comma and newline
+			sqlTableColumnDefinitions = sqlTableColumnDefinitions.substring(0, sqlTableColumnDefinitions.length()-3);
+			sqlTableColumnNames = sqlTableColumnNames.substring(0, sqlTableColumnNames.length()-3);
+		
+		sqlTableColumnDefinitions += ")";
+		sqlTableColumnNames += ")";
+		
+	}
+	
+
+	
+	private static String csvHeaderTemplate = fieldNamesJoined+","+valueNamesJoined;
+	private static String sqlCreateTableTemplate = "CREATE TABLE IF NOT EXISTS {tablename} "+sqlTableColumnDefinitions;
 			;
 	
-	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} (time,type,simulation,scenario,groups,metric,code";
+	private static String sqlInsertIntoTemplate = "INSERT INTO {tablename} "+sqlTableColumnNames
+													  + " VALUES (?"+ 
+													  			", ?".repeat( fieldNames.size() + valueNames.size() - 1 ) 
+													  +")";
 
 	static {
 		
@@ -98,20 +204,21 @@ public class GatlytronRecordStats {
 		
 		//-----------------------------------------
 		// SQL Create Table Template
-		for(String name : valueNames) {
-			sqlCreateTableTemplate += ",\r\n		  "+name+" DECIMAL(32,3)";
-		}
-		sqlCreateTableTemplate += ");";
+//		for(String name : valueNames) {
+//			sqlCreateTableTemplate += ", "+name+" DECIMAL(32,3)";
+//		}
+//		sqlCreateTableTemplate += ");";
 
 		//-----------------------------------------
 		// SQL Insert Into Template
-		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?, ?, ?";
-		for(String name : valueNames) {
-			sqlInsertIntoTemplate += ","+name;
-			sqlInsertValues += ", ?";
-		}
-		sqlInsertValues += ")";
-		sqlInsertIntoTemplate += ") " + sqlInsertValues;
+
+//		String sqlInsertValues = "VALUES (?, ?, ?, ?, ?, ?, ?";
+//		for(String name : valueNames) {
+//			//sqlInsertIntoTemplate += ","+name;
+//			sqlInsertValues += ", ?";
+//		}
+//		sqlInsertValues += ")";
+//		sqlInsertIntoTemplate += ") " + sqlInsertValues;
 		
 		
 	}
@@ -150,6 +257,7 @@ public class GatlytronRecordStats {
 		this.metricPath = record.getMetricPath();
 		this.metricPathFull = record.getMetricPathFull();
 		this.code = record.getResponseCode();
+		this.granularity = Gatlytron.getReportInterval();
 		this.statsIdentifier = record.getStatsIdentifier();
 
 		//-----------------------------------
@@ -165,16 +273,16 @@ public class GatlytronRecordStats {
 		// Add Values
 		String statusLower = record.getStatus().toLowerCase();  
 		
-		targetForData.addValue(statusLower, "count", count.toPlainString());
-		targetForData.addValue(statusLower, "min", min.toPlainString());
-		targetForData.addValue(statusLower, "max", max.toPlainString());
-		targetForData.addValue(statusLower, "mean", mean.toPlainString());
-		targetForData.addValue(statusLower, "stdev", stdev.toPlainString());
-		targetForData.addValue(statusLower, "p25", p25.toPlainString());
-		targetForData.addValue(statusLower, "p50", p50.toPlainString());
-		targetForData.addValue(statusLower, "p75", p75.toPlainString());
-		targetForData.addValue(statusLower, "p95", p95.toPlainString());
-		targetForData.addValue(statusLower, "p99", p99.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.count, count.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.min, min.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.max, max.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.mean, mean.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.stdev, stdev.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.p25, p25.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.p50, p50.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.p75, p75.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.p95, p95.toPlainString());
+		targetForData.addValue(statusLower, RecordMetric.p99, p99.toPlainString());
 		
 	}	
 	
@@ -182,10 +290,10 @@ public class GatlytronRecordStats {
 	 * 
 	 * @param type either ok | ko | all | users
 	 ***********************************************************************/
-	private void addValue(String type, String metric, String value) {
+	private void addValue(String type, RecordMetric metric, String value) {
 		
 		BigDecimal parsedInt = new BigDecimal(value);
-		String finalMetric = metric
+		String finalMetric = metric.toString()
 //								.replace("percentiles", "p")
 //								.replace("stdDev", "stdev")
 								;  // make it shorter to reduce footprint
@@ -216,6 +324,7 @@ public class GatlytronRecordStats {
 					+ separator + groupsPath.replace(separator, "_")  
 					+ separator + metricName.replace(separator, "_")  
 					+ separator + code.replace(separator, "_")  
+					+ separator + granularity
 					;
 				
 		for(String name : valueNames) {
@@ -243,13 +352,14 @@ public class GatlytronRecordStats {
 		
 		JsonObject object = new JsonObject();
 		
-		object.addProperty("time", time);
-		object.addProperty("type", type.threeLetters());
-		object.addProperty("simulation", simulation);
-		object.addProperty("scenario", scenario);
-		object.addProperty("groups", groupsPath);
-		object.addProperty("metric", metricName);
-		object.addProperty("code", code);
+		object.addProperty(RecordField.time.toString(), 		time);
+		object.addProperty(RecordField.type.toString(), 		type.threeLetters());
+		object.addProperty(RecordField.simulation.toString(), 	simulation);
+		object.addProperty(RecordField.scenario.toString(), 	scenario);
+		object.addProperty(RecordField.groups.toString(), 		groupsPath);
+		object.addProperty(RecordField.metric.toString(), 		metricName);
+		object.addProperty(RecordField.code.toString(), 		code);
+		object.addProperty(RecordField.granularity.toString(), 	granularity);
 		
 		for(String name : valueNames) {
 			object.addProperty(name, this.getValue(name));
@@ -260,10 +370,19 @@ public class GatlytronRecordStats {
 	}
 	
 	/***********************************************************************
-	 * Returns a CSV header
+	 * Returns a SQL Create Table statement for the statistics table
+	 * with the provided table name inserted.
 	 ***********************************************************************/
 	public static String getSQLCreateTableTemplate(String tableName) {
 		return sqlCreateTableTemplate.replace("{tablename}", tableName);
+	}
+	
+	/***********************************************************************
+	 * Returns a string like "(ColumnName, ColumnName, ...)" containing
+	 * the column names of the stats table.
+	 ***********************************************************************/
+	public static String getSQLTableColumnNames() {
+		return sqlTableColumnNames;
 	}
 	
 	/***********************************************************************
@@ -284,6 +403,7 @@ public class GatlytronRecordStats {
 		valueList.add(groupsPath);
 		valueList.add(metricName);
 		valueList.add(code);
+		valueList.add(granularity);
 		
 		for(String name : valueNames) {
 			valueList.add(this.getValue(name));

@@ -133,6 +133,13 @@
 		    <version>1.5.12</version>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.2.0-jre</version>
+		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 >
 		<dependency>
 		    <groupId>org.slf4j</groupId>
@@ -144,6 +151,30 @@
 
 	<!-- ================= BUILD ================== -->
 	<build>
+		
+		<!-- ================= RESOURCES ================== -->
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		
+		<!-- ================= TEST RESOURCES ================== -->
+		<testResources>
+			<testResource>
+				<directory>src/test/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+		
 		<plugins>
 			
 			<!-- ================= ASSEMBLY ================== -->

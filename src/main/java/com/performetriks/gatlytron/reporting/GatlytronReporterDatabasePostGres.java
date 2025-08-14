@@ -42,7 +42,7 @@ public class GatlytronReporterDatabasePostGres extends GatlytronReporterDatabase
 		db = DBInterface.createDBInterfacePostgres(uniqueName, servername, port, dbName, username, password);
 		
 		gtronDB = new GatlytronDBInterface(db, tableNamePrefix);
-		gtronDB.createTables();
+		gtronDB.initializeDB();
 		
 	}			
 
