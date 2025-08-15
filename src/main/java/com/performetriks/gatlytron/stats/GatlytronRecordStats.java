@@ -25,7 +25,6 @@ public class GatlytronRecordStats {
 	
 	//private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
 	
-	public static final String TEMP_TABLE_AGGREGATION = "TEMP_STATS_AGGREGATION";
 	
 	private long time;
 	private GatlytronRecordType type;
@@ -449,25 +448,23 @@ WHERE
 	"time" >= ? 
 AND "time" < ? 
 AND "granularity" < ?
-GROUP BY "time","type","simulation","scenario","groups","metric","code","granularity"
+GROUP BY "type","simulation","scenario","groups","metric","code","granularity"
 	 * </code></pre>
 	 ***********************************************************************/
-	public static String createAggregationSQL(String tablenameStats) {
+	public static String createAggregationSQL(String tablenameStats, String tablenameTempAggregation) {
 
 		String sqlAggregateTempStats =  GatlytronFiles.readPackageResource(GatlytronDBInterface.PACKAGE_RESOURCES, "sql_createTempAggregatedStatistics.sql");
 		
+		String fieldsNoTimeGranularity = fieldNamesJoined
+			.replaceAll("\"time\",", "")
+			.replaceAll(",\"granularity\"", "");
 		// it's ridiculously complicated, but well... 
 		// at least the next guy adjusting anything will be able to backtrack the problem
 		sqlAggregateTempStats = sqlAggregateTempStats
-							.replaceAll("\\{tempTableName\\}", TEMP_TABLE_AGGREGATION)
+							.replaceAll("\\{tempTableName\\}", tablenameTempAggregation)
 							.replaceAll("\\{tableColumnNames\\}", sqlTableColumnNames)
 							.replaceAll("\\{originalTableName\\}", tablenameStats)
-							.replaceAll("\\{namesWithoutTimeOrGranularity\\}"
-									   , fieldNamesJoined
-									   			.replaceAll("\"time\",", "")
-									   			.replaceAll(",\"granularity\"", "")
-									   )
-							.replaceAll("\\{groupByNames\\}", fieldNamesJoined)
+							.replaceAll("\\{namesWithoutTimeOrGranularity\\}", fieldsNoTimeGranularity)
 							.replaceAll("\\{valuesAggregation\\}", RecordMetric.getSQLAggregationPart())
 							;
 		

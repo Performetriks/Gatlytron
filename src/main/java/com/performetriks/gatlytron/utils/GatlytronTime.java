@@ -52,7 +52,7 @@ public class GatlytronTime {
 	/********************************************************************************************
 	 * The mother of all time enumerations! :-P
 	 ********************************************************************************************/
-	public enum CFWTimeUnit {
+	public enum GatlytronTimeUnit {
 		//  ns("nanosecond", 	TimeUnit.NANOSECONDS, 	ChronoUnit.NANOS, 	null)
 		//, us("microsecond", TimeUnit.MICROSECONDS, 	ChronoUnit.MICROS, 	null)
 		 ms("milliseconds", TimeUnit.MILLISECONDS, 	ChronoUnit.MILLIS, 	Calendar.MILLISECOND)
@@ -77,7 +77,7 @@ public class GatlytronTime {
 		private ChronoUnit chronoUnit;
 		private Integer calendarUnit;
 		
-		private CFWTimeUnit(String longName, TimeUnit timeUnit, ChronoUnit chronoUnit,  Integer calendarUnit) {
+		private GatlytronTimeUnit(String longName, TimeUnit timeUnit, ChronoUnit chronoUnit,  Integer calendarUnit) {
 			this.longName = longName;
 			this.timeUnit = timeUnit;
 			this.chronoUnit = chronoUnit;
@@ -99,16 +99,16 @@ public class GatlytronTime {
 		 * @param calendar which time should be truncated
 		 * @return nothing
 		 ********************************************************************************************/
-		public CFWTimeUnit calendarUnitLower() { 
+		public GatlytronTimeUnit calendarUnitLower() { 
 			switch(this) {
-				case y:	 return CFWTimeUnit.M;
-				case M:	 return CFWTimeUnit.d;
-				case d:	 return CFWTimeUnit.h;
-				case h:	 return CFWTimeUnit.m;
-				case m:	 return CFWTimeUnit.s;
-				case s:	 return CFWTimeUnit.ms;
-				case ms: return CFWTimeUnit.ms;
-				default: return CFWTimeUnit.ms;
+				case y:	 return GatlytronTimeUnit.M;
+				case M:	 return GatlytronTimeUnit.d;
+				case d:	 return GatlytronTimeUnit.h;
+				case h:	 return GatlytronTimeUnit.m;
+				case m:	 return GatlytronTimeUnit.s;
+				case s:	 return GatlytronTimeUnit.ms;
+				case ms: return GatlytronTimeUnit.ms;
+				default: return GatlytronTimeUnit.ms;
 						
 			}
 		}
@@ -119,7 +119,7 @@ public class GatlytronTime {
 			if(enumNames == null) {
 				enumNames = new TreeSet<>();
 				
-				for(CFWTimeUnit unit : CFWTimeUnit.values()) {
+				for(GatlytronTimeUnit unit : GatlytronTimeUnit.values()) {
 					enumNames.add(unit.name());
 				}
 			}
@@ -142,7 +142,7 @@ public class GatlytronTime {
 		public static String getOptionsHTMLList() {
 			if(optionsHTMLList == null) {
 				optionsHTMLList = "<ul>";
-				for(CFWTimeUnit unit : CFWTimeUnit.values()) {
+				for(GatlytronTimeUnit unit : GatlytronTimeUnit.values()) {
 					optionsHTMLList += "<li><b>"+unit.name()+":&nbsp</b>"+unit.longName()+"</li>";
 				}
 				optionsHTMLList += "</ul>";
@@ -518,7 +518,7 @@ public class GatlytronTime {
 	public static int getMachineTimeZoneOffSetMinutes(){
 		int offsetMillis = GatlytronTime.getMachineTimeZone().getOffset(System.currentTimeMillis());
 
-		return (int) ( -1 * CFWTimeUnit.m.convert(offsetMillis) );
+		return (int) ( -1 * GatlytronTimeUnit.m.convert(offsetMillis) );
 		
 	}
 	

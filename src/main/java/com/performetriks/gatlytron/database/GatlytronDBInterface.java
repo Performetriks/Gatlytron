@@ -16,7 +16,7 @@ import com.performetriks.gatlytron.stats.GatlytronRecordStats;
 import com.performetriks.gatlytron.stats.GatlytronRecordStats.RecordMetric;
 import com.performetriks.gatlytron.utils.GatlytronFiles;
 import com.performetriks.gatlytron.utils.GatlytronTime;
-import com.performetriks.gatlytron.utils.GatlytronTime.CFWTimeUnit;
+import com.performetriks.gatlytron.utils.GatlytronTime.GatlytronTimeUnit;
 
 public class GatlytronDBInterface {
 	
@@ -27,6 +27,7 @@ public class GatlytronDBInterface {
 	public final String tablenamePrefix;
 	public final String tablenameStats;
 	public final String tablenameTestsettings;
+	public final String tablenameTempAggregation;
 	
 	private String sqlCreateTableStats;
 	private String sqlCreateTableTestSettings;
@@ -49,10 +50,11 @@ public class GatlytronDBInterface {
 		this.tablenamePrefix = tablenamePrefix;
 		this.tablenameStats = tablenamePrefix+"_stats";
 		this.tablenameTestsettings = tablenamePrefix+"_testsettings";
+		this.tablenameTempAggregation = tablenamePrefix+"_temp_aggregation";
 
 		this.setCreateTableSQLStats( GatlytronRecordStats.getSQLCreateTableTemplate(tablenameStats) );
 		this.setCreateTableSQLTestSettings( GatlytronScenario.getSQLCreateTableTemplate(tablenameTestsettings) );
-		this.setAggregateSQL( GatlytronRecordStats.createAggregationSQL(tablenameStats) );
+		this.setAggregateSQL( GatlytronRecordStats.createAggregationSQL(tablenameStats, tablenameTempAggregation) );
 	}
 	
 	/****************************************************************************
@@ -100,7 +102,7 @@ public class GatlytronDBInterface {
 		
 		//----------------------------
 		// Add granularity Column
-		String addGranularityColumn = "ALTER TABLE "+tablenameStats+" ADD IF NOT EXISTS granularity INTEGER;";
+		String addGranularityColumn = "ALTER TABLE "+tablenameStats+" ADD IF NOT EXISTS granularity INTEGER DEFAULT 0;";
 		db.preparedExecute(addGranularityColumn);
 		
 		//----------------------------
@@ -201,7 +203,6 @@ public class GatlytronDBInterface {
 		boolean success = true;
 		int cacheCounter = 0;
 		
-
 		//--------------------------------------------
 		// Check if there is anything to aggregate
 		
@@ -224,9 +225,7 @@ public class GatlytronDBInterface {
 		//--------------------------------------------
 		// Create Temp Table
 		String createTempTable = 
-				GatlytronRecordStats.getSQLCreateTableTemplate(
-						GatlytronRecordStats.TEMP_TABLE_AGGREGATION
-					);
+				GatlytronRecordStats.getSQLCreateTableTemplate(tablenameTempAggregation);
 
 		db.preparedExecute(createTempTable);
 		
@@ -241,6 +240,7 @@ public class GatlytronDBInterface {
 						, newGranularity
 					);
 		
+
 		//--------------------------------------------
 		// Delete Old Stats in stats table
 		String sqlDeleteOldStats = 
@@ -257,11 +257,12 @@ public class GatlytronDBInterface {
 						, newGranularity
 					);
 
+
 		//--------------------------------------------
 		// Move Temp Stats to EAVTable
 		String sqlMoveStats = 
 				"INSERT INTO " + tablenameStats + " " + GatlytronRecordStats.getSQLTableColumnNames()
-				+" SELECT * FROM "+GatlytronRecordStats.TEMP_TABLE_AGGREGATION+";"
+				+" SELECT * FROM "+tablenameTempAggregation+";"
 				;
 
 		success &= db.preparedExecute(
@@ -270,15 +271,16 @@ public class GatlytronDBInterface {
 
 		//--------------------------------------------
 		// Drop Temp Table
-//		String sqlDropTempTable = 
-//				"DROP TABLE " +GatlytronRecordStats.TEMP_TABLE_AGGREGATION+";"
-//				;
-//
-//		success &= db.preparedExecute(sqlDropTempTable );
-		
+		String sqlDropTempTable = 
+				"DROP TABLE " +tablenameTempAggregation+";"
+				;
 
-		System.out.println(">>> SUCCESS Z: "+success);
+		// success &= db.preparedExecute(sqlDropTempTable); // results in count 0
+		db.preparedExecute(sqlDropTempTable);
+
 		db.transactionEnd(success);
+		
+		logger.debug(">>> AgeOut Success: "+success+" for "+GatlytronTime.formatMillisAsTimestamp(startTime) + " to "+ GatlytronTime.formatMillisAsTimestamp(endTime));
 		
 		
 		return success;
@@ -292,40 +294,45 @@ public class GatlytronDBInterface {
 		
 		//----------------------------
 		// Iterate all granularities
-		for(int granularity : GatlytronTime.AGE_OUT_GRANULARITIES) {
+		for(int granularitySec : GatlytronTime.AGE_OUT_GRANULARITIES) {
 			//--------------------------
 			// Get Age Out Time
-			long ageOutTime = this.getAgeOutTime(granularity);
+			long ageOutTime = this.getAgeOutTime(granularitySec);
 			
 			//--------------------------
 			// Get timespan 
-			Long oldest = getOldestAgedRecord(granularity, ageOutTime);
-			Long youngest = getYoungestAgedRecord(granularity, ageOutTime);
+			Long oldest = getOldestAgedRecord(granularitySec, ageOutTime);
+			Long youngest = getYoungestAgedRecord(granularitySec, ageOutTime);
 			if(oldest == null || youngest == null ) {
 				//nothing to aggregate for this granularity
 				continue;
 			}
 			
-			logger.info("DB: Age Out statistics with granularity smaller than: "+granularity+" seconds");
+			logger.info("DB: Age Out statistics with granularity smaller than: "+granularitySec+" seconds");
+			logger.info(">>> Age Out earliest time: "+GatlytronTime.formatMillisAsTimestamp(oldest));
+			logger.info(">>> Age Out latest time: "+GatlytronTime.formatMillisAsTimestamp(youngest));
+
+
 			//--------------------------
 			// Get Start Time
 			// Cannot take oldest as start time, as it might offset deep into 
 			// the timerange that still should be kept
-			Long startTime = GatlytronTime.offsetTime(oldest, 0, 0, 0, 0, +1);
+			Long startTime = GatlytronTimeUnit.s.offset(oldest, +1);
 			
 			while(startTime > oldest) {
-				startTime = GatlytronTime.offsetTime(startTime, 0, 0, 0, 0, -granularity);
+				startTime = GatlytronTimeUnit.s.offset(startTime, -granularitySec);
 			}
 			
 			//--------------------------
 			// Iterate with offsets
-			Long endTime = GatlytronTime.offsetTime(startTime, 0, 0, 0, 0, granularity);
+			Long endTime =  GatlytronTimeUnit.s.offset(startTime, granularitySec);
 			
 			// do-while to execute at least once, else would not work if (endTime - startTime) < granularity
 			do {
-				aggregateStatistics(startTime, endTime, granularity);
-				startTime =  GatlytronTime.offsetTime(startTime, 0, 0, 0, 0, granularity);
-				endTime = GatlytronTime.offsetTime(endTime, 0, 0, 0, 0, granularity);
+
+				aggregateStatistics(startTime, endTime, granularitySec);
+				startTime =  GatlytronTimeUnit.s.offset(startTime, granularitySec);
+				endTime = GatlytronTimeUnit.s.offset(endTime, granularitySec);
 
 			} while(endTime < youngest);
 
@@ -345,14 +352,13 @@ public class GatlytronDBInterface {
 		
 		long ageOutOffset;
 		
-		if		(granularitySeconds <= GatlytronTime.SECONDS_OF_1MIN) 	{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep1MinFor().get(ChronoUnit.SECONDS) ); }
-		else if	(granularitySeconds <= GatlytronTime.SECONDS_OF_5MIN) 	{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep5MinFor().get(ChronoUnit.SECONDS)); }
-		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_10MIN) 	{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep10MinFor().get(ChronoUnit.SECONDS)); }
-		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_15MIN) 	{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep15MinFor().get(ChronoUnit.SECONDS)); }
-		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_60MIN) 	{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep60MinFor().get(ChronoUnit.SECONDS)); }
-		else  															{ ageOutOffset = CFWTimeUnit.s.offset(null, -1 * (int)config.keep60MinFor().get(ChronoUnit.SECONDS)); }
+		if		(granularitySeconds <= GatlytronTime.SECONDS_OF_1MIN) 	{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep1MinFor().get(ChronoUnit.SECONDS) ); }
+		else if	(granularitySeconds <= GatlytronTime.SECONDS_OF_5MIN) 	{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep5MinFor().get(ChronoUnit.SECONDS)); }
+		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_10MIN) 	{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep10MinFor().get(ChronoUnit.SECONDS)); }
+		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_15MIN) 	{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep15MinFor().get(ChronoUnit.SECONDS)); }
+		else if (granularitySeconds <= GatlytronTime.SECONDS_OF_60MIN) 	{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep60MinFor().get(ChronoUnit.SECONDS)); }
+		else  															{ ageOutOffset = GatlytronTimeUnit.s.offset(null, -1 * (int)config.keep60MinFor().get(ChronoUnit.SECONDS)); }
 
-		System.out.println(">>> Granularity: "+granularitySeconds+", AgeOutTime: "+GatlytronTime.formatMillisAsTimestamp(ageOutOffset));
 		return ageOutOffset;
 	}
 	

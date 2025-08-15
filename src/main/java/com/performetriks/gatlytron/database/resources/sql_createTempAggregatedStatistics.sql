@@ -9,5 +9,5 @@ WHERE
 	"time" >= ? 
 AND "time" < ? 
 AND "granularity" < ?
-GROUP BY {groupByNames}
+GROUP BY {namesWithoutTimeOrGranularity}
 ;
