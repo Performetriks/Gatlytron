@@ -216,6 +216,9 @@ public class Gatlytron {
 	/******************************************************************
 	 * Enable age out of data that was reported to Databases.
 	 * Default is false.
+	 * This must be called before constructors of DB Reporters are called
+	 * to have an effect, as the age out will be triggered in the
+	 * constructor.
 	 * 
 	 * @param doAgeOut 
 	 ******************************************************************/

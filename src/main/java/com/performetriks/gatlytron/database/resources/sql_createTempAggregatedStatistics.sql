@@ -1,13 +1,13 @@
 INSERT INTO {tempTableName} {tableColumnNames}
 SELECT 
-      MIN("TIME") + ((MAX("TIME") - MIN("TIME"))/2) AS "CENTER_TIME"
+      MIN("time") + ((MAX("time") - MIN("time"))/2) AS "time"
     , {namesWithoutTimeOrGranularity}
-    , ? AS "GRANULARITY"
+    , ? AS "granularity"
     {valuesAggregation}
 FROM {originalTableName}
 WHERE 
-	"TIME" >= ? 
-AND "TIME" < ? 
-AND "GRANULARITY" < ?
+	"time" >= ? 
+AND "time" < ? 
+AND "granularity" < ?
 GROUP BY {groupByNames}
 ;

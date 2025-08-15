@@ -302,6 +302,7 @@ public class DBInterface {
 	 ********************************************************************************************/
 	public boolean preparedExecute(String sql, Object... values){	
         
+		//System.out.println("SQL: "+sql);
 		Connection conn = null;
 		PreparedStatement prepared = null;
 

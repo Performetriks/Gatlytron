@@ -2,6 +2,7 @@ package com.performetriks.gatlytron.reporting;
 
 import java.util.ArrayList;
 
+import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.database.DBInterface;
 import com.performetriks.gatlytron.database.GatlytronDBInterface;
 import com.performetriks.gatlytron.stats.GatlytronRecordStats;
@@ -43,6 +44,10 @@ public class GatlytronReporterDatabasePostGres extends GatlytronReporterDatabase
 		
 		gtronDB = new GatlytronDBInterface(db, tableNamePrefix);
 		gtronDB.initializeDB();
+		
+		if(Gatlytron.isAgeOut()) {
+			gtronDB.ageOutStatistics();
+		}
 		
 	}			
 

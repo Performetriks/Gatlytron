@@ -3,13 +3,14 @@ package com.performetriks.gatlytron.stats;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import com.google.gson.JsonObject;
 import com.performetriks.gatlytron.base.Gatlytron;
 import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.database.GatlytronDBInterface;
 import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
+import com.performetriks.gatlytron.utils.GatlytronFiles;
 
 /***************************************************************************
  * This record holds one record of statistical data.
@@ -23,6 +24,8 @@ import com.performetriks.gatlytron.stats.GatlytronRecordRaw.GatlytronRecordType;
 public class GatlytronRecordStats {
 	
 	//private static final Logger logger = LoggerFactory.getLogger(GatlytronRecordStats.class);
+	
+	public static final String TEMP_TABLE_AGGREGATION = "TEMP_STATS_AGGREGATION";
 	
 	private long time;
 	private GatlytronRecordType type;
@@ -88,16 +91,16 @@ public class GatlytronRecordStats {
 	// !#!#!#!#!# END OF IMPORTANCE !#!#!#!#!#
 
 	public enum RecordMetric {
-		  count("SUM(\"count\")")
-		, min("MIN(\"min\")")
-		, max(" MAX(\"max\")")
-		, mean("AVG(\"mean\")")
-		, stdev("STDDEV(\"stdev\")")
-		, p25("PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value_column)") // (CALL AGGREGATE_PERC('p50', 0.50, ?, ?, ?, ?))
-		, p50("PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY value_column)")
-		, p75("PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value_column)")
-		, p95("PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY value_column)") 
-		, p99("PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY value_column)")
+		  count("SUM(\"{type}_count\")")
+		, min("MIN(\"{type}_min\")")
+		, max("MAX(\"{type}_max\")")
+		, mean("AVG(\"{type}_mean\")")
+		, stdev("STDDEV(\"{type}_stdev\")")
+		, p25("PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY \"{type}_p25\")") // (CALL AGGREGATE_PERC('p50', 0.50, ?, ?, ?, ?))
+		, p50("PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY \"{type}_p50\")")
+		, p75("PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY \"{type}_p75\")")
+		, p95("PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY \"{type}_p95\")") 
+		, p99("PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY \"{type}_p99\")")
 		;
 		
 		private String sqlAggregation = "";
@@ -110,8 +113,15 @@ public class GatlytronRecordStats {
 		static {
 			for(RecordMetric type : RecordMetric.values()) { 
 				names.add(type.name()); 
-				sqlAggregationPart += ", "+type.sqlAggregation+" AS \""+type.name()+"\"";
-				
+				sqlAggregationPart += "\r\n, "
+						+ type.sqlAggregation.replace("{type}", "ok")
+						+ " AS \"ok_"+type.name()+"\""
+						;
+			}
+			for(RecordMetric type : RecordMetric.values()) { 
+				sqlAggregationPart += "\r\n, "
+								+ type.sqlAggregation.replace("{type}", "ko")
+								+ " AS \"ko_"+type.name()+"\"";
 			}
 		}
 
@@ -375,6 +385,93 @@ public class GatlytronRecordStats {
 	 ***********************************************************************/
 	public static String getSQLCreateTableTemplate(String tableName) {
 		return sqlCreateTableTemplate.replace("{tablename}", tableName);
+	}
+	
+	/***********************************************************************
+	 * Returns a humongous SQL for aggregating SQL.
+	 * Here is an example:
+	 * <pre><code>
+INSERT INTO TEMP_STATS_AGGREGATION (time,
+type,
+simulation,
+scenario,
+groups,
+metric,
+code,
+granularity,
+ok_count,
+ok_min,
+ok_max,
+ok_mean,
+ok_stdev,
+ok_p25,
+ok_p50,
+ok_p75,
+ok_p95,
+ok_p99,
+ko_count,
+ko_min,
+ko_max,
+ko_mean,
+ko_stdev,
+ko_p25,
+ko_p50,
+ko_p75,
+ko_p95,
+ko_p99)
+SELECT 
+      MIN("time") + ((MAX("time") - MIN("time"))/2) AS "time"
+    , "type","simulation","scenario","groups","metric","code"
+    , ? AS "granularity"
+    
+, SUM("ok_count") AS "ok_count"
+, MIN("ok_min") AS "ok_min"
+, MAX("ok_max") AS "ok_max"
+, AVG("ok_mean") AS "ok_mean"
+, STDDEV("ok_stdev") AS "ok_stdev"
+, PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY "ok_p25") AS "ok_p25"
+, PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY "ok_p50") AS "ok_p50"
+, PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY "ok_p75") AS "ok_p75"
+, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY "ok_p95") AS "ok_p95"
+, PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY "ok_p99") AS "ok_p99"
+, SUM("ko_count") AS "ko_count"
+, MIN("ko_min") AS "ko_min"
+, MAX("ko_max") AS "ko_max"
+, AVG("ko_mean") AS "ko_mean"
+, STDDEV("ko_stdev") AS "ko_stdev"
+, PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY "ko_p25") AS "ko_p25"
+, PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY "ko_p50") AS "ko_p50"
+, PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY "ko_p75") AS "ko_p75"
+, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY "ko_p95") AS "ko_p95"
+, PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY "ko_p99") AS "ko_p99"
+FROM gatlytronx_stats
+WHERE 
+	"time" >= ? 
+AND "time" < ? 
+AND "granularity" < ?
+GROUP BY "time","type","simulation","scenario","groups","metric","code","granularity"
+	 * </code></pre>
+	 ***********************************************************************/
+	public static String createAggregationSQL(String tablenameStats) {
+
+		String sqlAggregateTempStats =  GatlytronFiles.readPackageResource(GatlytronDBInterface.PACKAGE_RESOURCES, "sql_createTempAggregatedStatistics.sql");
+		
+		// it's ridiculously complicated, but well... 
+		// at least the next guy adjusting anything will be able to backtrack the problem
+		sqlAggregateTempStats = sqlAggregateTempStats
+							.replaceAll("\\{tempTableName\\}", TEMP_TABLE_AGGREGATION)
+							.replaceAll("\\{tableColumnNames\\}", sqlTableColumnNames)
+							.replaceAll("\\{originalTableName\\}", tablenameStats)
+							.replaceAll("\\{namesWithoutTimeOrGranularity\\}"
+									   , fieldNamesJoined
+									   			.replaceAll("\"time\",", "")
+									   			.replaceAll(",\"granularity\"", "")
+									   )
+							.replaceAll("\\{groupByNames\\}", fieldNamesJoined)
+							.replaceAll("\\{valuesAggregation\\}", RecordMetric.getSQLAggregationPart())
+							;
+		
+		return sqlAggregateTempStats;
 	}
 	
 	/***********************************************************************

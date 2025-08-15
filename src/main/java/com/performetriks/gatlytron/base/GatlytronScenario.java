@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.performetriks.gatlytron.database.DBInterface;
+import com.performetriks.gatlytron.stats.GatlytronRecordStats;
+import com.performetriks.gatlytron.stats.GatlytronRecordStats.RecordMetric;
+import com.performetriks.gatlytron.utils.GatlytronFiles;
 
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ClosedInjectionStep;
@@ -84,6 +87,7 @@ public class GatlytronScenario {
 	public static String getSQLCreateTableTemplate(String tableName) {
 		return sqlCreateTableTemplate.replace("{tablename}", tableName);
 	}
+	
 	
 	/***********************************************************************
 	 * Returns an insert statement 
